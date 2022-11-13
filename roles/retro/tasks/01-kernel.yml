@@ -1,0 +1,82 @@
+
+#Install kernel, disable speaker and configure grub
+---
+- name: Disable pcspeaker.
+  blockinfile:
+    create: yes
+    dest: "/etc/modprobe.d/nobeep"
+    block: |
+      blacklist pcspkr
+
+- name: Install xz-utils package.
+  apt:
+    name: xz-utils
+
+- name: Download kernel debs. Debian 64 bit.
+  get_url:
+    url: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+  with_items:
+     - { src: "https://www.dropbox.com/s/z0v47cvdbpmosiv/linux-image-6.0.3_6.0.3-1_amd64.deb?dl=1", dest: "/root/linux_image.deb" }
+     - { src: "https://www.dropbox.com/s/38zqj4xjw0nf4vd/linux-headers-6.0.3_6.0.3-1_amd64.deb?dl=1", dest: "/root/linux_headers.deb" }
+     - { src: "https://www.dropbox.com/s/k4fszrc9k36d07x/linux-libc-dev_6.0.3-1_amd64.deb?dl=1", dest: "/root/linux_libc.deb" }
+  when:
+    - ansible_architecture == 'x86_64'
+
+- name: Download kernel debs. Debian 32 bit.
+  get_url:
+    url: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+  with_items:
+     - { src: "https://www.dropbox.com/s/g8cfmz0v99hrqo0/linux-image-6.0.3_6.0.3-1_i386.deb?dl=1", dest: "/root/linux_image.deb" }
+     - { src: "https://www.dropbox.com/s/yfzso1fwbt7q7fm/linux-headers-6.0.3_6.0.3-1_i386.deb?dl=1", dest: "/root/linux_headers.deb" }
+     - { src: "https://www.dropbox.com/s/ljmygb7hx19y93m/linux-libc-dev_6.0.3-1_i386.deb?dl=1", dest: "/root/linux_libc.deb" }
+  when:
+    - ansible_architecture == 'i386'
+
+- name: Install 15khz kernel debs.
+  apt:
+    deb: "{{ item }}"
+  with_items:
+    - /root/linux_image.deb
+    - /root/linux_headers.deb
+    - /root/linux_libc.deb
+  ignore_errors: yes
+
+- name: Remove deb files.
+  file:
+    path: "/root/{{ item }}"
+    state: absent
+  with_items:
+    - /root/linux_image.deb
+    - /root/linux_headers.deb
+    - /root/linux_libc.deb
+
+- name: Check if there is grub configuration.
+  stat:
+    path: "/etc/default/grub"
+  register: grub
+
+- name: Change grub cmdline defaults for ATI
+  replace:
+    dest: "/etc/default/grub"
+    regexp: '^(.*)GRUB_CMDLINE_LINUX_DEFAULT=(.*)$'
+    replace: 'GRUB_CMDLINE_LINUX_DEFAULT="vga=0x311 video=VGA-1:640x480iec"'
+  register: grubati
+  when:
+    - grub.stat.exists == true
+    - card == "ati"
+
+- name: Change grub cmdline defaults for INTEL
+  replace:
+    dest: "/etc/default/grub"
+    regexp: '^(.*)GRUB_CMDLINE_LINUX_DEFAULT=(.*)$'
+    replace: 'GRUB_CMDLINE_LINUX_DEFAULT="vga=0x311 video=VGA-1:1280x480iec"'
+  register: grubintel
+  when:
+    - grub.stat.exists == true
+    - card == "intel"
+
+- name: Update grub config.
+  command: /usr/sbin/update-grub
+  when: (grubati.changed == true) or (grubintel.changed == true)
