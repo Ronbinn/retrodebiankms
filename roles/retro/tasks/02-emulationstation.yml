@@ -1,0 +1,59 @@
+#Install emulationstation
+---
+- name: Install EmulationStation dependencies.
+  apt:
+    name: "{{ packages }}"
+  vars:
+    packages:
+    - libfreeimage3
+    - libboost-locale1.74.0 
+    - libboost-filesystem1.74.0
+    - libsdl2-2.0-0
+    - libcurl4
+    - libvlc5
+
+- name: Download EmulationStation deb. 64 bit.
+  get_url:
+    url: "https://www.dropbox.com/s/r2e3p6ng09fuhbx/emulationstation_20221112-1_amd64.deb?dl=1"
+    dest: "/root/emulationstation.deb"
+  when: ansible_architecture == 'x86_64'
+
+- name: Download EmulationStation deb. 32 bit.
+  get_url:
+    url: "https://www.dropbox.com/s/sx2dkhv2bcr2l1n/emulationstation_20221112-1_i386.deb?dl=1"
+    dest: "/root/emulationstation.deb"
+  when: ansible_architecture == 'i386'
+
+- name: Install EmulationStation.
+  apt:
+    deb: "/root/emulationstation.deb"
+
+- name: Remove deb file.
+  file:
+    path: "/root/emulationstation.deb"
+    state: absent
+
+#- name: Create config dirs.
+#  file:
+#    path: "{{ item }}"
+#    state: directory
+#    mode: 0755
+#  with_items:
+#    - "/etc/skel/.emulationstation"
+#    - "/etc/emulationstation/themes"
+#    - "/usr/local/share/applications"
+
+#- name: Copy configurations and desktop file.
+#  copy:
+#    src: "{{ role_path }}/files/{{ item }}"
+#    dest: "/{{ item }}"
+#    mode: 0644
+#  with_items:
+#    - "etc/skel/.emulationstation/es_systems.cfg"
+#    - "usr/local/share/applications/emulationstation.desktop"
+
+#- name: Download and extract emulationstation simple theme
+#  unarchive:
+#    src: https://emulationstation.org/downloads/themes/simple_latest.zip
+#    dest: /etc/emulationstation/themes
+#    remote_src: yes
