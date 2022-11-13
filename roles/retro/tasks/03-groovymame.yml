@@ -1,0 +1,74 @@
+---
+- name: Install original MAME to get the dependencies.
+  apt:
+    name: mame
+
+- name: Install libdrm-dev.
+  apt:
+    name: libdrm-dev
+
+- name: Check if exists a groovymame installation.
+  stat:
+    path: "/usr/local/bin/groovymame"
+  register: groovy
+
+- name: Download and extract groovymame. 64 bit.
+  unarchive:
+    src: https://github.com/antonioginer/GroovyMAME/releases/download/gm0249sr002m/groovymame_0249.002m_linux.tar.bz2
+    dest: /usr/local/bin
+    remote_src: yes
+  when:
+    - groovy.stat.exists == false
+    - ansible_architecture == 'x86_64'
+
+- name: Download and extract groovymame. 32 bit.
+  unarchive:
+    src: "https://www.dropbox.com/s/9xcoljhfxl32fpi/groovymame32_0249_linux.tar.bz2?dl=1"
+    dest: /usr/local/bin
+    remote_src: yes
+  when:
+    - groovy.stat.exists == false
+    - ansible_architecture == 'i386'
+
+#- name: Create config dirs.
+#  file:
+#    path: "{{ item }}"
+#    state: directory
+#    mode: 0755
+#  with_items:
+#    - "/etc/skel/mame/roms"
+
+#- name: Copy configurations.
+#  copy:
+#    src: "{{ role_path }}/files/{{ item }}"
+#    dest: "/{{ item }}"
+#    mode: 0644
+#  with_items:
+#    - "etc/skel/mame/roms/wrally.zip"
+#    - "etc/skel/mame.ini"
+
+#- name: Change mame.ini defaults for INTEL
+#  replace:
+#    dest: "/etc/skel/mame.ini"
+#    regexp: 'dotclock_min              0'
+#    replace: 'dotclock_min              25.0'
+#  when: card == "intel"
+
+#- name: Change mame.ini defaults for INTEL
+#  replace:
+#    dest: "/etc/skel/mame.ini"
+#    regexp: 'aspect                    auto'
+#    replace: 'aspect                     1:1'
+#  when: card == "intel"
+
+#- name: Copy groovymame intel script.
+#  copy:
+#    src: "{{ role_path }}/files/usr/local/bin/groovymame_intel"
+#    dest: "/usr/local/bin/groovymame_intel"
+#    mode: 0755
+
+#- name: Copy groovymame ati script.
+#  copy:
+#    src: "{{ role_path }}/files/usr/local/bin/groovymame_ati"
+#    dest: "/usr/local/bin/groovymame_ati"
+#    mode: 0755
