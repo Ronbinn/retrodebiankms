@@ -14,13 +14,13 @@
 
 - name: Download EmulationStation deb. 64 bit.
   get_url:
-    url: "https://www.dropbox.com/s/r2e3p6ng09fuhbx/emulationstation_20221112-1_amd64.deb?dl=1"
+    url: "https://www.dropbox.com/s/503b4ldk9dulc56/emulationstation_20221112-1_amd64.deb?dl=1"
     dest: "/root/emulationstation.deb"
   when: ansible_architecture == 'x86_64'
 
 - name: Download EmulationStation deb. 32 bit.
   get_url:
-    url: "https://www.dropbox.com/s/sx2dkhv2bcr2l1n/emulationstation_20221112-1_i386.deb?dl=1"
+    url: "https://www.dropbox.com/s/57j1dn895niwgqu/emulationstation_20221112-1_i386.deb?dl=1"
     dest: "/root/emulationstation.deb"
   when: ansible_architecture == 'i386'
 
