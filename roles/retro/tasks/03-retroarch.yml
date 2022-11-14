@@ -26,6 +26,12 @@
   file:
     path: "/root/retroarch.deb"
     state: absent
+    
+- name: Copy switchres.ini file.
+  copy:
+    src: "{{ role_path }}/files/etc/switchres.ini"
+    dest: "/etc/switchres.ini"
+    mode: 0644
 
 #- name: Copy configurations.
 #  copy:
