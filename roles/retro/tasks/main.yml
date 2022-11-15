@@ -1,4 +1,5 @@
 ---
+  - include: 00-sdl.yml
   - include: 01-kernel.yml
   - include: 02-emulationstation.yml
   - include: 03-groovymame.yml
