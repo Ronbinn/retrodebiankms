@@ -9,13 +9,13 @@
 
 - name: Download sdl2 deb. 64 bit.
   get_url:
-    url: "https://www.dropbox.com/s/n64cb8qpe6yip22/sdl_2.25.0-1_amd64.deb?dl=1"
+    url: "https://www.dropbox.com/s/6p2jzw31nolr9hq/sdl-release_2.24-1_amd64.deb?dl=1"
     dest: "/root/sdl2.deb"
   when: ansible_architecture == 'x86_64'
 
 - name: Download sdl2 deb. 32 bit.
   get_url:
-    url: "https://www.dropbox.com/s/ge0x1na5o4oj4ab/sdl_2.25.0-1_i386.deb?dl=1"
+    url: "https://www.dropbox.com/s/03e0xzhtpaorjyc/sdl-release_2.24-1_i386.deb?dl=1"
     dest: "/root/sdl2.deb"
   when: ansible_architecture == 'i386'
 
