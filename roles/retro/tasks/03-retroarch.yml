@@ -8,13 +8,13 @@
 
 - name: Download retroarch deb. 64 bit.
   get_url:
-    url: "https://www.dropbox.com/s/z9zr511mun596kc/retroarch_1.12.0-1_amd64.deb?dl=1"
+    url: "https://www.dropbox.com/s/34a7orlxggvygqz/retroarch_1.12.0-1_amd64.deb?dl=1"
     dest: "/root/retroarch.deb"
   when: ansible_architecture == 'x86_64'
 
 - name: Download retroarch deb. 32 bit.
   get_url:
-    url: "https://www.dropbox.com/s/fspqnikvbmzwxsw/retroarch_1.12.0-1_i386.deb?dl=1"
+    url: "https://www.dropbox.com/s/3e385r11ds327gz/retroarch_1.12.0-1_i386.deb?dl=1"
     dest: "/root/retroarch.deb"
   when: ansible_architecture == 'i386'
 
