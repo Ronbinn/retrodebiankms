@@ -2,16 +2,26 @@
 #Install kernel, disable speaker and configure grub
 ---
 - name: Disable pcspeaker.
-  blockinfile:
+  lineinfile:
     create: yes
-    dest: "/etc/modprobe.d/nobeep"
-    block: |
-      blacklist pcspkr
+    path: "/etc/modprobe.d/nobeep.conf"
+    line: "blacklist pcspkr"
 
-- name: Install xz-utils package.
+- name: Disable pcspeaker
+  replace:
+    dest: "/etc/inputrc"
+    regexp: "# set bell-style none"
+    replace: "set bell-style none"
+
+- name: Instalatu programa extra batzuk.
   apt:
-    name: xz-utils
-
+    name: "{{ packages }}"
+  vars:
+    packages:
+    - firmware-linux-nonfree
+    - firmware-misc-nonfree
+    - xz-utils
+  
 - name: Download kernel debs. Debian 64 bit.
   get_url:
     url: "{{ item.src }}"
@@ -41,8 +51,7 @@
     - /root/linux_image.deb
     - /root/linux_headers.deb
     - /root/linux_libc.deb
-  ignore_errors: yes
-
+  
 - name: Remove deb files.
   file:
     path: "/root/{{ item }}"
