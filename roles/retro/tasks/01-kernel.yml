@@ -1,6 +1,12 @@
 
 #Install kernel, disable speaker and configure grub
 ---
+- name: Copy listconnectors script.
+  copy:
+    src: "{{ role_path }}/files/usr/local/bin/listconnectors"
+    dest: "/usr/local/bin/listconnectors"
+    mode: 0755
+    
 - name: Disable pcspeaker.
   lineinfile:
     create: yes
