@@ -24,6 +24,7 @@
     name: "{{ packages }}"
   vars:
     packages:
+    - sudo
     - firmware-linux-nonfree
     - firmware-misc-nonfree
     - xz-utils
@@ -86,7 +87,7 @@
   replace:
     dest: "/etc/default/grub"
     regexp: '^(.*)GRUB_CMDLINE_LINUX_DEFAULT=(.*)$'
-    replace: 'GRUB_CMDLINE_LINUX_DEFAULT="vga=0x311 video=VGA-1:1280x480iec"'
+    replace: 'GRUB_CMDLINE_LINUX_DEFAULT="video=VGA-1:1280x480iec"'
   register: grubintel
   when:
     - grub.stat.exists == true
