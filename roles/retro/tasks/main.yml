@@ -1,5 +1,6 @@
 ---
   - include: 00-sdl.yml
+  - include: 00-repositories.yml
   - include: 00-autologin.yml
   - include: 00-users.yml
   - include: 01-kernel.yml

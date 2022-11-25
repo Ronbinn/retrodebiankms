@@ -1,0 +1,42 @@
+#Configure repositories
+---
+- name: Updates repository.
+  apt_repository:
+    repo: "{{ item  }} http://deb.debian.org/debian/ {{ ansible_distribution_release }}-updates main contrib non-free"
+    state: present
+  with_items:
+    - "deb"
+    - "deb-src"
+
+- name: Backports repository.
+  apt_repository:
+    repo: "{{ item  }} http://deb.debian.org/debian/ {{ ansible_distribution_release }}-backports main contrib non-free"
+    state: present
+  with_items:
+    - "deb"
+    - "deb-src"
+
+- name: Debian security repository.
+  apt_repository:
+    repo: "{{ item }} http://security.debian.org/debian-security {{ ansible_distribution_release }}-security main contrib non-free"
+    state: present
+  with_items:
+    - "deb"
+    - "deb-src"
+
+- name: Remove original sources.list.
+  file: 
+    path="/etc/apt/sources.list"
+    state=absent
+
+- name: Regular repositories.
+  apt_repository:
+    repo: "{{ item  }} http://deb.debian.org/debian/ {{ ansible_distribution_release }} main contrib non-free"
+    state: present
+  with_items:
+    - "deb"
+    - "deb-src"
+
+- name: "apt-get update"
+  apt:
+    update_cache: yes
