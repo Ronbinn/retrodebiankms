@@ -60,7 +60,7 @@
   
 - name: Remove deb files.
   file:
-    path: "/root/{{ item }}"
+    path: "{{ item }}"
     state: absent
   with_items:
     - /root/linux_image.deb
