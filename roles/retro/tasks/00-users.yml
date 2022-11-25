@@ -1,0 +1,31 @@
+#creates new user. username and password are "arcade"
+#use 'mkpasswd --method=sha-512' to create password (whois program).
+---
+  - name: Create arcade user. Debian.
+    user:
+       name: arcade
+       password: $6$ndekHMDnVv4Fdr6B$CD1ZtFjKS7loAjnY/j7NYnw05Sdd3yNeKXwNMI4zRsQo1vRisinuHkMbKoy0T84G3/G.ky1kM9frooS.Argc81
+       shell: /bin/bash
+       createhome: no
+       groups: cdrom,floppy,audio,dip,video,plugdev,netdev,sudo,render,input,bluetooth
+    register: arcade
+
+  - name: Create home folder at first boot.
+    replace:
+      dest: /usr/share/pam-configs/mkhomedir
+      regexp: 'Default: no'
+      replace: 'Default: yes'
+    register: pam
+
+  - name: pam-auth-update
+    command: pam-auth-update --package --enable mkhomedir
+    args:
+      warn: no
+    when: (arcade.changed  == true) or (pam.changed  == true)
+
+  - name: Arcade user doesn't need password for sudo.
+    blockinfile:
+      dest: "/etc/sudoers.d/arcade"
+      create: yes
+      block: |
+        arcade ALL=(ALL) NOPASSWD: ALL
