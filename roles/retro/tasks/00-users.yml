@@ -7,7 +7,7 @@
        password: $6$ndekHMDnVv4Fdr6B$CD1ZtFjKS7loAjnY/j7NYnw05Sdd3yNeKXwNMI4zRsQo1vRisinuHkMbKoy0T84G3/G.ky1kM9frooS.Argc81
        shell: /bin/bash
        createhome: no
-       groups: cdrom,floppy,audio,dip,video,plugdev,netdev,sudo,render,input,bluetooth
+       groups: cdrom,floppy,audio,dip,video,plugdev,netdev,sudo,render,input
     register: arcade
 
   - name: Create home folder at first boot.
