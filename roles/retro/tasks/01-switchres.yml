@@ -1,4 +1,13 @@
 ---
+- name: Install the dependencies
+  apt:
+    name: "{{ packages }}"
+  vars:
+    packages:
+    - libxrandr-dev
+    - libdrm-dev
+    - pkg-config
+
 - name: Download switchreslib deb. 64 bit.
   get_url:
     url: "https://www.dropbox.com/s/b0m06w49us4buhw/switchres_20221124-1_amd64.deb?dl=1"

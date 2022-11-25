@@ -19,7 +19,7 @@
     regexp: "# set bell-style none"
     replace: "set bell-style none"
 
-- name: Instalatu programa extra batzuk.
+- name: Install extra firmwares.
   apt:
     name: "{{ packages }}"
   vars:
