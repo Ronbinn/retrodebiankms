@@ -1,32 +1,32 @@
 ---
-- name: Install retroarch to get all the dependencies
+- name: Install mednafen to get all the dependencies
   apt:
     name: "{{ packages }}"
   vars:
     packages:
-    - retroarch
+    - mednafen
 
-- name: Download retroarch deb. 64 bit.
+- name: Download mednafen deb. 64 bit.
   get_url:
-    url: "https://www.dropbox.com/s/34a7orlxggvygqz/retroarch_1.12.0-1_amd64.deb?dl=1"
-    dest: "/root/retroarch.deb"
+    url: "https://www.dropbox.com/s/z2i7ipjx5h6yxmt/mednafen_1.31.0-1_amd64.deb?dl=1"
+    dest: "/root/mednafen.deb"
   when: ansible_architecture == 'x86_64'
 
-- name: Download retroarch deb. 32 bit.
+- name: Download mednafen deb. 32 bit.
   get_url:
-    url: "https://www.dropbox.com/s/3e385r11ds327gz/retroarch_1.12.0-1_i386.deb?dl=1"
-    dest: "/root/retroarch.deb"
+    url: "https://www.dropbox.com/s/5dql91ftcc2w9ud/mednafen_1.31.0-1_i386.deb?dl=1"
+    dest: "/root/mednafen.deb"
   when: ansible_architecture == 'i386'
 
-- name: Install retroarch.
+- name: Install mednafen.
   apt:
-    deb: "/root/retroarch.deb"
+    deb: "/root/mednafen.deb"
 
-- name: Remove deb file.
+- name: Remove mednafen deb file.
   file:
-    path: "/root/retroarch.deb"
+    path: "/root/mednafen.deb"
     state: absent
-    
+
 #- name: Copy configurations.
 #  copy:
 #    src: "{{ role_path }}/files/etc/retroarch{{ card }}.cfg"

@@ -1,0 +1,27 @@
+---
+- name: Download switchreslib deb. 64 bit.
+  get_url:
+    url: "https://www.dropbox.com/s/b0m06w49us4buhw/switchres_20221124-1_amd64.deb?dl=1"
+    dest: "/root/switchres.deb"
+  when: ansible_architecture == 'x86_64'
+
+- name: Download switchreslib deb. 32 bit.
+  get_url:
+    url: "https://www.dropbox.com/s/fxh49kcl0kvim5w/switchres_20221124-1_i386.deb?dl=1"
+    dest: "/root/switchres.deb"
+  when: ansible_architecture == 'i386'
+
+- name: Install switchreslib.
+  apt:
+    deb: "/root/switchres.deb"
+
+- name: Remove switchres deb file.
+  file:
+    path: "/root/switchres.deb"
+    state: absent
+    
+- name: Copy switchres.ini file.
+  copy:
+    src: "{{ role_path }}/files/etc/switchres.ini"
+    dest: "/etc/switchres.ini"
+    mode: 0644
