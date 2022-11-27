@@ -23,7 +23,7 @@
 
 - name: Download and extract groovymame. 32 bit.
   unarchive:
-    src: "https://www.dropbox.com/s/cyua9dmeg1wto8f/GroovyMAME-gm0249sr002m.tar.gz?dl=1"
+    src: "https://www.dropbox.com/s/9ro7h4aw9lxw7v9/GroovyMAME-gm0249sr002m.tar.gz?dl=1"
     dest: /usr/local/bin
     remote_src: yes
   when:
