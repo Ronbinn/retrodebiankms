@@ -10,6 +10,11 @@
   vars:
     packages:
     - git
+    - build-essential
+    - pkg-config
+    - libxrandr-dev
+    - libdrm-dev
+    - libsdl2-dev
   when: not switchres_bin.stat.exists
 
 - name: Download switchres git
