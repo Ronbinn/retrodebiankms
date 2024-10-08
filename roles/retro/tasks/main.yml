@@ -2,5 +2,5 @@
 #  - include: 00-users.yml
 #  - include: 01-kernel.yml
 #  - include: 01-switchres.yml
-  - include: 02-retroarch.yml
-#  - include: 03-groovymame.yml
+#  - include: 02-retroarch.yml
+  - include: 03-groovymame.yml
