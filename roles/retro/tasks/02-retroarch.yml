@@ -65,6 +65,11 @@
     dest: /home/retroarch
   when: not retroarch_bin.stat.exists
 
+- name: configure retroarch
+  command: ./configure
+  args:
+    chdir: /home/retroarch
+
 - name: Build retroarch.
   make:
     chdir: /home/retroarch

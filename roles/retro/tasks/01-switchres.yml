@@ -33,3 +33,10 @@
     target: install
 #    params:
 #      NUM_THREADS: 4
+
+- name: copy switchres executable.
+  copy:
+    src: "/home/switchres/switchres"
+    dest: "/usr/local/bin/switchres"
+    remote_src: yes
+    mode: 0755

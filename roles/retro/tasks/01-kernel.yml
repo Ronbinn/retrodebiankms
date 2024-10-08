@@ -28,6 +28,14 @@
     - firmware-misc-nonfree
     - xz-utils
 
+- name: Check 15khz kernels.
+  find:
+    paths:
+      - "/boot"
+    patterns:
+      - "*15khz*"
+  register: result
+
 - name: Download kernel debs. Debian 64 bit.
   get_url:
     url: "{{ item.src }}"
@@ -36,6 +44,7 @@
      - { src: "https://www.dropbox.com/scl/fi/dtmiqyu4cs4j9qs30vqfz/linux-image-6.10.11-15khz_6.10.11-1_amd64.deb?rlkey=yf851fjdhfuas82i5dhit7hhq&st=lw503p6d&dl=1", dest: "/root/linux_image.deb" }
      - { src: "https://www.dropbox.com/scl/fi/tq4gtil06ths56tbcy9dc/linux-headers-6.10.11-15khz_6.10.11-1_amd64.deb?rlkey=y51nlrwswl8dubxon8jivm5ll&st=v7zm57yt&dl=1", dest: "/root/linux_headers.deb" }
      - { src: "https://www.dropbox.com/scl/fi/saenb4gsx5tndtd3x7yvb/linux-libc-dev_6.10.11-1_amd64.deb?rlkey=lt8q0erhzcbz4nz156onyo8wh&st=4inxuffa&dl=1", dest: "/root/linux_libc.deb" }
+  when: result.matched == 0
 
 - name: Install 15khz kernel debs.
   apt:
@@ -44,6 +53,7 @@
     - /root/linux_image.deb
     - /root/linux_headers.deb
     - /root/linux_libc.deb
+  when: result.matched == 0
 
 - name: Remove deb files.
   file:
@@ -53,6 +63,7 @@
     - /root/linux_image.deb
     - /root/linux_headers.deb
     - /root/linux_libc.deb
+  when: result.matched == 0
 
 #- name: Check if there is grub configuration.
 #  stat:
