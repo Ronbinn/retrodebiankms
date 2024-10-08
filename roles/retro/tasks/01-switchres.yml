@@ -26,6 +26,7 @@
 - name: Build switchres.
   make:
     chdir: /home/switchres
+  when: not switchres_bin.stat.exists
 
 - name: Install switchres.
   make:
@@ -33,6 +34,7 @@
     target: install
 #    params:
 #      NUM_THREADS: 4
+  when: not switchres_bin.stat.exists
 
 - name: copy switchres executable.
   copy:
@@ -40,3 +42,4 @@
     dest: "/usr/local/bin/switchres"
     remote_src: yes
     mode: 0755
+  when: not switchres_bin.stat.exists
