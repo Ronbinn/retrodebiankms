@@ -1,4 +1,3 @@
-
 #Install kernel, disable speaker and configure grub
 ---
 - name: Copy listconnectors script.
@@ -6,7 +5,7 @@
     src: "{{ role_path }}/files/usr/local/bin/listconnectors"
     dest: "/usr/local/bin/listconnectors"
     mode: 0755
-    
+
 - name: Disable pcspeaker.
   lineinfile:
     create: yes
@@ -28,28 +27,15 @@
     - firmware-linux-nonfree
     - firmware-misc-nonfree
     - xz-utils
-  
+
 - name: Download kernel debs. Debian 64 bit.
   get_url:
     url: "{{ item.src }}"
     dest: "{{ item.dest }}"
   with_items:
-     - { src: "https://www.dropbox.com/s/z0v47cvdbpmosiv/linux-image-6.0.3_6.0.3-1_amd64.deb?dl=1", dest: "/root/linux_image.deb" }
-     - { src: "https://www.dropbox.com/s/38zqj4xjw0nf4vd/linux-headers-6.0.3_6.0.3-1_amd64.deb?dl=1", dest: "/root/linux_headers.deb" }
-     - { src: "https://www.dropbox.com/s/k4fszrc9k36d07x/linux-libc-dev_6.0.3-1_amd64.deb?dl=1", dest: "/root/linux_libc.deb" }
-  when:
-    - ansible_architecture == 'x86_64'
-
-- name: Download kernel debs. Debian 32 bit.
-  get_url:
-    url: "{{ item.src }}"
-    dest: "{{ item.dest }}"
-  with_items:
-     - { src: "https://www.dropbox.com/s/g8cfmz0v99hrqo0/linux-image-6.0.3_6.0.3-1_i386.deb?dl=1", dest: "/root/linux_image.deb" }
-     - { src: "https://www.dropbox.com/s/yfzso1fwbt7q7fm/linux-headers-6.0.3_6.0.3-1_i386.deb?dl=1", dest: "/root/linux_headers.deb" }
-     - { src: "https://www.dropbox.com/s/ljmygb7hx19y93m/linux-libc-dev_6.0.3-1_i386.deb?dl=1", dest: "/root/linux_libc.deb" }
-  when:
-    - ansible_architecture == 'i386'
+     - { src: "https://www.dropbox.com/scl/fi/dtmiqyu4cs4j9qs30vqfz/linux-image-6.10.11-15khz_6.10.11-1_amd64.deb?rlkey=yf851fjdhfuas82i5dhit7hhq&st=lw503p6d&dl=1", dest: "/root/linux_image.deb" }
+     - { src: "https://www.dropbox.com/scl/fi/tq4gtil06ths56tbcy9dc/linux-headers-6.10.11-15khz_6.10.11-1_amd64.deb?rlkey=y51nlrwswl8dubxon8jivm5ll&st=v7zm57yt&dl=1", dest: "/root/linux_headers.deb" }
+     - { src: "https://www.dropbox.com/scl/fi/saenb4gsx5tndtd3x7yvb/linux-libc-dev_6.10.11-1_amd64.deb?rlkey=lt8q0erhzcbz4nz156onyo8wh&st=4inxuffa&dl=1", dest: "/root/linux_libc.deb" }
 
 - name: Install 15khz kernel debs.
   apt:
@@ -58,7 +44,7 @@
     - /root/linux_image.deb
     - /root/linux_headers.deb
     - /root/linux_libc.deb
-  
+
 - name: Remove deb files.
   file:
     path: "{{ item }}"
@@ -68,31 +54,31 @@
     - /root/linux_headers.deb
     - /root/linux_libc.deb
 
-- name: Check if there is grub configuration.
-  stat:
-    path: "/etc/default/grub"
-  register: grub
+#- name: Check if there is grub configuration.
+#  stat:
+#    path: "/etc/default/grub"
+#  register: grub
 
-- name: Change grub cmdline defaults for ATI
-  replace:
-    dest: "/etc/default/grub"
-    regexp: '^(.*)GRUB_CMDLINE_LINUX_DEFAULT=(.*)$'
-    replace: 'GRUB_CMDLINE_LINUX_DEFAULT="vga=0x311 video=VGA-1:640x480iec"'
-  register: grubati
-  when:
-    - grub.stat.exists == true
-    - card == "ati"
+#- name: Change grub cmdline defaults for ATI
+#  replace:
+#    dest: "/etc/default/grub"
+#    regexp: '^(.*)GRUB_CMDLINE_LINUX_DEFAULT=(.*)$'
+#    replace: 'GRUB_CMDLINE_LINUX_DEFAULT="vga=0x311 video=VGA-1:640x480iec"'
+#  register: grubati
+#  when:
+#    - grub.stat.exists == true
+#    - card == "ati"
 
-- name: Change grub cmdline defaults for INTEL
-  replace:
-    dest: "/etc/default/grub"
-    regexp: '^(.*)GRUB_CMDLINE_LINUX_DEFAULT=(.*)$'
-    replace: 'GRUB_CMDLINE_LINUX_DEFAULT="video=VGA-1:1280x480iec"'
-  register: grubintel
-  when:
-    - grub.stat.exists == true
-    - card == "intel"
+#- name: Change grub cmdline defaults for INTEL
+#  replace:
+#    dest: "/etc/default/grub"
+#    regexp: '^(.*)GRUB_CMDLINE_LINUX_DEFAULT=(.*)$'
+#    replace: 'GRUB_CMDLINE_LINUX_DEFAULT="video=VGA-1:1280x480iec"'
+#  register: grubintel
+#  when:
+#    - grub.stat.exists == true
+#    - card == "intel"
 
-- name: Update grub config.
-  command: /usr/sbin/update-grub
-  when: (grubati.changed == true) or (grubintel.changed == true)
+#- name: Update grub config.
+#  command: /usr/sbin/update-grub
+#  when: (grubati.changed == true) or (grubintel.changed == true)

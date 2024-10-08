@@ -1,0 +1,24 @@
+---
+- name: Install retroarch.
+  apt:
+    name: "{{ packages }}"
+  vars:
+    packages:
+    - retroarch
+
+- name: Remove retroarch original configuration.
+  file:
+    path: "/etc/retroarch.cfg"
+    state: absent
+
+- name: Copy service.
+  copy:
+    src: "{{ role_path }}/files/etc/systemd/system/retroarch.service"
+    dest: "/etc/systemd/system/retroarch.service"
+    mode: 0644
+
+- name: Enable service.
+  file:
+    src: "/etc/systemd/system/retroarch.service"
+    dest: "/etc/systemd/system/multi-user.target.wants/retroarch.service"
+    state: link

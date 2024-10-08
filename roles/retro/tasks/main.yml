@@ -1,13 +1,6 @@
 ---
-  - include: 00-sdl.yml
-  - include: 00-repositories.yml
-  - include: 00-autologin.yml
   - include: 00-users.yml
   - include: 01-kernel.yml
   - include: 01-switchres.yml
-  - include: 02-advancemenu.yml
-  - include: 02-attractplus.yml
-  - include: 02-emulationstation.yml
+  - include: 02-retroarch.yml
   - include: 03-groovymame.yml
-  - include: 03-mednafen.yml
-  - include: 03-retroarch.yml

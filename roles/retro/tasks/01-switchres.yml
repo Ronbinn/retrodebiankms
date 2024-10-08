@@ -1,36 +1,30 @@
 ---
-- name: Install the dependencies
+- name: Check if it's already installed
+  stat:
+    path: "/usr/local/bin/switchres"
+  register: switchres_bin
+
+- name: Install switchres build dependencies
   apt:
     name: "{{ packages }}"
   vars:
     packages:
-    - libxrandr-dev
-    - libdrm-dev
-    - pkg-config
+    - git
+  when: not switchres_bin.stat.exists
 
-- name: Download switchreslib deb. 64 bit.
-  get_url:
-    url: "https://www.dropbox.com/s/b0m06w49us4buhw/switchres_20221124-1_amd64.deb?dl=1"
-    dest: "/root/switchres.deb"
-  when: ansible_architecture == 'x86_64'
+- name: Download switchres git
+  git:
+    repo: 'https://github.com/antonioginer/switchres.git'
+    dest: /home/switchres
+  when: not switchres_bin.stat.exists
 
-- name: Download switchreslib deb. 32 bit.
-  get_url:
-    url: "https://www.dropbox.com/s/fxh49kcl0kvim5w/switchres_20221124-1_i386.deb?dl=1"
-    dest: "/root/switchres.deb"
-  when: ansible_architecture == 'i386'
+- name: Build switchres.
+  make:
+    chdir: /home/switchres
 
-- name: Install switchreslib.
-  apt:
-    deb: "/root/switchres.deb"
-
-- name: Remove switchres deb file.
-  file:
-    path: "/root/switchres.deb"
-    state: absent
-    
-- name: Copy switchres.ini file.
-  copy:
-    src: "{{ role_path }}/files/etc/switchres.ini"
-    dest: "/etc/switchres.ini"
-    mode: 0644
+- name: Install switchres.
+  make:
+    chdir: /home/switchres
+    target: install
+#    params:
+#      NUM_THREADS: 4
