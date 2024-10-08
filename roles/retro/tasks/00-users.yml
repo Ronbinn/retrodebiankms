@@ -19,9 +19,7 @@
 
   - name: pam-auth-update
     command: pam-auth-update --package --enable mkhomedir
-    args:
-      warn: no
-    when: (arcade.changed  == true) or (pam.changed  == true)
+    when: (arcade is changed) or (pam is changed)
 
   - name: Arcade user doesn't need password for sudo.
     blockinfile:
