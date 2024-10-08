@@ -14,8 +14,7 @@
 
 - name: Download and extract groovymame. 64 bit.
   unarchive:
-#    src: "https://github.com/antonioginer/GroovyMAME/releases/download/gm0270sr221d/groovymame_0270.221d_linux.tar.bz2"
-    src: "https://github.com/antonioginer/GroovyMAME/releases/download/gm0251sr002o/groovymame_0251.002o_linux.tar.bz2"
+    src: "https://github.com/antonioginer/GroovyMAME/releases/download/gm0269sr221d/groovymame_0269.221d_linux.tar.bz2"
     dest: /usr/local/bin
     remote_src: yes
   when:
