@@ -69,6 +69,7 @@
   command: ./configure
   args:
     chdir: /home/retroarch
+  when: not retroarch_bin.stat.exists
 
 - name: Build retroarch.
   make:
@@ -87,6 +88,12 @@
   file:
     path: "/etc/retroarch.cfg"
     state: absent
+
+- name: Copy configuration.
+  copy:
+    src: "{{ role_path }}/files/etc/retroarch.cfg"
+    dest: "/etc/retroarch.cfg"
+    mode: 0644
 
 - name: Copy service.
   copy:
