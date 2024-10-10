@@ -16,6 +16,6 @@
 
 - name: Remove ansible text.
   lineinfile:
-    dest: /etc/xdg/Thunar/uca.xml
+    dest: /etc/systemd/system/getty@tty1.service.d/autologin.conf
     state: absent
     regexp: "ANSIBLE"

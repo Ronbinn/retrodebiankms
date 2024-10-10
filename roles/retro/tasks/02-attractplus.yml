@@ -1,33 +1,55 @@
-#Install Attract Mode plus
 ---
-- name: Install Attract Mode plus dependencies.
+- name: Check if it's already installed
+  stat:
+    path: "/usr/local/bin/attractplus"
+  register: attractplus_bin
+
+- name: Install attractplus build dependencies.
   apt:
     name: "{{ packages }}"
   vars:
     packages:
-    - libsfml-graphics2.5
-    - libcurl4
-    - libavformat58
-    - libswscale5
-    - libopenal1
+    - git
+    - build-essential
+    - pkg-config
+    - cmake
+    - libdrm-dev
+    - libgbm-dev
+    - libavformat-dev
+    - libavcodec-dev
+    - libavutil-dev
+    - libswscale-dev
+    - libswresample-dev
+    - libopenal-dev
+    - libgl1-mesa-dev
+    - libudev-dev
+    - libvorbis-dev
+    - libflac-dev
+    - libfreetype-dev
+    - libexpat1-dev
+    - libglu1-mesa-dev
+    - libboost-filesystem-dev
+    - libboost-system-dev
+  when: not attractplus_bin.stat.exists
 
-- name: Download Attract Mode plus deb. 64 bit.
-  get_url:
-    url: "https://www.dropbox.com/s/97hxs8mgnrstuea/attractplus_20221112-1_amd64.deb?dl=1"
-    dest: "/root/attractplus.deb"
-  when: ansible_architecture == 'x86_64'
+- name: Download attractplus git
+  git:
+    repo: "https://github.com/oomek/attractplus"
+    dest: /home/attractplus
+  when: not attractplus_bin.stat.exists
 
-- name: Download Attract Mode plus deb. 32 bit.
-  get_url:
-    url: "https://www.dropbox.com/s/w3bnqhfgigrd6sp/attractplus_20221112-1_i386.deb?dl=1"
-    dest: "/root/attractplus.deb"
-  when: ansible_architecture == 'i386'
+- name: Build attractplus.
+  make:
+    chdir: /home/attractplus
+    params:
+      prefix: /usr/local
+      STATIC: 1
+      FE_HWACCEL_VAAPI: 1
+      USE_DRM: 1
+  when: not attractplus_bin.stat.exists
 
-- name: Install Attract Mode plus.
-  apt:
-    deb: "/root/attractplus.deb"
-
-- name: Remove deb file.
-  file:
-    path: "/root/attractplus.deb"
-    state: absent
+- name: Install attractplus.
+  make:
+    chdir: /home/attractplus
+    target: install
+  when: not attractplus_bin.stat.exists
