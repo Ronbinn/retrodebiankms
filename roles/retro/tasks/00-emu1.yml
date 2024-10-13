@@ -28,8 +28,19 @@
   register: archive_contents
   when: not emulationstation_bin.stat.exists
 
-- name: Copy patch
-  copy:
+- name: Apply patch to multiple files under basedir
+  patch:
     src: "{{ role_path }}/files/emulationstation_datasource.patch"
-    dest: "/home/{{ archive_contents.files[0].split('/')[0] }}"
-    mode: 0644
+    basedir: "/home/{{ archive_contents.files[0].split('/')[0] }}"
+    strip: 1
+  when: not emulationstation_bin.stat.exists
+
+#- name: Build emulationstation.
+#  make:
+#    chdir: "/home/{{ archive_contents.files[0].split('/')[0] }}"
+#    params:
+#      prefix: /usr/local
+#      STATIC: 1
+#      FE_HWACCEL_VAAPI: 1
+#      USE_DRM: 1
+#  when: not emulationstation_bin.stat.exists
