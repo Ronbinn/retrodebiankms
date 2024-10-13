@@ -17,6 +17,7 @@
     - libsdl2-dev
     - libcurl4-openssl-dev
     - libvlc-dev
+    - rapidjson-dev
   when: not emulationstation_bin.stat.exists
 
 #https://stackoverflow.com/questions/50966777/ansible-download-latest-release-binary-from-github-repo
@@ -51,3 +52,13 @@
 #      FE_HWACCEL_VAAPI: 1
 #      USE_DRM: 1
 #  when: not emulationstation_bin.stat.exists
+
+- name: Create resources dir.
+  file:
+    path: "/usr/share/emulationstation"
+    state: directory
+
+- name: Copy resources.
+  copy:
+    src: "/home/emulationstationgit/resources"
+    dest: "/usr/share/emulationstation/resources"
