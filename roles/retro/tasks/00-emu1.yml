@@ -1,0 +1,35 @@
+---
+- name: Check if it's already installed.
+  stat:
+    path: "/usr/local/bin/emulationstation"
+  register: emulationstation_bin
+
+#https://stackoverflow.com/questions/50966777/ansible-download-latest-release-binary-from-github-repo
+- name: Get latest release's URL.
+  uri:
+    url: https://api.github.com/repos/Retropie/EmulationStation/releases/latest
+    return_content: true
+  register: json_reponse
+  when: not emulationstation_bin.stat.exists
+
+#- name: Download latest release.
+#  get_url:
+#    url: "{{json_reponse.json.tarball_url}}"
+#    dest: /home/emulationstation_latest.tar.gz
+#  when: not emulationstation_bin.stat.exists
+
+- name: Extract latest release.
+  unarchive:
+#    src: /home/emulationstation_latest.tar.gz
+    src: "{{json_reponse.json.tarball_url}}"
+    dest: /home
+    remote_src: yes
+    list_files: yes
+  register: archive_contents
+  when: not emulationstation_bin.stat.exists
+
+- name: Copy patch
+  copy:
+    src: "{{ role_path }}/files/emulationstation_datasource.patch"
+    dest: "/home/{{ archive_contents.files[0].split('/')[0] }}"
+    mode: 0644
