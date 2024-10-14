@@ -89,9 +89,13 @@
     - rapidjson-dev
   when: not emulationstation_bin.stat.exists
 
+- name: Set package name.
+  set_fact:
+    package_name: "emulationstation_{{ json_reponse.json.tag_name }}_{{ ansible_architecture }}"
+
 - name: Create package dirs.
   file:
-    path: "/home/packages/emulationstation/{{ item }}"
+    path: "/home/packages/{{ package_name }}/{{ item }}"
     state: directory
   with_items:
      - usr/local/bin
@@ -99,34 +103,31 @@
      - usr/local/lib/cmake/pugixml
      - usr/local/share/emulationstation
      - DEBIAN
-  when: not emulationstation_bin.stat.exists
 
 - name: Copy package files.
   copy:
-    src: "/home/emulationstationgit/{{ item.src }}"
-    dest: "/home/packages/emulationstation/{{ item.dest }}"
-    mode: "{{ item.mode }}"
+    src: "/{{ item }}"
+    dest: "/home/packages/{{ package_name }}/{{ item }}"
+    mode: "preserve"
     remote_src: true
   with_items:
-     - { mode: "0644", src: "libpugixml.a", dest: "usr/local/lib/libpugixml.a" }
-     - { mode: "preserve", src: "resources", dest: "usr/local/share/emulationstation" }
-     - { mode: "0644", src: "external/pugixml/src/pugixml.hpp", dest: "usr/local/include/pugixml.hpp" }
-     - { mode: "0644", src: "external/pugixml/src/pugiconfig.hpp", dest: "usr/local/include/pugiconfig.hpp" }
-     - { mode: "0644", src: "external/pugixml/CMakeFiles/Export/be764272e56105fc8ff11fec8314e604/pugixml-config.cmake", dest: "usr/local/lib/cmake/pugixml/pugixml-config.cmake" }
-     - { mode: "0644", src: "external/pugixml/CMakeFiles/Export/be764272e56105fc8ff11fec8314e604/pugixml-config-noconfig.cmake", dest: "usr/local/lib/cmake/pugixml/pugixml-config-noconfig.cmake" }
-     - { mode: "0755", src: "emulationstation", dest: "usr/local/bin/emulationstation" }
-  when: not emulationstation_bin.stat.exists
+     - "usr/local/lib/libpugixml.a"
+     - "usr/local/share/emulationstation"
+     - "usr/local/include/pugixml.hpp"
+     - "usr/local/include/pugiconfig.hpp"
+     - "usr/local/lib/cmake/pugixml/pugixml-config.cmake"
+     - "usr/local/lib/cmake/pugixml/pugixml-config-noconfig.cmake"
+     - "usr/local/bin/emulationstation"
 
 - name: Copy package's control file.
   template:
     src: "{{ role_path }}/templates/control.j2"
-    dest: "/home/packages/emulationstation/DEBIAN/control"
+    dest: "/home/packages/{{ package_name }}/DEBIAN/control"
     mode: 0644
   vars:
     package_name: "emulationstation"
     package_description: "Emulator frontend"
     package_version: "{{ json_reponse.json.tag_name | replace('v','') }}" #remove the "v" character from the number
-  when: not emulationstation_bin.stat.exists
 
 - name: Build package.
   command:
@@ -135,10 +136,9 @@
       - /usr/bin/dpkg-deb
       - "--build"
       - "--root-owner-group"
-      - emulationstation
+      - "{{ package_name }}"
 
 - name: Remove source code.
   file:
     path: "/home/emulationstationgit"
     state: absent
-  when: not emulationstation_bin.stat.exists
