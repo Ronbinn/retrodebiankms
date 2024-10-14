@@ -64,10 +64,10 @@
   file:
     path: "/usr/share/emulationstation"
     state: directory
-  when: not emulationstation_bin.stat.exists
+#  when: not emulationstation_bin.stat.exists
 
 - name: Copy resources.
   copy:
     src: "/home/emulationstationgit/resources"
-    dest: "/usr/share/emulationstation/resources"
-  when: not emulationstation_bin.stat.exists
+    dest: "/usr/share/emulationstation"
+#  when: not emulationstation_bin.stat.exists
