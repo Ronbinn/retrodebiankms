@@ -125,9 +125,10 @@
     dest: "/home/packages/{{ package_name }}/DEBIAN/control"
     mode: 0644
   vars:
-    package_name: "emulationstation"
-    package_description: "Emulator frontend"
+    package_internal_name: "emulationstation"
     package_version: "{{ json_reponse.json.tag_name | replace('v','') }}" #remove the "v" character from the number
+    package_architecture: "{{ ansible_architecture | replace('x86_64','amd64') }}" #ansible uses x86_64 debian uses amd64
+    package_description: "Emulator frontend"
 
 - name: Build package.
   command:
