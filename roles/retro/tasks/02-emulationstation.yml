@@ -96,6 +96,7 @@
      - usr/local/bin
      - usr/local/include
      - usr/local/lib/cmake/pugixml
+     - DEBIAN
 
 - name: Copy package files.
   copy:
@@ -111,8 +112,17 @@
      - { src: "external/pugixml/CMakeFiles/Export/be764272e56105fc8ff11fec8314e604/pugixml-config-noconfig.cmake", dest: "usr/local/lib/cmake/pugixml/pugixml-config-noconfig.cmake" }
      - { src: "emulationstation", dest: "usr/local/bin/emulationstation" }
 
-#- name: Remove source code.
-#  file:
-#    path: "/home/emulationstationgit"
-#    state: absent
+- name: Copy package's control file.
+  template:
+    src: "{{ role_path }}/templates/control.j2"
+    dest: "/home/packages/emulationstation/DEBIAN/control"
+    mode: 0644
+  vars:
+    package_name: "emulationstation"
+    package_description: "Emulator frontend"
+    package_version: "{{ json_reponse.json.tag_name  }}"
 
+- name: Remove source code.
+  file:
+    path: "/home/emulationstationgit"
+    state: absent
