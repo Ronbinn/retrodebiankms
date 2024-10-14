@@ -91,7 +91,7 @@
 
 - name: Set package name.
   set_fact:
-    package_name: "emulationstation_{{ json_reponse.json.tag_name }}_{{ ansible_architecture }}"
+    package_name: "emulationstation_{{ json_reponse.json.tag_name }}_{{ ansible_architecture | replace('x86_64','amd64') }}"
 
 - name: Create package dirs.
   file:
@@ -112,7 +112,7 @@
     remote_src: true
   with_items:
      - "usr/local/lib/libpugixml.a"
-     - "usr/local/share/emulationstation"
+     - "usr/local/share/emulationstation/"
      - "usr/local/include/pugixml.hpp"
      - "usr/local/include/pugiconfig.hpp"
      - "usr/local/lib/cmake/pugixml/pugixml-config.cmake"
