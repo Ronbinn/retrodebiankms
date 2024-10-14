@@ -1,8 +1,19 @@
 ---
+#https://stackoverflow.com/questions/50966777/ansible-download-latest-release-binary-from-github-repo
+- name: Get latest release's tag.
+  uri:
+    url: https://api.github.com/repos/Retropie/EmulationStation/releases/latest
+    return_content: true
+  register: json_reponse
+
 - name: Check if it's already installed.
   stat:
     path: "/usr/local/bin/emulationstation"
   register: emulationstation_bin
+
+- name: Set package name.
+  set_fact:
+    package_name: "emulationstation_{{ json_reponse.json.tag_name }}_{{ ansible_architecture | replace('x86_64','amd64') }}"
 
 - name: Install attractplus build dependencies.
   apt:
@@ -19,14 +30,6 @@
     - libvlc-dev
     - rapidjson-dev
   when: not emulationstation_bin.stat.exists
-
-#https://stackoverflow.com/questions/50966777/ansible-download-latest-release-binary-from-github-repo
-- name: Get latest release's tag.
-  uri:
-    url: https://api.github.com/repos/Retropie/EmulationStation/releases/latest
-    return_content: true
-  register: json_reponse
-#  when: not emulationstation_bin.stat.exists
 
 - name: Download latest release from github.
   git:
@@ -89,9 +92,16 @@
     - rapidjson-dev
   when: not emulationstation_bin.stat.exists
 
-- name: Set package name.
-  set_fact:
-    package_name: "emulationstation_{{ json_reponse.json.tag_name }}_{{ ansible_architecture | replace('x86_64','amd64') }}"
+- name: Remove source code.
+  file:
+    path: "/home/emulationstationgit"
+    state: absent
+  when: not emulationstation_bin.stat.exists
+
+- name: Check if there is a package.
+  stat:
+    path: "/home/packages/{{ package_name }}.deb"
+  register: debpackage
 
 - name: Create package dirs.
   file:
@@ -103,6 +113,7 @@
      - usr/local/lib/cmake/pugixml
      - usr/local/share/emulationstation
      - DEBIAN
+  when: not debpackage.stat.exists
 
 - name: Copy package files.
   copy:
@@ -118,6 +129,7 @@
      - "usr/local/lib/cmake/pugixml/pugixml-config.cmake"
      - "usr/local/lib/cmake/pugixml/pugixml-config-noconfig.cmake"
      - "usr/local/bin/emulationstation"
+  when: not debpackage.stat.exists
 
 - name: Copy package's control file.
   template:
@@ -129,6 +141,7 @@
     package_version: "{{ json_reponse.json.tag_name | replace('v','') }}" #remove the "v" character from the number
     package_architecture: "{{ ansible_architecture | replace('x86_64','amd64') }}" #ansible uses x86_64 debian uses amd64
     package_description: "Emulator frontend"
+  when: not debpackage.stat.exists
 
 - name: Build package.
   command:
@@ -138,8 +151,10 @@
       - "--build"
       - "--root-owner-group"
       - "{{ package_name }}"
+  when: not debpackage.stat.exists
 
-- name: Remove source code.
+- name: Remove package source.
   file:
-    path: "/home/emulationstationgit"
+    path: "/home/{{ package_name }}"
     state: absent
+  when: not debpackage.stat.exists
