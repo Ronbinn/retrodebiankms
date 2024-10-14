@@ -33,7 +33,7 @@ index 94be3a5..6e5f750 100644
 +//////////////////////////////////////////////////////////////////////////
 +                std::string getDataPath()
 +                {
-+                        dataPath = getGenericPath("/usr/share");
++                        dataPath = getGenericPath("/usr/local/share");
 +
 +                        // return constructed datapath
 +                        if(dataPath.length())

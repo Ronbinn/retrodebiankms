@@ -62,14 +62,14 @@
 
 - name: Create resources dir.
   file:
-    path: "/usr/share/emulationstation"
+    path: "/usr/local/share/emulationstation"
     state: directory
   when: not emulationstation_bin.stat.exists
 
 - name: Copy resources.
   copy:
     src: "/home/emulationstationgit/resources"
-    dest: "/usr/share/emulationstation"
+    dest: "/usr/local/share/emulationstation"
   when: not emulationstation_bin.stat.exists
 
 - name: Remove build dependencies.
@@ -99,7 +99,7 @@
      - usr/local/lib/cmake/pugixml
      - usr/local/share/emulationstation
      - DEBIAN
-#  when: not emulationstation_bin.stat.exists
+  when: not emulationstation_bin.stat.exists
 
 - name: Copy package files.
   copy:
@@ -115,7 +115,7 @@
      - { mode: "0644", src: "external/pugixml/CMakeFiles/Export/be764272e56105fc8ff11fec8314e604/pugixml-config.cmake", dest: "usr/local/lib/cmake/pugixml/pugixml-config.cmake" }
      - { mode: "0644", src: "external/pugixml/CMakeFiles/Export/be764272e56105fc8ff11fec8314e604/pugixml-config-noconfig.cmake", dest: "usr/local/lib/cmake/pugixml/pugixml-config-noconfig.cmake" }
      - { mode: "0755", src: "emulationstation", dest: "usr/local/bin/emulationstation" }
-#  when: not emulationstation_bin.stat.exists
+  when: not emulationstation_bin.stat.exists
 
 - name: Copy package's control file.
   template:
@@ -126,7 +126,7 @@
     package_name: "emulationstation"
     package_description: "Emulator frontend"
     package_version: "{{ json_reponse.json.tag_name | replace('v','') }}" #remove the "v" character from the number
-#  when: not emulationstation_bin.stat.exists
+  when: not emulationstation_bin.stat.exists
 
 - name: Build package.
   command:
@@ -142,4 +142,3 @@
     path: "/home/emulationstationgit"
     state: absent
   when: not emulationstation_bin.stat.exists
-
