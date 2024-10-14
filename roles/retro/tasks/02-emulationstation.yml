@@ -64,10 +64,31 @@
   file:
     path: "/usr/share/emulationstation"
     state: directory
-#  when: not emulationstation_bin.stat.exists
+  when: not emulationstation_bin.stat.exists
 
 - name: Copy resources.
   copy:
     src: "/home/emulationstationgit/resources"
     dest: "/usr/share/emulationstation"
-#  when: not emulationstation_bin.stat.exists
+  when: not emulationstation_bin.stat.exists
+
+- name: Remove build dependencies.
+  apt:
+    name: "{{ packages }}"
+    state: absent
+  vars:
+    packages:
+    - build-essential
+    - cmake
+    - libgl1-mesa-dev
+    - libfreetype-dev
+    - libfreeimage-dev
+    - libsdl2-dev
+    - libcurl4-openssl-dev
+    - libvlc-dev
+    - rapidjson-dev
+
+- name: Remove source code.
+  file:
+    path: "/home/emulationstationgit"
+    state: absent
