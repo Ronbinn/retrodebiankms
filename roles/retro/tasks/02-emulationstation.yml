@@ -15,6 +15,11 @@
   set_fact:
     package_name: "emulationstation_{{ json_reponse.json.tag_name }}_{{ ansible_architecture | replace('x86_64','amd64') }}"
 
+- name: Check if there is a package.
+  stat:
+    path: "/home/packages/{{ package_name }}.deb"
+  register: debpackage
+
 - name: Install attractplus build dependencies.
   apt:
     name: "{{ packages }}"
@@ -97,11 +102,6 @@
     path: "/home/emulationstationgit"
     state: absent
   when: not emulationstation_bin.stat.exists
-
-- name: Check if there is a package.
-  stat:
-    path: "/home/packages/{{ package_name }}.deb"
-  register: debpackage
 
 - name: Create package dirs.
   file:
