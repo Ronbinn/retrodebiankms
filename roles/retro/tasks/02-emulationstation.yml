@@ -1,59 +1,72 @@
-#Install emulationstation
 ---
-- name: Install EmulationStation dependencies.
+- name: Check if it's already installed.
+  stat:
+    path: "/usr/local/bin/emulationstation"
+  register: emulationstation_bin
+
+- name: Install attractplus build dependencies.
   apt:
     name: "{{ packages }}"
   vars:
     packages:
-    - libfreeimage3
-    - libboost-locale1.74.0 
-    - libboost-filesystem1.74.0
-    - libsdl2-2.0-0
-    - libcurl4
-    - libvlc5
+    - build-essential
+    - cmake
+    - libgl1-mesa-dev
+    - libfreetype-dev
+    - libfreeimage-dev
+    - libsdl2-dev
+    - libcurl4-openssl-dev
+    - libvlc-dev
+    - rapidjson-dev
+  when: not emulationstation_bin.stat.exists
 
-- name: Download EmulationStation deb. 64 bit.
-  get_url:
-    url: "https://www.dropbox.com/s/503b4ldk9dulc56/emulationstation_20221112-1_amd64.deb?dl=1"
-    dest: "/root/emulationstation.deb"
-  when: ansible_architecture == 'x86_64'
+#https://stackoverflow.com/questions/50966777/ansible-download-latest-release-binary-from-github-repo
+- name: Get latest release's tag.
+  uri:
+    url: https://api.github.com/repos/Retropie/EmulationStation/releases/latest
+    return_content: true
+  register: json_reponse
+  when: not emulationstation_bin.stat.exists
 
-- name: Download EmulationStation deb. 32 bit.
-  get_url:
-    url: "https://www.dropbox.com/s/57j1dn895niwgqu/emulationstation_20221112-1_i386.deb?dl=1"
-    dest: "/root/emulationstation.deb"
-  when: ansible_architecture == 'i386'
+- name: Download latest release from github.
+  git:
+    repo: 'https://github.com/RetroPie/EmulationStation'
+    dest: /home/emulationstationgit
+    version: "{{ json_reponse.json.tag_name  }}"
+    recursive: true
+  when: not emulationstation_bin.stat.exists
 
-- name: Install EmulationStation.
-  apt:
-    deb: "/root/emulationstation.deb"
+- name: Apply resources patch.
+  patch:
+    src: "{{ role_path }}/files/emulationstation_datasource.patch"
+    basedir: "/home/emulationstationgit"
+    strip: 1
+  when: not emulationstation_bin.stat.exists
 
-- name: Remove deb file.
+- name: Execute cmake.
+  command: "cmake ."
+    chdir: "/home/emulationstationgit"
+  when: not emulationstation_bin.stat.exists
+
+- name: Build emulationstation.
+  make:
+    chdir: "/home/emulationstationgit"
+  when: not emulationstation_bin.stat.exists
+
+- name: Install attractplus.
+  make:
+    chdir: /home/attractplus
+    target: install
+  when: not emulationstation_bin.stat.exists
+
+- name: Create resources dir.
   file:
-    path: "/root/emulationstation.deb"
-    state: absent
+    path: "/usr/share/emulationstation"
+    state: directory
+  when: not emulationstation_bin.stat.exists
 
-#- name: Create config dirs.
-#  file:
-#    path: "{{ item }}"
-#    state: directory
-#    mode: 0755
-#  with_items:
-#    - "/etc/skel/.emulationstation"
-#    - "/etc/emulationstation/themes"
-#    - "/usr/local/share/applications"
-
-#- name: Copy configurations and desktop file.
-#  copy:
-#    src: "{{ role_path }}/files/{{ item }}"
-#    dest: "/{{ item }}"
-#    mode: 0644
-#  with_items:
-#    - "etc/skel/.emulationstation/es_systems.cfg"
-#    - "usr/local/share/applications/emulationstation.desktop"
-
-#- name: Download and extract emulationstation simple theme
-#  unarchive:
-#    src: https://emulationstation.org/downloads/themes/simple_latest.zip
-#    dest: /etc/emulationstation/themes
-#    remote_src: yes
+- name: Copy resources.
+  copy:
+    src: "/home/emulationstationgit/resources"
+    dest: "/usr/share/emulationstation/resources"
+  when: not emulationstation_bin.stat.exists
