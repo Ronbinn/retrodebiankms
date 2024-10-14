@@ -1,8 +1,23 @@
 ---
+- name: Get latest release's tag.
+  uri:
+    url: https://api.github.com/repos/oomek/attractplus/releases/latest
+    return_content: true
+  register: json_reponse
+
 - name: Check if it's already installed
   stat:
     path: "/usr/local/bin/attractplus"
   register: attractplus_bin
+
+- name: Set package name.
+  set_fact:
+    package_name: "attractplus_{{ json_reponse.json.tag_name }}_{{ ansible_architecture | replace('x86_64','amd64') }}"
+
+- name: Check if there is a package.
+  stat:
+    path: "/home/packages/{{ package_name }}.deb"
+  register: debpackage
 
 - name: Install attractplus build dependencies.
   apt:
@@ -36,6 +51,7 @@
   git:
     repo: "https://github.com/oomek/attractplus"
     dest: /home/attractplus
+    version: "{{ json_reponse.json.tag_name  }}"
   when: not attractplus_bin.stat.exists
 
 - name: Build attractplus.
@@ -53,3 +69,52 @@
     chdir: /home/attractplus
     target: install
   when: not attractplus_bin.stat.exists
+
+- name: Create package dirs.
+  file:
+    path: "/home/packages/{{ package_name }}/{{ item }}"
+    state: directory
+  with_items:
+     - usr/local/bin
+     - usr/local/share/attract
+     - DEBIAN
+  when: not debpackage.stat.exists
+
+- name: Copy package files.
+  copy:
+    src: "/{{ item }}"
+    dest: "/home/packages/{{ package_name }}/{{ item }}"
+    mode: "preserve"
+    remote_src: true
+  with_items:
+     - "usr/local/bin/attractplus"
+     - "usr/local/share/attract"
+  when: not debpackage.stat.exists
+
+- name: Copy package's control file.
+  template:
+    src: "{{ role_path }}/templates/control.j2"
+    dest: "/home/packages/{{ package_name }}/DEBIAN/control"
+    mode: 0644
+  vars:
+    package_internal_name: "attractplus"
+    package_version: "{{ json_reponse.json.tag_name | replace('v','') }}" #remove the "v" character from the number
+    package_architecture: "{{ ansible_architecture | replace('x86_64','amd64') }}" #ansible uses x86_64 debian uses amd64
+    package_description: "Emulator frontend"
+  when: not debpackage.stat.exists
+
+- name: Build package.
+  command:
+    chdir: "/home/packages"
+    argv:
+      - /usr/bin/dpkg-deb
+      - "--build"
+      - "--root-owner-group"
+      - "{{ package_name }}"
+  when: not debpackage.stat.exists
+
+- name: Remove package source.
+  file:
+    path: "/home/packages/{{ package_name }}"
+    state: absent
+  when: not debpackage.stat.exists

@@ -111,6 +111,6 @@
 
 - name: Remove package source.
   file:
-    path: "/home/{{ package_name }}"
+    path: "/home/packages/{{ package_name }}"
     state: absent
   when: not debpackage.stat.exists
