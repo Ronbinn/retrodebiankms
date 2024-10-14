@@ -44,7 +44,8 @@
   when: not emulationstation_bin.stat.exists
 
 - name: Execute cmake.
-  command: "cmake ."
+  command:
+    cmd: "cmake ."
     chdir: "/home/emulationstationgit"
   when: not emulationstation_bin.stat.exists
 
@@ -53,9 +54,9 @@
     chdir: "/home/emulationstationgit"
   when: not emulationstation_bin.stat.exists
 
-- name: Install attractplus.
+- name: Install emulationstation.
   make:
-    chdir: /home/attractplus
+    chdir: "/home/emulationstationgit"
     target: install
   when: not emulationstation_bin.stat.exists
 
