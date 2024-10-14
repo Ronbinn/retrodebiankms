@@ -88,7 +88,31 @@
     - libvlc-dev
     - rapidjson-dev
 
-- name: Remove source code.
+- name: Create package dirs.
   file:
-    path: "/home/emulationstationgit"
-    state: absent
+    path: "/home/packages/emulationstation/{{ item }}"
+    state: directory
+  with_items:
+     - usr/local/bin
+     - usr/local/include
+     - usr/local/lib/cmake/pugixml
+
+- name: Copy package files.
+  copy:
+    src: "/home/emulationstationgit/{{ item.src }}"
+    dest: "/home/packages/emulationstation/{{ item.dest }}"
+    mode: 0644
+    remote_src: true
+  with_items:
+     - { src: "libpugixml.a", dest: "usr/local/lib/libpugixml.a" }
+     - { src: "external/pugixml/src/pugixml.hpp", dest: "usr/local/include/pugixml.hpp" }
+     - { src: "external/pugixml/src/pugiconfig.hpp", dest: "usr/local/include/pugiconfig.hpp" }
+     - { src: "external/pugixml/CMakeFiles/Export/be764272e56105fc8ff11fec8314e604/pugixml-config.cmake", dest: "usr/local/lib/cmake/pugixml/pugixml-config.cmake" }
+     - { src: "external/pugixml/CMakeFiles/Export/be764272e56105fc8ff11fec8314e604/pugixml-config-noconfig.cmake", dest: "usr/local/lib/cmake/pugixml/pugixml-config-noconfig.cmake" }
+     - { src: "emulationstation", dest: "usr/local/bin/emulationstation" }
+
+#- name: Remove source code.
+#  file:
+#    path: "/home/emulationstationgit"
+#    state: absent
+
