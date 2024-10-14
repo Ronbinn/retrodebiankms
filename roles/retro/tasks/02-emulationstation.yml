@@ -26,7 +26,7 @@
     url: https://api.github.com/repos/Retropie/EmulationStation/releases/latest
     return_content: true
   register: json_reponse
-  when: not emulationstation_bin.stat.exists
+#  when: not emulationstation_bin.stat.exists
 
 - name: Download latest release from github.
   git:
@@ -97,23 +97,25 @@
      - usr/local/bin
      - usr/local/include
      - usr/local/lib/cmake/pugixml
+     - usr/local/share/emulationstation
      - DEBIAN
-  when: not emulationstation_bin.stat.exists
+#  when: not emulationstation_bin.stat.exists
 
 - name: Copy package files.
   copy:
     src: "/home/emulationstationgit/{{ item.src }}"
     dest: "/home/packages/emulationstation/{{ item.dest }}"
-    mode: 0644
+    mode: "{{ item.mode }}"
     remote_src: true
   with_items:
-     - { src: "libpugixml.a", dest: "usr/local/lib/libpugixml.a" }
-     - { src: "external/pugixml/src/pugixml.hpp", dest: "usr/local/include/pugixml.hpp" }
-     - { src: "external/pugixml/src/pugiconfig.hpp", dest: "usr/local/include/pugiconfig.hpp" }
-     - { src: "external/pugixml/CMakeFiles/Export/be764272e56105fc8ff11fec8314e604/pugixml-config.cmake", dest: "usr/local/lib/cmake/pugixml/pugixml-config.cmake" }
-     - { src: "external/pugixml/CMakeFiles/Export/be764272e56105fc8ff11fec8314e604/pugixml-config-noconfig.cmake", dest: "usr/local/lib/cmake/pugixml/pugixml-config-noconfig.cmake" }
-     - { src: "emulationstation", dest: "usr/local/bin/emulationstation" }
-  when: not emulationstation_bin.stat.exists
+     - { mode: "0644", src: "libpugixml.a", dest: "usr/local/lib/libpugixml.a" }
+     - { mode: "preserve", src: "resources", dest: "usr/local/share/emulationstation" }
+     - { mode: "0644", src: "external/pugixml/src/pugixml.hpp", dest: "usr/local/include/pugixml.hpp" }
+     - { mode: "0644", src: "external/pugixml/src/pugiconfig.hpp", dest: "usr/local/include/pugiconfig.hpp" }
+     - { mode: "0644", src: "external/pugixml/CMakeFiles/Export/be764272e56105fc8ff11fec8314e604/pugixml-config.cmake", dest: "usr/local/lib/cmake/pugixml/pugixml-config.cmake" }
+     - { mode: "0644", src: "external/pugixml/CMakeFiles/Export/be764272e56105fc8ff11fec8314e604/pugixml-config-noconfig.cmake", dest: "usr/local/lib/cmake/pugixml/pugixml-config-noconfig.cmake" }
+     - { mode: "0755", src: "emulationstation", dest: "usr/local/bin/emulationstation" }
+#  when: not emulationstation_bin.stat.exists
 
 - name: Copy package's control file.
   template:
@@ -123,11 +125,21 @@
   vars:
     package_name: "emulationstation"
     package_description: "Emulator frontend"
-    package_version: "{{ json_reponse.json.tag_name  }}"
-  when: not emulationstation_bin.stat.exists
+    package_version: "{{ json_reponse.json.tag_name | replace('v','') }}" #remove the "v" character from the number
+#  when: not emulationstation_bin.stat.exists
+
+- name: Build package.
+  command:
+    chdir: "/home/packages"
+    argv:
+      - /usr/bin/dpkg-deb
+      - "--build"
+      - "--root-owner-group"
+      - emulationstation
 
 - name: Remove source code.
   file:
     path: "/home/emulationstationgit"
     state: absent
   when: not emulationstation_bin.stat.exists
+
