@@ -87,6 +87,7 @@
     - libcurl4-openssl-dev
     - libvlc-dev
     - rapidjson-dev
+  when: not emulationstation_bin.stat.exists
 
 - name: Create package dirs.
   file:
@@ -97,6 +98,7 @@
      - usr/local/include
      - usr/local/lib/cmake/pugixml
      - DEBIAN
+  when: not emulationstation_bin.stat.exists
 
 - name: Copy package files.
   copy:
@@ -111,6 +113,7 @@
      - { src: "external/pugixml/CMakeFiles/Export/be764272e56105fc8ff11fec8314e604/pugixml-config.cmake", dest: "usr/local/lib/cmake/pugixml/pugixml-config.cmake" }
      - { src: "external/pugixml/CMakeFiles/Export/be764272e56105fc8ff11fec8314e604/pugixml-config-noconfig.cmake", dest: "usr/local/lib/cmake/pugixml/pugixml-config-noconfig.cmake" }
      - { src: "emulationstation", dest: "usr/local/bin/emulationstation" }
+  when: not emulationstation_bin.stat.exists
 
 - name: Copy package's control file.
   template:
@@ -121,8 +124,10 @@
     package_name: "emulationstation"
     package_description: "Emulator frontend"
     package_version: "{{ json_reponse.json.tag_name  }}"
+  when: not emulationstation_bin.stat.exists
 
 - name: Remove source code.
   file:
     path: "/home/emulationstationgit"
     state: absent
+  when: not emulationstation_bin.stat.exists
