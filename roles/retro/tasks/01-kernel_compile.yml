@@ -1,0 +1,78 @@
+---
+- name: Check 15khz kernels.
+  find:
+    paths:
+      - "/boot"
+    patterns:
+      - "*15khz*"
+  register: result
+
+- name: Create work dir.
+  file:
+    path: "/home/kernelcompile"
+    state: directory
+  when: result.matched == 0
+
+- name: Download kernel and 15 khz patches.
+  get_url:
+    url: "{{ item }}"
+    dest: "/home/kernelcompile"
+  with_items:
+     - "https://mirrors.edge.kernel.org/pub/linux/kernel/v6.x/linux-6.11.2.tar.gz"
+     - "https://github.com/D0023R/linux_kernel_15khz/raw/refs/heads/master/linux-6.11/01_linux_15khz.patch"
+     - "https://github.com/D0023R/linux_kernel_15khz/raw/refs/heads/master/linux-6.11/02_linux_15khz_interlaced_mode_fix.patch"
+     - "https://github.com/D0023R/linux_kernel_15khz/raw/refs/heads/master/linux-6.11/03_linux_15khz_dcn1_dcn2_interlaced_mode_fix.patch"
+     - "https://github.com/D0023R/linux_kernel_15khz/raw/refs/heads/master/linux-6.11/04_linux_15khz_dce_interlaced_mode_fix.patch"
+     - "https://github.com/D0023R/linux_kernel_15khz/raw/refs/heads/master/linux-6.11/05_linux_15khz_amdgpu_pll_fix.patch"
+     - "https://github.com/D0023R/linux_kernel_15khz/raw/refs/heads/master/linux-6.11/06_linux_switchres_kms_drm_modesetting.patch"
+     - "https://github.com/D0023R/linux_kernel_15khz/raw/refs/heads/master/linux-6.11/07_linux_15khz_fix_ddc.patch"
+  when: result.matched == 0
+
+
+- name: Unarchive a file that is already on the remote machine
+  ansible.builtin.unarchive:
+    src: "/home/kernelcompile/linux-6.11.2.tar.gz"
+    dest: "/home/kernelcompile/kernelsource"
+    remote_src: yes
+
+#apt-rdepends --build-depends --follow=DEPENDS linux
+- name: Install linux build dependencies.
+  apt:
+    name: "{{ packages }}"
+    recommends: no
+  vars:
+    packages:
+    - bison
+    - cpio
+    - debhelper-compat
+    - dh-exec
+    - dh-python
+    - flex
+    - python3
+    - python3-jinja2
+    - quilt
+    - xz-utils
+    - dvipng
+    - graphviz
+    - patchutils
+    - python3-sphinx
+    - python3-sphinx-rtd-theme
+    - texlive-latex-base
+    - texlive-latex-extra
+  when: result.matched == 0
+
+- name: Apply 15khz patches.
+  patch:
+    src: "/home/kernelcompile/{{ item }}"
+    basedir: "/home/kernelcompile/kernelsource"
+    strip: 1
+  with_items:
+     - "01_linux_15khz.patch"
+     - "02_linux_15khz_interlaced_mode_fix.patch"
+     - "03_linux_15khz_dcn1_dcn2_interlaced_mode_fix.patch"
+     - "04_linux_15khz_dce_interlaced_mode_fix.patch"
+     - "05_linux_15khz_amdgpu_pll_fix.patch"
+     - "06_linux_switchres_kms_drm_modesetting.patch"
+     - "07_linux_15khz_fix_ddc.patch"
+  when: result.matched == 0
+
