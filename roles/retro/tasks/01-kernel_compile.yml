@@ -9,7 +9,7 @@
 
 - name: Create work dir.
   file:
-    path: "/home/kernelcompile"
+    path: "/home/kernelcompile/kernelsource"
     state: directory
   when: result.matched == 0
 
@@ -32,14 +32,15 @@
 - name: Unarchive a file that is already on the remote machine
   ansible.builtin.unarchive:
     src: "/home/kernelcompile/linux-6.11.2.tar.gz"
-    dest: "/home/kernelcompile/kernelsource"
+    dest: "/home/kernelcompile"
     remote_src: yes
+  when: result.matched == 0
 
 #apt-rdepends --build-depends --follow=DEPENDS linux
 - name: Install linux build dependencies.
   apt:
     name: "{{ packages }}"
-    recommends: no
+    install_recommends: no
   vars:
     packages:
     - bison
@@ -64,7 +65,7 @@
 - name: Apply 15khz patches.
   patch:
     src: "/home/kernelcompile/{{ item }}"
-    basedir: "/home/kernelcompile/kernelsource"
+    basedir: "/home/kernelcompile/linux-6.11.2"
     strip: 1
   with_items:
      - "01_linux_15khz.patch"
@@ -76,3 +77,8 @@
      - "07_linux_15khz_fix_ddc.patch"
   when: result.matched == 0
 
+- name: Make defconfig.
+  make:
+    chdir: "/home/kernelcompile/linux-6.11.2"
+    target: defconfig
+  when: result.matched == 0
