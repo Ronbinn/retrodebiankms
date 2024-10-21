@@ -74,14 +74,14 @@
 - name: Build retroarch.
   make:
     chdir: /home/retroarch
+    params:
+      NUM_THREADS: {{ ansible_processor_nproc  }}
   when: not retroarch_bin.stat.exists
 
 - name: Install retroarch.
   make:
     chdir: /home/retroarch
     target: install
-#    params:
-#      NUM_THREADS: 4
   when: not retroarch_bin.stat.exists
 
 - name: Remove retroarch original configuration.
