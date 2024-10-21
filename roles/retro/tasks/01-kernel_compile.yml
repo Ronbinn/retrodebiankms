@@ -11,7 +11,7 @@
   file:
     path: "/home/kernelcompile/kernelsource"
     state: directory
-  when: result.matched == 0
+  when: result.matched != 0
 
 - name: Download kernel and 15 khz patches.
   get_url:
@@ -26,14 +26,14 @@
      - "https://github.com/D0023R/linux_kernel_15khz/raw/refs/heads/master/linux-6.11/05_linux_15khz_amdgpu_pll_fix.patch"
      - "https://github.com/D0023R/linux_kernel_15khz/raw/refs/heads/master/linux-6.11/06_linux_switchres_kms_drm_modesetting.patch"
      - "https://github.com/D0023R/linux_kernel_15khz/raw/refs/heads/master/linux-6.11/07_linux_15khz_fix_ddc.patch"
-  when: result.matched == 0
+  when: result.matched != 0
 
 - name: Unarchive kernel source.
   ansible.builtin.unarchive:
     src: "/home/kernelcompile/linux-6.11.2.tar.gz"
     dest: "/home/kernelcompile"
     remote_src: yes
-  when: result.matched == 0
+  when: result.matched != 0
 
 #apt-rdepends --build-depends --follow=DEPENDS linux
 - name: Install linux build dependencies.
@@ -55,7 +55,7 @@
     - libssl-dev
     - rsync
 
-  when: result.matched == 0
+  when: result.matched != 0
 
 - name: Apply 15khz patches.
   patch:
@@ -70,16 +70,26 @@
      - "05_linux_15khz_amdgpu_pll_fix.patch"
      - "06_linux_switchres_kms_drm_modesetting.patch"
      - "07_linux_15khz_fix_ddc.patch"
-  when: result.matched == 0
+  when: result.matched != 0
 
 - name: Copy current kernel configuration.
   copy:
     src: "/boot/config-{{ ansible_kernel  }}"
     dest: "/home/kernelcompile/linux-6.11.2/.config"
     remote_src: yes
+  when: result.matched == 0
 
 - name: Make defconfig.
   make:
     chdir: "/home/kernelcompile/linux-6.11.2"
     target: olddefconfig
   when: result.matched == 0
+
+- name: Configure for 15khz.
+  lineinfile:
+    dest: "/home/kernelcompile/linux-6.11.2/.config"
+    regexp: "{{ item.old }}"
+    line: "{{ item.new }}"
+  with_items:
+     - { old: '^(.*)CONFIG_DRM_KMS_HELPER=(.*)$', new: 'CONFIG_DRM_KMS_HELPER=y' }
+     - { old: '^(.*)CONFIG_LOCALVERSION=(.*)$', new: 'CONFIG_LOCALVERSION="-15khz"' }
