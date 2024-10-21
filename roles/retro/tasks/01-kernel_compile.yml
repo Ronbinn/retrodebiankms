@@ -16,7 +16,7 @@
   file:
     path: "/home/kernelcompile"
     state: directory
-  when: result.matched == 0
+  when: result.matched != 0
 
 - name: Download kernel and 15 khz patches.
   get_url:
@@ -31,14 +31,14 @@
      - "https://github.com/D0023R/linux_kernel_15khz/raw/refs/heads/master/linux-{{ kernel_big_version }}/05_linux_15khz_amdgpu_pll_fix.patch"
      - "https://github.com/D0023R/linux_kernel_15khz/raw/refs/heads/master/linux-{{ kernel_big_version }}/06_linux_switchres_kms_drm_modesetting.patch"
      - "https://github.com/D0023R/linux_kernel_15khz/raw/refs/heads/master/linux-{{ kernel_big_version }}/07_linux_15khz_fix_ddc.patch"
-  when: result.matched == 0
+  when: result.matched != 0
 
 - name: Unarchive kernel source.
   ansible.builtin.unarchive:
     src: "/home/kernelcompile/linux-{{ kernel_version }}.tar.gz"
     dest: "/home/kernelcompile"
     remote_src: yes
-  when: result.matched == 0
+  when: result.matched != 0
 
 #apt-rdepends --build-depends --follow=DEPENDS linux
 - name: Install linux build dependencies.
@@ -59,7 +59,7 @@
     - libelf-dev
     - libssl-dev
     - rsync
-  when: result.matched == 0
+  when: result.matched != 0
 
 - name: Apply 15khz patches.
   patch:
@@ -74,20 +74,20 @@
      - "05_linux_15khz_amdgpu_pll_fix.patch"
      - "06_linux_switchres_kms_drm_modesetting.patch"
      - "07_linux_15khz_fix_ddc.patch"
-  when: result.matched == 0
+  when: result.matched != 0
 
 - name: Copy current kernel configuration.
   copy:
     src: "/boot/config-{{ ansible_kernel  }}"
     dest: "/home/kernelcompile/linux-{{ kernel_version }}/.config"
     remote_src: yes
-  when: result.matched == 0
+  when: result.matched != 0
 
 - name: Make defconfig.
   make:
     chdir: "/home/kernelcompile/linux-{{ kernel_version }}"
     target: olddefconfig
-  when: result.matched == 0
+  when: result.matched != 0
 
 - name: Configure for 15khz.
   lineinfile:
@@ -97,4 +97,47 @@
   with_items:
      - { old: '^(.*)CONFIG_DRM_KMS_HELPER=(.*)$', new: 'CONFIG_DRM_KMS_HELPER=y' }
      - { old: '^(.*)CONFIG_LOCALVERSION=(.*)$', new: 'CONFIG_LOCALVERSION="-15khz"' }
-  when: result.matched == 0
+  when: result.matched != 0
+
+- name: Create package dir.
+  file:
+    path: "/home/packages"
+    state: directory
+  when: result.matched != 0
+
+- name: Copy generated deb packages.
+  copy:
+    src: "/home/kernelcompile/{{ item }}"
+    dest: "/home/packages/{{ item }}"
+    remote_src: yes
+  with_items:
+     - "linux-image-{{ kernel_version }}-15khz_{{ kernel_version }}-1_{{ ansible_architecture | replace('x86_64','amd64') }}.deb"
+     - "linux-headers-{{ kernel_version }}-15khz_{{ kernel_version }}-1_{{ ansible_architecture | replace('x86_64','amd64') }}.deb"
+     - "linux-libc-dev_{{ kernel_version }}-1_{{ ansible_architecture | replace('x86_64','amd64') }}.deb"
+  when: result.matched != 0
+
+- name: Remove sources.
+  file:
+    path: "/home/kernelcompile"
+    state: absent
+  when: result.matched != 0
+
+- name: Uninstall linux build dependencies.
+  apt:
+    name: "{{ packages }}"
+    state: absent
+  vars:
+    packages:
+    - build-essential
+    - fakeroot
+    - dwarves
+    - atool
+    - zstd
+    - flex
+    - bison
+    - debhelper-compat
+    - bc
+    - libelf-dev
+    - libssl-dev
+    - rsync
+  when: result.matched != 0
