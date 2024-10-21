@@ -80,7 +80,7 @@
     remote_src: yes
   when: not debpackage.stat.exists
 
-- name: Make defconfig.
+- name: Make olddefconfig.
   make:
     chdir: "/home/kernelcompile/linux-{{ kernel_version }}"
     target: olddefconfig
@@ -102,7 +102,7 @@
     chdir: "/home/kernelcompile/linux-{{ kernel_version }}"
     target: bindeb-pkg
     params:
-      NUM_THREADS: {{ ansible_processor_nproc  }}
+      NUM_THREADS: "{{ ansible_processor_nproc  }}"
   when: not debpackage.stat.exists
 
 - name: Create package dir.
