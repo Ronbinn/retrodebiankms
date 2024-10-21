@@ -1,4 +1,9 @@
 ---
+- name: Set new kernel version.
+  set_fact:
+    kernel_version: "6.11.4"
+    kernel_big_version: "6.11"
+
 - name: Check 15khz kernels.
   find:
     paths:
@@ -7,33 +12,33 @@
       - "*15khz*"
   register: result
 
-- name: Create work dir.
+- name: Create working dir.
   file:
     path: "/home/kernelcompile/kernelsource"
     state: directory
-  when: result.matched != 0
+  when: result.matched == 0
 
 - name: Download kernel and 15 khz patches.
   get_url:
     url: "{{ item }}"
     dest: "/home/kernelcompile"
   with_items:
-     - "https://mirrors.edge.kernel.org/pub/linux/kernel/v6.x/linux-6.11.2.tar.gz"
-     - "https://github.com/D0023R/linux_kernel_15khz/raw/refs/heads/master/linux-6.11/01_linux_15khz.patch"
-     - "https://github.com/D0023R/linux_kernel_15khz/raw/refs/heads/master/linux-6.11/02_linux_15khz_interlaced_mode_fix.patch"
-     - "https://github.com/D0023R/linux_kernel_15khz/raw/refs/heads/master/linux-6.11/03_linux_15khz_dcn1_dcn2_interlaced_mode_fix.patch"
-     - "https://github.com/D0023R/linux_kernel_15khz/raw/refs/heads/master/linux-6.11/04_linux_15khz_dce_interlaced_mode_fix.patch"
-     - "https://github.com/D0023R/linux_kernel_15khz/raw/refs/heads/master/linux-6.11/05_linux_15khz_amdgpu_pll_fix.patch"
-     - "https://github.com/D0023R/linux_kernel_15khz/raw/refs/heads/master/linux-6.11/06_linux_switchres_kms_drm_modesetting.patch"
-     - "https://github.com/D0023R/linux_kernel_15khz/raw/refs/heads/master/linux-6.11/07_linux_15khz_fix_ddc.patch"
-  when: result.matched != 0
+     - "https://mirrors.edge.kernel.org/pub/linux/kernel/v6.x/linux-{{ kernel_version }}.tar.gz"
+     - "https://github.com/D0023R/linux_kernel_15khz/raw/refs/heads/master/linux-{{ kernel_big_version }}/01_linux_15khz.patch"
+     - "https://github.com/D0023R/linux_kernel_15khz/raw/refs/heads/master/linux-{{ kernel_big_version }}/02_linux_15khz_interlaced_mode_fix.patch"
+     - "https://github.com/D0023R/linux_kernel_15khz/raw/refs/heads/master/linux-{{ kernel_big_version }}/03_linux_15khz_dcn1_dcn2_interlaced_mode_fix.patch"
+     - "https://github.com/D0023R/linux_kernel_15khz/raw/refs/heads/master/linux-{{ kernel_big_version }}/04_linux_15khz_dce_interlaced_mode_fix.patch"
+     - "https://github.com/D0023R/linux_kernel_15khz/raw/refs/heads/master/linux-{{ kernel_big_version }}/05_linux_15khz_amdgpu_pll_fix.patch"
+     - "https://github.com/D0023R/linux_kernel_15khz/raw/refs/heads/master/linux-{{ kernel_big_version }}/06_linux_switchres_kms_drm_modesetting.patch"
+     - "https://github.com/D0023R/linux_kernel_15khz/raw/refs/heads/master/linux-{{ kernel_big_version }}/07_linux_15khz_fix_ddc.patch"
+  when: result.matched == 0
 
 - name: Unarchive kernel source.
   ansible.builtin.unarchive:
-    src: "/home/kernelcompile/linux-6.11.2.tar.gz"
+    src: "/home/kernelcompile/linux-{{ kernel_version }}.tar.gz"
     dest: "/home/kernelcompile"
     remote_src: yes
-  when: result.matched != 0
+  when: result.matched == 0
 
 #apt-rdepends --build-depends --follow=DEPENDS linux
 - name: Install linux build dependencies.
@@ -54,13 +59,12 @@
     - libelf-dev
     - libssl-dev
     - rsync
-
-  when: result.matched != 0
+  when: result.matched == 0
 
 - name: Apply 15khz patches.
   patch:
     src: "/home/kernelcompile/{{ item }}"
-    basedir: "/home/kernelcompile/linux-6.11.2"
+    basedir: "/home/kernelcompile/linux-{{ kernel_version }}"
     strip: 1
   with_items:
      - "01_linux_15khz.patch"
@@ -70,26 +74,27 @@
      - "05_linux_15khz_amdgpu_pll_fix.patch"
      - "06_linux_switchres_kms_drm_modesetting.patch"
      - "07_linux_15khz_fix_ddc.patch"
-  when: result.matched != 0
+  when: result.matched == 0
 
 - name: Copy current kernel configuration.
   copy:
     src: "/boot/config-{{ ansible_kernel  }}"
-    dest: "/home/kernelcompile/linux-6.11.2/.config"
+    dest: "/home/kernelcompile/linux-{{ kernel_version }}/.config"
     remote_src: yes
   when: result.matched == 0
 
 - name: Make defconfig.
   make:
-    chdir: "/home/kernelcompile/linux-6.11.2"
+    chdir: "/home/kernelcompile/linux-{{ kernel_version }}"
     target: olddefconfig
   when: result.matched == 0
 
 - name: Configure for 15khz.
   lineinfile:
-    dest: "/home/kernelcompile/linux-6.11.2/.config"
+    dest: "/home/kernelcompile/linux-{{ kernel_version }}/.config"
     regexp: "{{ item.old }}"
     line: "{{ item.new }}"
   with_items:
      - { old: '^(.*)CONFIG_DRM_KMS_HELPER=(.*)$', new: 'CONFIG_DRM_KMS_HELPER=y' }
      - { old: '^(.*)CONFIG_LOCALVERSION=(.*)$', new: 'CONFIG_LOCALVERSION="-15khz"' }
+  when: result.matched == 0
