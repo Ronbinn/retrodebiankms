@@ -28,8 +28,7 @@
      - "https://github.com/D0023R/linux_kernel_15khz/raw/refs/heads/master/linux-6.11/07_linux_15khz_fix_ddc.patch"
   when: result.matched == 0
 
-
-- name: Unarchive a file that is already on the remote machine
+- name: Unarchive kernel source.
   ansible.builtin.unarchive:
     src: "/home/kernelcompile/linux-6.11.2.tar.gz"
     dest: "/home/kernelcompile"
@@ -73,8 +72,14 @@
      - "07_linux_15khz_fix_ddc.patch"
   when: result.matched == 0
 
+- name: Copy current kernel configuration.
+  copy:
+    src: "/boot/config-{{ ansible_kernel  }}"
+    dest: "/home/kernelcompile/linux-6.11.2/.config"
+    remote_src: yes
+
 - name: Make defconfig.
   make:
     chdir: "/home/kernelcompile/linux-6.11.2"
-    target: defconfig
+    target: olddefconfig
   when: result.matched == 0
