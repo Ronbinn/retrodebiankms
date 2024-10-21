@@ -50,9 +50,9 @@
   apt:
     deb: "{{ item }}"
   with_items:
-    - /root/linux_image.deb
-    - /root/linux_headers.deb
-    - /root/linux_libc.deb
+    - "/root/linux_image.deb"
+    - "/root/linux_headers.deb"
+    - "/root/linux_libc.deb"
   when: result.matched == 0
 
 - name: Remove deb files.
@@ -60,36 +60,7 @@
     path: "{{ item }}"
     state: absent
   with_items:
-    - /root/linux_image.deb
-    - /root/linux_headers.deb
-    - /root/linux_libc.deb
+    - "/root/linux_image.deb"
+    - "/root/linux_headers.deb"
+    - "/root/linux_libc.deb"
   when: result.matched == 0
-
-#- name: Check if there is grub configuration.
-#  stat:
-#    path: "/etc/default/grub"
-#  register: grub
-
-#- name: Change grub cmdline defaults for ATI
-#  replace:
-#    dest: "/etc/default/grub"
-#    regexp: '^(.*)GRUB_CMDLINE_LINUX_DEFAULT=(.*)$'
-#    replace: 'GRUB_CMDLINE_LINUX_DEFAULT="vga=0x311 video=VGA-1:640x480iec"'
-#  register: grubati
-#  when:
-#    - grub.stat.exists == true
-#    - card == "ati"
-
-#- name: Change grub cmdline defaults for INTEL
-#  replace:
-#    dest: "/etc/default/grub"
-#    regexp: '^(.*)GRUB_CMDLINE_LINUX_DEFAULT=(.*)$'
-#    replace: 'GRUB_CMDLINE_LINUX_DEFAULT="video=VGA-1:1280x480iec"'
-#  register: grubintel
-#  when:
-#    - grub.stat.exists == true
-#    - card == "intel"
-
-#- name: Update grub config.
-#  command: /usr/sbin/update-grub
-#  when: (grubati.changed == true) or (grubintel.changed == true)

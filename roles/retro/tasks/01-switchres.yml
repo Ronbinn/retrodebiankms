@@ -35,20 +35,20 @@
 - name: Download switchres git
   git:
     repo: 'https://github.com/antonioginer/switchres.git'
-    dest: /home/switchres
+    dest: "/home/switchres"
     version: "{{ json_reponse.json.tag_name  }}"
   when: not switchres_bin.stat.exists
 
 - name: Build switchres.
   make:
-    chdir: /home/switchres
+    chdir: "/home/switchres"
     params:
       NUM_THREADS: "{{ ansible_processor_nproc }}"
   when: not switchres_bin.stat.exists
 
 - name: Install switchres.
   make:
-    chdir: /home/switchres
+    chdir: "/home/switchres"
     target: install
   when: not switchres_bin.stat.exists
 
@@ -60,15 +60,35 @@
     mode: 0755
   when: not switchres_bin.stat.exists
 
+- name: Unistall switchres build dependencies
+  apt:
+    name: "{{ packages }}"
+    state: absent
+  vars:
+    packages:
+    - git
+    - build-essential
+    - pkg-config
+    - libxrandr-dev
+    - libdrm-dev
+    - libsdl2-dev
+  when: not switchres_bin.stat.exists
+
+- name: Remove source code.
+  file:
+    path: "/home/switchres"
+    state: absent
+  when: not switchres_bin.stat.exists
+
 - name: Create package dirs.
   file:
     path: "/home/packages/{{ package_name }}/{{ item }}"
     state: directory
   with_items:
-     - usr/lib
-     - usr/include/switchres
-     - usr/lib/pkgconfig
-     - DEBIAN
+     - "usr/lib"
+     - "usr/include/switchres"
+     - "usr/lib/pkgconfig"
+     - "DEBIAN"
   when: not debpackage.stat.exists
 
 - name: Copy package files.

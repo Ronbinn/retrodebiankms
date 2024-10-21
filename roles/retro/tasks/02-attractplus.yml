@@ -48,15 +48,15 @@
 - name: Download attractplus git
   git:
     repo: "https://github.com/oomek/attractplus"
-    dest: /home/attractplus
+    dest: "/home/attractplus"
     version: "{{ release  }}"
   when: not attractplus_bin.stat.exists
 
 - name: Build attractplus.
   make:
-    chdir: /home/attractplus
+    chdir: "/home/attractplus"
     params:
-      prefix: /usr/local
+      prefix: "/usr/local"
       STATIC: 1
       FE_HWACCEL_VAAPI: 1
       USE_DRM: 1
@@ -64,7 +64,7 @@
 
 - name: Install attractplus.
   make:
-    chdir: /home/attractplus
+    chdir: "/home/attractplus"
     target: install
   when: not attractplus_bin.stat.exists
 
@@ -97,14 +97,20 @@
     - libboost-system-dev
   when: not attractplus_bin.stat.exists
 
+- name: Remove source code.
+  file:
+    path: "/home/attractplus"
+    state: absent
+  when: not attractplus_bin.stat.exists
+
 - name: Create package dirs.
   file:
     path: "/home/packages/{{ package_name }}/{{ item }}"
     state: directory
   with_items:
-     - usr/local/bin
-     - usr/local/share/attract
-     - DEBIAN
+     - "usr/local/bin"
+     - "usr/local/share/attract"
+     - "DEBIAN"
   when: not debpackage.stat.exists
 
 - name: Copy package files.
