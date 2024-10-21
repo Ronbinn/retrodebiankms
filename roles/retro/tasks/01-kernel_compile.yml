@@ -14,7 +14,7 @@
 
 - name: Create working dir.
   file:
-    path: "/home/kernelcompile/kernelsource"
+    path: "/home/kernelcompile"
     state: directory
   when: result.matched == 0
 
