@@ -43,23 +43,19 @@
     install_recommends: no
   vars:
     packages:
-    - bison
-    - cpio
-    - debhelper-compat
-    - dh-exec
-    - dh-python
+    - build-essential
+    - fakeroot
+    - dwarves
+    - atool
+    - zstd
     - flex
-    - python3
-    - python3-jinja2
-    - quilt
-    - xz-utils
-    - dvipng
-    - graphviz
-    - patchutils
-    - python3-sphinx
-    - python3-sphinx-rtd-theme
-    - texlive-latex-base
-    - texlive-latex-extra
+    - bison
+    - debhelper-compat
+    - bc
+    - libelf-dev
+    - libssl-dev
+    - rsync
+
   when: result.matched == 0
 
 - name: Apply 15khz patches.
