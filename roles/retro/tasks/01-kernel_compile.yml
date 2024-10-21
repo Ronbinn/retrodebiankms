@@ -99,6 +99,15 @@
      - { old: '^(.*)CONFIG_LOCALVERSION=(.*)$', new: 'CONFIG_LOCALVERSION="-15khz"' }
   when: result.matched != 0
 
+#make -j`nproc` bindeb-pkg 
+- name: Compile kernel.
+  make:
+    chdir: "/home/kernelcompile/linux-{{ kernel_version }}"
+    target: bindeb-pkg
+    params:
+      NUM_THREADS: {{ ansible_processor_nproc  }}
+  when: result.matched != 0
+
 - name: Create package dir.
   file:
     path: "/home/packages"
