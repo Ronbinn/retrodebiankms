@@ -75,7 +75,7 @@
   make:
     chdir: /home/retroarch
     params:
-      NUM_THREADS: {{ ansible_processor_nproc  }}
+      NUM_THREADS: "{{ ansible_processor_nproc  }}"
   when: not retroarch_bin.stat.exists
 
 - name: Install retroarch.
