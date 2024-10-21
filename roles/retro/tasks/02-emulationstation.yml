@@ -1,10 +1,7 @@
 ---
-#https://stackoverflow.com/questions/50966777/ansible-download-latest-release-binary-from-github-repo
-- name: Get latest release's tag.
-  uri:
-    url: https://api.github.com/repos/Retropie/EmulationStation/releases/latest
-    return_content: true
-  register: json_reponse
+- name: Set release version.
+  set_fact:
+    release: "v2.11.2"
 
 - name: Check if it's already installed.
   stat:
@@ -13,7 +10,7 @@
 
 - name: Set package name.
   set_fact:
-    package_name: "emulationstation_{{ json_reponse.json.tag_name }}_{{ ansible_architecture | replace('x86_64','amd64') }}"
+    package_name: "emulationstation_{{ release }}_{{ ansible_architecture | replace('x86_64','amd64') }}"
 
 - name: Check if there is a package.
   stat:
@@ -40,7 +37,7 @@
   git:
     repo: 'https://github.com/RetroPie/EmulationStation'
     dest: /home/emulationstationgit
-    version: "{{ json_reponse.json.tag_name  }}"
+    version: "{{ release  }}"
     recursive: true
   when: not emulationstation_bin.stat.exists
 
@@ -138,7 +135,7 @@
     mode: 0644
   vars:
     package_internal_name: "emulationstation"
-    package_version: "{{ json_reponse.json.tag_name | replace('v','') }}" #remove the "v" character from the number
+    package_version: "{{ release | replace('v','') }}" #remove the "v" character from the number
     package_architecture: "{{ ansible_architecture | replace('x86_64','amd64') }}" #ansible uses x86_64 debian uses amd64
     package_description: "Emulator frontend"
   when: not debpackage.stat.exists
