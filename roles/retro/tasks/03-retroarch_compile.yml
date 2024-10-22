@@ -22,9 +22,47 @@
     name: "{{ packages }}"
   vars:
     packages:
+    - git
     - build-essential
     - pkg-config
-  when: retroarch_bin.stat.exists
+    - libxrandr-dev
+    - debhelper-compat
+    - glslang-dev
+    - libasound2-dev
+    - libavcodec-dev
+    - libavdevice-dev
+    - libavformat-dev
+    - libavutil-dev
+    - libdbus-1-dev
+    - libdrm-dev
+    - libegl-dev
+    - libflac-dev
+    - libfreetype-dev
+    - libgbm-dev
+    - libglm-dev
+    - libjack-jackd2-dev
+    - libminiupnpc-dev
+    - libopenal-dev
+    - libpulse-dev
+    - libsdl2-dev
+    - libstb-dev
+    - libswscale-dev
+    - libudev-dev
+    - libusb-1.0-0-dev
+    - libv4l-dev
+    - libvulkan-dev
+    - libx11-xcb-dev
+    - libxinerama-dev
+    - libxml2-dev
+    - libxv-dev
+    - libxxf86vm-dev
+    - pkg-config
+    - python3-dev
+    - qtbase5-dev
+    - wayland-protocols
+    - x11proto-xext-dev
+    - zlib1g-dev
+  when: not retroarch_bin.stat.exists
 
 - name: Download retroarch git.
   git:
@@ -37,20 +75,20 @@
   command: ./configure
   args:
     chdir: "/home/retroarchgit"
-  when: retroarch_bin.stat.exists
+  when: not retroarch_bin.stat.exists
 
 - name: Build retroarch.
   make:
     chdir: "/home/retroarchgit"
     params:
       NUM_THREADS: "{{ ansible_processor_nproc  }}"
-  when: retroarch_bin.stat.exists
+  when: not retroarch_bin.stat.exists
 
 - name: Install retroarch.
   make:
     chdir: "/home/retroarchgit"
     target: install
-  when: retroarch_bin.stat.exists
+  when: not retroarch_bin.stat.exists
 
 - name: Uninstall retroarch build dependencies.
   apt:
@@ -58,15 +96,53 @@
     state: absent
   vars:
     packages:
+    - git
     - build-essential
     - pkg-config
-  when: retroarch_bin.stat.exists
+    - libxrandr-dev
+    - debhelper-compat
+    - glslang-dev
+    - libasound2-dev
+    - libavcodec-dev
+    - libavdevice-dev
+    - libavformat-dev
+    - libavutil-dev
+    - libdbus-1-dev
+    - libdrm-dev
+    - libegl-dev
+    - libflac-dev
+    - libfreetype-dev
+    - libgbm-dev
+    - libglm-dev
+    - libjack-jackd2-dev
+    - libminiupnpc-dev
+    - libopenal-dev
+    - libpulse-dev
+    - libsdl2-dev
+    - libstb-dev
+    - libswscale-dev
+    - libudev-dev
+    - libusb-1.0-0-dev
+    - libv4l-dev
+    - libvulkan-dev
+    - libx11-xcb-dev
+    - libxinerama-dev
+    - libxml2-dev
+    - libxv-dev
+    - libxxf86vm-dev
+    - pkg-config
+    - python3-dev
+    - qtbase5-dev
+    - wayland-protocols
+    - x11proto-xext-dev
+    - zlib1g-dev
+  when: not retroarch_bin.stat.exists
 
 - name: Remove source code.
   file:
     path: "/home/retroarchgit"
     state: absent
-  when: retroarch_bin.stat.exists
+  when: not retroarch_bin.stat.exists
 
 - name: Create package dirs.
   file:
@@ -81,7 +157,7 @@
      - "usr/local/share/pixmaps"
      - "usr/local/share/doc/retroarch"
      - "DEBIAN"
-  when: debpackage.stat.exists
+  when: not debpackage.stat.exists
 
 - name: Copy package files.
   copy:
@@ -100,7 +176,7 @@
      - "usr/local/share/pixmaps/retroarch.svg"
      - "usr/local/share/doc/retroarch/COPYING"
      - "usr/local/share/doc/retroarch/README.md"
-  when: debpackage.stat.exists
+  when: not debpackage.stat.exists
 
 - name: Copy package's control file.
   template:
@@ -112,7 +188,7 @@
     package_version: "{{ release | replace('v','') }}"
     package_architecture: "{{ ansible_architecture | replace('x86_64','amd64') }}" #ansible uses x86_64 debian uses amd64
     package_description: "Emulator frontend"
-  when: debpackage.stat.exists
+  when: not debpackage.stat.exists
 
 - name: Build package.
   command:
@@ -122,10 +198,10 @@
       - "--build"
       - "--root-owner-group"
       - "{{ package_name }}"
-  when: debpackage.stat.exists
+  when: not debpackage.stat.exists
 
 - name: Remove package source.
   file:
     path: "/home/packages/{{ package_name }}"
     state: absent
-  when: debpackage.stat.exists
+  when: not debpackage.stat.exists
