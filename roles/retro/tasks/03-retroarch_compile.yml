@@ -74,7 +74,12 @@
     state: directory
   with_items:
      - "usr/local/bin"
-     - "usr/local/share/attract"
+     - "etc"
+     - "usr/local/share/metainfo"
+     - "usr/local/share/applications"
+     - "usr/local/share/man/man6"
+     - "usr/local/share/pixmaps"
+     - "usr/local/share/doc/retroarch"
      - "DEBIAN"
   when: debpackage.stat.exists
 
@@ -85,8 +90,16 @@
     mode: "preserve"
     remote_src: true
   with_items:
-     - "usr/local/bin/attractplus"
-     - "usr/local/share/attract"
+     - "usr/local/bin/retroarch"
+     - "usr/local/bin/retroarch-cg2glsl"
+     - "etc/retroarch.cfg"
+     - "usr/local/share/metainfo/com.libretro.RetroArch.appdata.xml"
+     - "usr/local/share/applications/org.libretro.RetroArch.desktop"
+     - "usr/local/share/man/man6/retroarch.6"
+     - "usr/local/share/man/man6/retroarch-cg2g"
+     - "usr/local/share/pixmaps/retroarch.svg"
+     - "usr/local/share/doc/retroarch/COPYING"
+     - "usr/local/share/doc/retroarch/README.md"
   when: debpackage.stat.exists
 
 - name: Copy package's control file.
@@ -95,8 +108,8 @@
     dest: "/home/packages/{{ package_name }}/DEBIAN/control"
     mode: 0644
   vars:
-    package_internal_name: "attractplus"
-    package_version: "{{ release }}"
+    package_internal_name: "retroarch"
+    package_version: "{{ release | replace('v','') }}"
     package_architecture: "{{ ansible_architecture | replace('x86_64','amd64') }}" #ansible uses x86_64 debian uses amd64
     package_description: "Emulator frontend"
   when: debpackage.stat.exists
