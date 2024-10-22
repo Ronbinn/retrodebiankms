@@ -27,6 +27,7 @@
     - libsdl2-dev
     - libfontconfig-dev
     - qtbase5-dev
+    - libsdl2-ttf-dev
   when: not groovymame_bin.stat.exists
 
 - name: Download latest release from github.
@@ -40,7 +41,14 @@
 - name: Build groovymame.
   make:
     chdir: "/home/groovymamegit"
-  when: groovymame_bin.stat.exists
+  when: not groovymame_bin.stat.exists
+
+- name: Install groovymame.
+  copy:
+    src: "/home/groovymamegit/mame"
+    dest: "/usr/local/bin/groovymame"
+    mode: "0755"
+    remote_src: true
 
 - name: Remove build dependencies.
   apt:
@@ -49,13 +57,18 @@
   vars:
     packages:
     - build-essential
-  when: groovymame_bin.stat.exists
+    - pkg-config
+    - libsdl2-dev
+    - libfontconfig-dev
+    - qtbase5-dev
+    - libsdl2-ttf-dev
+  when: not groovymame_bin.stat.exists
 
 - name: Remove source code.
   file:
     path: "/home/groovymamegit"
     state: absent
-  when: groovymame_bin.stat.exists
+  when: not groovymame_bin.stat.exists
 
 - name: Create package dirs.
   file:
@@ -63,11 +76,8 @@
     state: directory
   with_items:
      - usr/local/bin
-     - usr/local/include
-     - usr/local/lib/cmake/pugixml
-     - usr/local/share/emulationstation
      - DEBIAN
-  when: debpackage.stat.exists
+  when: not debpackage.stat.exists
 
 - name: Copy package files.
   copy:
@@ -76,14 +86,8 @@
     mode: "preserve"
     remote_src: true
   with_items:
-     - "usr/local/lib/libpugixml.a"
-     - "usr/local/share/emulationstation/"
-     - "usr/local/include/pugixml.hpp"
-     - "usr/local/include/pugiconfig.hpp"
-     - "usr/local/lib/cmake/pugixml/pugixml-config.cmake"
-     - "usr/local/lib/cmake/pugixml/pugixml-config-noconfig.cmake"
-     - "usr/local/bin/emulationstation"
-  when: debpackage.stat.exists
+     - "usr/local/bin/groovymame"
+  when: not debpackage.stat.exists
 
 - name: Copy package's control file.
   template:
@@ -91,11 +95,11 @@
     dest: "/home/packages/{{ package_name }}/DEBIAN/control"
     mode: 0644
   vars:
-    package_internal_name: "emulationstation"
-    package_version: "{{ release | replace('v','') }}" #remove the "v" character from the number
+    package_internal_name: "groovymame"
+    package_version: "{{ release | replace('mame','') }}"
     package_architecture: "{{ ansible_architecture | replace('x86_64','amd64') }}" #ansible uses x86_64 debian uses amd64
-    package_description: "Emulator frontend"
-  when: debpackage.stat.exists
+    package_description: "MAME fork for CRTs"
+  when: not debpackage.stat.exists
 
 - name: Build package.
   command:
@@ -105,10 +109,10 @@
       - "--build"
       - "--root-owner-group"
       - "{{ package_name }}"
-  when: debpackage.stat.exists
+  when: not debpackage.stat.exists
 
 - name: Remove package source.
   file:
     path: "/home/packages/{{ package_name }}"
     state: absent
-  when: debpackage.stat.exists
+  when: not debpackage.stat.exists
