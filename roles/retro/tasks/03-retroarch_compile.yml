@@ -1,0 +1,118 @@
+---
+- name: Set release version.
+  set_fact:
+    release: "v1.19.1"
+
+- name: Check if it's already installed
+  stat:
+    path: "/usr/local/bin/retroarch"
+  register: retroarch_bin
+
+- name: Set package name.
+  set_fact:
+    package_name: "retroarch_{{ release }}_{{ ansible_architecture | replace('x86_64','amd64') }}"
+
+- name: Check if there is a package.
+  stat:
+    path: "/home/packages/{{ package_name }}.deb"
+  register: debpackage
+
+- name: Install retroarch build dependencies.
+  apt:
+    name: "{{ packages }}"
+  vars:
+    packages:
+    - build-essential
+    - pkg-config
+  when: retroarch_bin.stat.exists
+
+- name: Download retroarch git.
+  git:
+    repo: "https://github.com/libretro/retroarch"
+    dest: "/home/retroarchgit"
+    version: "{{ release  }}"
+  when: not retroarch_bin.stat.exists
+
+- name: configure retroarch
+  command: ./configure
+  args:
+    chdir: "/home/retroarchgit"
+  when: retroarch_bin.stat.exists
+
+- name: Build retroarch.
+  make:
+    chdir: "/home/retroarchgit"
+    params:
+      NUM_THREADS: "{{ ansible_processor_nproc  }}"
+  when: retroarch_bin.stat.exists
+
+- name: Install retroarch.
+  make:
+    chdir: "/home/retroarchgit"
+    target: install
+  when: retroarch_bin.stat.exists
+
+- name: Uninstall retroarch build dependencies.
+  apt:
+    name: "{{ packages }}"
+    state: absent
+  vars:
+    packages:
+    - build-essential
+    - pkg-config
+  when: retroarch_bin.stat.exists
+
+- name: Remove source code.
+  file:
+    path: "/home/retroarchgit"
+    state: absent
+  when: retroarch_bin.stat.exists
+
+- name: Create package dirs.
+  file:
+    path: "/home/packages/{{ package_name }}/{{ item }}"
+    state: directory
+  with_items:
+     - "usr/local/bin"
+     - "usr/local/share/attract"
+     - "DEBIAN"
+  when: debpackage.stat.exists
+
+- name: Copy package files.
+  copy:
+    src: "/{{ item }}"
+    dest: "/home/packages/{{ package_name }}/{{ item }}"
+    mode: "preserve"
+    remote_src: true
+  with_items:
+     - "usr/local/bin/attractplus"
+     - "usr/local/share/attract"
+  when: debpackage.stat.exists
+
+- name: Copy package's control file.
+  template:
+    src: "{{ role_path }}/templates/control.j2"
+    dest: "/home/packages/{{ package_name }}/DEBIAN/control"
+    mode: 0644
+  vars:
+    package_internal_name: "attractplus"
+    package_version: "{{ release }}"
+    package_architecture: "{{ ansible_architecture | replace('x86_64','amd64') }}" #ansible uses x86_64 debian uses amd64
+    package_description: "Emulator frontend"
+  when: debpackage.stat.exists
+
+- name: Build package.
+  command:
+    chdir: "/home/packages"
+    argv:
+      - /usr/bin/dpkg-deb
+      - "--build"
+      - "--root-owner-group"
+      - "{{ package_name }}"
+  when: debpackage.stat.exists
+
+- name: Remove package source.
+  file:
+    path: "/home/packages/{{ package_name }}"
+    state: absent
+  when: debpackage.stat.exists

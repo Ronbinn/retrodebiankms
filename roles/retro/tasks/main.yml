@@ -8,4 +8,5 @@
 #  - include_tasks: 02-emulationstation.yml
 #  - include_tasks: 02-attractplus.yml
 #  - include_tasks: 03-groovymame.yml
-  - include_tasks: 03-groovymame_compile.yml
+#  - include_tasks: 03-groovymame_compile.yml
+  - include_tasks: 03-retroarch_compile.yml
