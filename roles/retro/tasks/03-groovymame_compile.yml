@@ -23,7 +23,11 @@
   vars:
     packages:
     - build-essential
-  when: groovymame_bin.stat.exists
+    - pkg-config
+    - libsdl2-dev
+    - libfontconfig-dev
+    - qtbase5-dev
+  when: not groovymame_bin.stat.exists
 
 - name: Download latest release from github.
   git:
