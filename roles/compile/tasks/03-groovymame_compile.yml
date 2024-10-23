@@ -22,6 +22,7 @@
     name: "{{ packages }}"
   vars:
     packages:
+    - git
     - build-essential
     - pkg-config
     - libsdl2-dev
@@ -56,6 +57,7 @@
     state: absent
   vars:
     packages:
+    - git
     - build-essential
     - pkg-config
     - libsdl2-dev

@@ -1,0 +1,161 @@
+---
+- name: Check if it's already installed
+  stat:
+    path: "/usr/local/bin/retroarch"
+  register: retroarch_bin
+
+#apt-rdepends --build-depends --follow=DEPENDS retroarch
+- name: Install retroarch build depends.
+  apt:
+    name: "{{ packages }}"
+  vars:
+    packages:
+    - git
+    - build-essential
+    - pkg-config
+    - libxrandr-dev
+    - debhelper-compat
+    - glslang-dev
+    - libasound2-dev
+    - libavcodec-dev
+    - libavdevice-dev
+    - libavformat-dev
+    - libavutil-dev
+    - libdbus-1-dev
+    - libdrm-dev
+    - libegl-dev
+    - libflac-dev
+    - libfreetype-dev
+    - libgbm-dev
+    - libglm-dev
+    - libjack-jackd2-dev
+    - libminiupnpc-dev
+    - libopenal-dev
+    - libpulse-dev
+    - libsdl2-dev
+    - libstb-dev
+    - libswscale-dev
+    - libudev-dev
+    - libusb-1.0-0-dev
+    - libv4l-dev
+    - libvulkan-dev
+    - libx11-xcb-dev
+    - libxinerama-dev
+    - libxml2-dev
+    - libxv-dev
+    - libxxf86vm-dev
+    - pkg-config
+    - python3-dev
+    - qtbase5-dev
+    - wayland-protocols
+    - x11proto-xext-dev
+    - zlib1g-dev
+  when: not retroarch_bin.stat.exists
+
+- name: Install retroarch.
+  apt:
+    name: "{{ packages }}"
+  vars:
+    packages:
+    - retroarch
+
+- name: Download retroarch git
+  git:
+    repo: 'https://github.com/libretro/retroarch.git'
+    dest: /home/retroarch
+  when: not retroarch_bin.stat.exists
+
+- name: configure retroarch
+  command: ./configure
+  args:
+    chdir: /home/retroarch
+  when: not retroarch_bin.stat.exists
+
+- name: Build retroarch.
+  make:
+    chdir: /home/retroarch
+    params:
+      NUM_THREADS: "{{ ansible_processor_nproc  }}"
+  when: not retroarch_bin.stat.exists
+
+- name: Install retroarch.
+  make:
+    chdir: /home/retroarch
+    target: install
+  when: not retroarch_bin.stat.exists
+
+- name: Remove build dependencies.
+  apt:
+    name: "{{ packages }}"
+    state: absent
+  vars:
+    packages:
+    - git
+    - build-essential
+    - pkg-config
+    - libxrandr-dev
+    - debhelper-compat
+    - glslang-dev
+    - libasound2-dev
+    - libavcodec-dev
+    - libavdevice-dev
+    - libavformat-dev
+    - libavutil-dev
+    - libdbus-1-dev
+    - libdrm-dev
+    - libegl-dev
+    - libflac-dev
+    - libfreetype-dev
+    - libgbm-dev
+    - libglm-dev
+    - libjack-jackd2-dev
+    - libminiupnpc-dev
+    - libopenal-dev
+    - libpulse-dev
+    - libsdl2-dev
+    - libstb-dev
+    - libswscale-dev
+    - libudev-dev
+    - libusb-1.0-0-dev
+    - libv4l-dev
+    - libvulkan-dev
+    - libx11-xcb-dev
+    - libxinerama-dev
+    - libxml2-dev
+    - libxv-dev
+    - libxxf86vm-dev
+    - pkg-config
+    - python3-dev
+    - qtbase5-dev
+    - wayland-protocols
+    - x11proto-xext-dev
+    - zlib1g-dev
+
+- name: Remove sources.
+  file:
+    path: "/home/retroarch"
+    state: absent
+  when: not debpackage.stat.exists
+
+- name: Remove retroarch original configuration.
+  file:
+    path: "/etc/retroarch.cfg"
+    state: absent
+
+- name: Copy configuration.
+  copy:
+    src: "{{ role_path }}/files/etc/retroarch.cfg"
+    dest: "/etc/retroarch.cfg"
+    mode: 0644
+
+- name: Copy service.
+  copy:
+    src: "{{ role_path }}/files/etc/systemd/system/retroarch.service"
+    dest: "/etc/systemd/system/retroarch.service"
+    mode: 0644
+
+- name: Enable service.
+  file:
+    src: "/etc/systemd/system/retroarch.service"
+    dest: "/etc/systemd/system/multi-user.target.wants/retroarch.service"
+    state: link

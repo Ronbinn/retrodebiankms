@@ -172,11 +172,11 @@
      - "usr/local/share/metainfo/com.libretro.RetroArch.appdata.xml"
      - "usr/local/share/applications/org.libretro.RetroArch.desktop"
      - "usr/local/share/man/man6/retroarch.6"
-     - "usr/local/share/man/man6/retroarch-cg2g"
+     - "usr/local/share/man/man6/retroarch-cg2glsl.6"
      - "usr/local/share/pixmaps/retroarch.svg"
      - "usr/local/share/doc/retroarch/COPYING"
      - "usr/local/share/doc/retroarch/README.md"
-  when: not debpackage.stat.exists
+  when: debpackage.stat.exists
 
 - name: Copy package's control file.
   template:

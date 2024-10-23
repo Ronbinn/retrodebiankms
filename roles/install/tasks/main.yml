@@ -1,0 +1,6 @@
+---
+  - include_tasks: 00-autologin.yml
+  - include_tasks: 00-users.yml
+  - include_tasks: 01-kernel.yml
+  - include_tasks: 02-retroarch.yml
+  - include_tasks: 03-groovymame.yml

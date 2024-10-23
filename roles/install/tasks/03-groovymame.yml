@@ -1,0 +1,22 @@
+---
+- name: Install original MAME to get the dependencies.
+  apt:
+    name: mame
+
+- name: Install libdrm-dev.
+  apt:
+    name: libdrm-dev
+
+- name: Check if exists a groovymame installation.
+  stat:
+    path: "/usr/local/bin/groovymame"
+  register: groovy
+
+- name: Download and extract groovymame. 64 bit.
+  unarchive:
+    src: "https://github.com/antonioginer/GroovyMAME/releases/download/gm0269sr221d/groovymame_0269.221d_linux.tar.bz2"
+    dest: /usr/local/bin
+    remote_src: yes
+  when:
+    - groovy.stat.exists == false
+    - ansible_architecture == 'x86_64'
