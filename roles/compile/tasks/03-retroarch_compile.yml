@@ -187,7 +187,7 @@
     package_internal_name: "retroarch"
     package_version: "{{ release | replace('v','') }}"
     package_architecture: "{{ ansible_architecture | replace('x86_64','amd64') }}" #ansible uses x86_64 debian uses amd64
-    package_depends: "retroarch"
+    package_depends: "libqt5core5a, libqt5gui5-gles, libasound2, libjack0, libpulse0, libxxf86vm1, libgl1, libsdl2-2.0-0, libv4l-0, libavcodec59, libavformat59, libswscale6"
     package_description: "Emulator frontend"
   when: not debpackage.stat.exists
 
