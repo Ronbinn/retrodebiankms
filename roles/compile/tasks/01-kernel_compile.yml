@@ -86,6 +86,12 @@
     target: olddefconfig
   when: not debpackage.stat.exists
 
+- name: Download Debian certificate.
+  get_url:
+    url: "https://salsa.debian.org/kernel-team/linux/-/raw/bookworm/debian/certs/debian-uefi-certs.pem?ref_type=heads"
+    dest: "/home/kernelcompile/linux-{{ kernel_version }}/certs/debian-uefi-certs.pem"
+  when: not debpackage.stat.exists
+
 - name: Configure for 15khz.
   lineinfile:
     dest: "/home/kernelcompile/linux-{{ kernel_version }}/.config"
@@ -94,6 +100,7 @@
   with_items:
      - { old: '^(.*)CONFIG_DRM_KMS_HELPER=(.*)$', new: 'CONFIG_DRM_KMS_HELPER=y' }
      - { old: '^(.*)CONFIG_LOCALVERSION=(.*)$', new: 'CONFIG_LOCALVERSION="-15khz"' }
+     - { old: '^(.*)CONFIG_SYSTEM_TRUSTED_KEYS=(.*)$', new: 'CONFIG_SYSTEM_TRUSTED_KEYS="certs/debian-uefi-certs.pem"' }
   when: not debpackage.stat.exists
 
 #make -j`nproc` bindeb-pkg 
