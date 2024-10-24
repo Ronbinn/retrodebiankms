@@ -1,0 +1,6 @@
+#playbook to install different roles
+---
+- hosts: localhost
+  connection: local
+  roles:
+    - compile
