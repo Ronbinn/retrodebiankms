@@ -187,6 +187,7 @@
     package_internal_name: "retroarch"
     package_version: "{{ release | replace('v','') }}"
     package_architecture: "{{ ansible_architecture | replace('x86_64','amd64') }}" #ansible uses x86_64 debian uses amd64
+    package_depends: "retroarch"
     package_description: "Emulator frontend"
   when: not debpackage.stat.exists
 

@@ -133,6 +133,7 @@
     package_internal_name: "attractplus"
     package_version: "{{ release }}"
     package_architecture: "{{ ansible_architecture | replace('x86_64','amd64') }}" #ansible uses x86_64 debian uses amd64
+    package_depends: "libgl1, libgbm1, libavformat59, libswscale6, libopenal1"
     package_description: "Emulator frontend"
   when: not debpackage.stat.exists
 

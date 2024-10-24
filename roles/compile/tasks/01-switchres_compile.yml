@@ -85,6 +85,7 @@
     path: "/home/packages/{{ package_name }}/{{ item }}"
     state: directory
   with_items:
+     - "usr/local/bin"
      - "usr/lib"
      - "usr/include/switchres"
      - "usr/lib/pkgconfig"
@@ -98,6 +99,7 @@
     mode: "preserve"
     remote_src: true
   with_items:
+     - "usr/local/bin/switchres"
      - "usr/lib/libswitchres.so.2.2.1"
      - "usr/lib/libswitchres.so.2" # it's a link
      - "usr/lib/libswitchres.so" # it's a link
@@ -116,6 +118,7 @@
     package_internal_name: "switchres"
     package_version: "{{ json_reponse.json.tag_name | replace('v','') }}" #remove the "v" character from the number
     package_architecture: "{{ ansible_architecture | replace('x86_64','amd64') }}" #ansible uses x86_64 debian uses amd64
+    package_depends: ""
     package_description: "Modeline generation engine for emulation"
   when: not debpackage.stat.exists
 
