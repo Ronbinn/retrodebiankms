@@ -118,7 +118,7 @@
     package_internal_name: "switchres"
     package_version: "{{ json_reponse.json.tag_name | replace('v','') }}" #remove the "v" character from the number
     package_architecture: "{{ ansible_architecture | replace('x86_64','amd64') }}" #ansible uses x86_64 debian uses amd64
-    package_depends: ""
+    package_depends: "libsdl2-2.0-0"
     package_description: "Modeline generation engine for emulation"
   when: not debpackage.stat.exists
 
