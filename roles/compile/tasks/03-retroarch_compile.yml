@@ -176,7 +176,7 @@
      - "usr/local/share/pixmaps/retroarch.svg"
      - "usr/local/share/doc/retroarch/COPYING"
      - "usr/local/share/doc/retroarch/README.md"
-  when: debpackage.stat.exists
+  when: not debpackage.stat.exists
 
 - name: Copy package's control file.
   template:

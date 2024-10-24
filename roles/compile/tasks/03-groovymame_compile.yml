@@ -50,6 +50,7 @@
     dest: "/usr/local/bin/groovymame"
     mode: "0755"
     remote_src: true
+  when: not groovymame_bin.stat.exists
 
 - name: Remove build dependencies.
   apt:
