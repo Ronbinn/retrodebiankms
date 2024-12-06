@@ -24,6 +24,7 @@
   get_url:
     url: "https://www.dropbox.com/scl/fi/od70vls815dzh0to94sme/emulationstation_de_v3.1.0_amd64.deb?rlkey=poksa4fdrsck9qs3sifuwf349&st=o9g6mosk&dl=1"
     dest: "/home/emulationstation_de.deb"
+    timeout: 60
   when:
     - bin.stat.exists == false
     - ansible_architecture == 'x86_64'
@@ -32,6 +33,7 @@
   get_url:
     url: "https://www.dropbox.com/scl/fi/ku9eammnp9ino4gibyemp/emulationstation_de_v3.1.0_i386.deb?rlkey=3tv2x55ip3qgjekl7vv8uq9iq&st=r0q657uk&dl=1"
     dest: "/home/emulationstation_de.deb"
+    timeout: 60
   when:
     - bin.stat.exists == false
     - ansible_architecture == 'i386'

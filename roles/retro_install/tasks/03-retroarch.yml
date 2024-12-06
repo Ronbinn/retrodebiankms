@@ -13,6 +13,7 @@
   get_url:
     url: "https://www.dropbox.com/scl/fi/oy475jwjxw18hs3ymbmrs/retroarch_v1.19.1_amd64.deb?rlkey=ruykkuch2sqp8zh09hw3psh7o&st=zlozld2b&dl=1"
     dest: "/home/retroarch.deb"
+    timeout: 60
   when:
     - bin.stat.exists == false
     - ansible_architecture == 'x86_64'
@@ -21,6 +22,7 @@
   get_url:
     url: "https://www.dropbox.com/scl/fi/7vixh26cbjwhgcp0igixr/retroarch_v1.19.1_i386.deb?rlkey=wopsdr8qrfnc1wd8f4602df4d&st=10elo36h&dl=1"
     dest: "/home/retroarch.deb"
+    timeout: 60
   when:
     - bin.stat.exists == false
     - ansible_architecture == 'i386'
@@ -87,7 +89,8 @@
   get_url:
     url: "https://buildbot.libretro.com/stable/1.19.1/linux/x86/RetroArch_cores.7z"
     dest: "/home/arcade/RetroArch_cores.7z"
-  when:
+    timeout: 60
+ when:
     - ansible_architecture == 'i386'
     - result.matched == 0
 
@@ -95,6 +98,7 @@
   get_url:
     url: "https://buildbot.libretro.com/stable/1.19.1/linux/x86_64/RetroArch_cores.7z"
     dest: "/home/arcade/RetroArch_cores.7z"
+    timeout: 60
   when:
     - ansible_architecture == 'x86_64'
     - result.matched == 0

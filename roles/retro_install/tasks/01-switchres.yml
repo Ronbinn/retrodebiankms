@@ -13,6 +13,7 @@
   get_url:
     url: "https://www.dropbox.com/scl/fi/9j5bi0oos0o11lkupdviq/switchres_v2.2.1_amd64.deb?rlkey=4w2ivuc8u3wt1zeyvptsmetxy&st=bsh21yro&dl=1"
     dest: "/home/switchres.deb"
+    timeout: 60
   when:
     - bin.stat.exists == false
     - ansible_architecture == 'x86_64'
@@ -21,6 +22,7 @@
   get_url:
     url: "https://www.dropbox.com/scl/fi/uysy2qdq5oa39a721rkgx/switchres_v2.2.1_i386.deb?rlkey=dzcsvn6yjgpa6co8azhiykd4y&st=wd3xzgvb&dl=1"
     dest: "/home/switchres.deb"
+    timeout: 60
   when:
     - bin.stat.exists == false
     - ansible_architecture == 'i386'

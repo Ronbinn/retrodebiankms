@@ -20,6 +20,7 @@
   get_url:
     url: "https://www.dropbox.com/scl/fi/rvulvednnum869pv38t5b/groovymame_0271sr221d_amd64.deb?rlkey=033x37k5akz2netpzndwffsqw&st=tsefdws3&dl=1"
     dest: "/home/groovymame.deb"
+    timeout: 60
   when:
     - bin.stat.exists == false
     - ansible_architecture == 'x86_64'
@@ -28,6 +29,7 @@
   get_url:
     url: "https://www.dropbox.com/scl/fi/vsndxtofrlykg9zpwxku4/groovymame_0271sr221d_i386.deb?rlkey=ulyn8rvpjleq8pnmloof0bdyc&st=h1p8spl6&dl=1"
     dest: "/home/groovymame.deb"
+    timeout: 60
   when:
     - bin.stat.exists == false
     - ansible_architecture == 'i386'
