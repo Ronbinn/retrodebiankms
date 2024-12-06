@@ -1,15 +1,5 @@
 #Install kernel and configure grub
 ---
-- name: Install extra firmwares.
-  apt:
-    name: "{{ packages }}"
-  vars:
-    packages:
-    - firmware-linux-nonfree
-    - firmware-misc-nonfree
-    - firmware-sof-signed
-  when: ansible_distribution == 'Debian'
-
 - name: Check 15khz kernels.
   find:
     paths:

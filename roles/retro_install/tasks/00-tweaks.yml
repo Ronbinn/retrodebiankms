@@ -1,5 +1,15 @@
 #Disable speaker and enable audio
 ---
+- name: Install extra firmwares.
+  apt:
+    name: "{{ packages }}"
+  vars:
+    packages:
+    - firmware-linux-nonfree
+    - firmware-misc-nonfree
+    - firmware-sof-signed
+  when: ansible_distribution == 'Debian'
+
 - name: Install openssh-server.
   apt:
     name: "openssh-server"
