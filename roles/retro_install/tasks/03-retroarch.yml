@@ -3,6 +3,11 @@
   apt:
     name: retroarch
 
+- name: Check if exists a retroarch installation.
+  stat:
+    path: "/usr/local/bin/retroarch"
+  register: bin
+
 - name: Download retroarch. 64 bit.
   get_url:
     url: "https://www.dropbox.com/scl/fi/oy475jwjxw18hs3ymbmrs/retroarch_v1.19.1_amd64.deb?rlkey=ruykkuch2sqp8zh09hw3psh7o&st=zlozld2b&dl=1"
@@ -69,7 +74,7 @@
   apt:
     name: p7zip-full
 
-- name: Check 15khz kernels.
+- name: Check installed cores.
   find:
     paths:
       - "/home/arcade/.config/retroarch/cores"

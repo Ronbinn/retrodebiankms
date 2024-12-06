@@ -8,7 +8,7 @@
     name: "{{ item }}"
   with_items:
     - libdrm-dev
-    - xorg-dev
+    - xorg-dev #this is not mandatory
 
 - name: Check if exists a groovymame installation.
   stat:
@@ -60,19 +60,3 @@
     src: "/usr/local/bin/groovymame"
     dest: "/usr/local/bin/mame"
     state: link
-
-#- name: Create mame.ini configuration file.
-#  command:
-#    chdir: "/home/arcade/.mame"
-#    argv:
-#      - "/usr/local/bin/groovymame"
-#      - "-createconfig"
-
-#- name: Download and extract groovymame. 64 bit.
-#  unarchive:
-#    src: "https://github.com/antonioginer/GroovyMAME/releases/download/gm0269sr221d/groovymame_0269.221d_linux.tar.bz2"
-#    dest: /usr/local/bin
-#    remote_src: yes
-#  when:
-#    - bin.stat.exists == false
-#    - ansible_architecture == 'x86_64'
