@@ -1,3 +1,4 @@
+#install and configure retroarch
 ---
 - name: Install original retroarch to get the dependencies.
   apt:

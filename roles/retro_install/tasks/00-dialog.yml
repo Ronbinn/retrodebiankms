@@ -1,4 +1,4 @@
-#
+#dialog menu
 ---
 - name: Install whiptail and dialog.
   apt:

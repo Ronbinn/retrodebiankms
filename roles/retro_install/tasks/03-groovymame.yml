@@ -1,3 +1,4 @@
+#install and configure groovymame
 ---
 - name: Install original MAME to get the dependencies.
   apt:

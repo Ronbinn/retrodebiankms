@@ -1,4 +1,4 @@
-#
+#configure samba
 ---
 - name: Install samba and cifs-utils.
   apt:

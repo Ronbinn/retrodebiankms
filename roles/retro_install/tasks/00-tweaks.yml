@@ -1,4 +1,4 @@
-#Disable speaker and enable audio
+#Install firmwares, disable speaker and enable audio
 ---
 - name: Install extra firmwares.
   apt:
