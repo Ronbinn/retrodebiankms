@@ -1,0 +1,2 @@
+[hosts]
+/home/debianlive32		distro=debian suite=bookworm	arch=i386
