@@ -8,6 +8,5 @@
   - include_tasks: 01-switchres.yml
   - include_tasks: 02-attractplus.yml
   - include_tasks: 02-emulationstation_de.yml
-#  - include_tasks: 02-emulationstation.yml
   - include_tasks: 03-groovymame.yml
   - include_tasks: 03-retroarch.yml
