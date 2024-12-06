@@ -43,10 +43,10 @@
   - name: Create filesystem.squashfs file
     command: chdir={{ inventory_hostname }}/live mksquashfs squashfs-root filesystem.squashfs
 
-  - name: Remove squashfs-root folder
-    file:
-      path="{{ inventory_hostname }}/live/squashfs-root"
-      state=absent
+#  - name: Remove squashfs-root folder
+#    file:
+#      path="{{ inventory_hostname }}/live/squashfs-root"
+#      state=absent
 
   - name: Remove old md5 file.
     file:
