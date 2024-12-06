@@ -68,7 +68,6 @@
     patterns:
       - "initrd*15khz*"
   register: initrd15
-  when: result.matched == 0
 
 - name: Find new kernel's vmlinuz.
   find:
@@ -77,7 +76,6 @@
     patterns:
       - "vmlinuz*15khz*"
   register: vmlinuz15
-  when: result.matched == 0
 
 - name: Create new links. Debian.
   file:
@@ -87,9 +85,7 @@
   with_items:
      - { src: "{{ initrd15.files[-1].path | replace('/boot','boot') }}", dest: "/initrd.img" } #0 is first -1 is last
      - { src: "{{ vmlinuz15.files[-1].path | replace('/boot','boot') }}", dest: "/vmlinuz" } #remove first slash
-  when:
-    - ansible_distribution == 'Debian'
-    - result.matched == 0
+  when: ansible_distribution == 'Debian'
 
 - name: Create new links. Ubuntu.
   file:
@@ -99,9 +95,7 @@
   with_items:
      - { src: "{{ initrd15.files[-1].path }}", dest: "/boot/initrd.img" }
      - { src: "{{ vmlinuz15.files[-1].path }}", dest: "/boot/vmlinuz" }
-  when:
-    - ansible_distribution == 'Debian'
-    - result.matched == 0
+  when: ansible_distribution == 'Ubuntu'
 
 - name: Modify grub.
   lineinfile:
@@ -118,30 +112,3 @@
      - linux-image-686-pae
      - linux-image-amd64
      - linux-image-generic
-  when: result.matched == 0
-
-#- name: Hold i386 kernel for Debian.
-#  dpkg_selections:
-#    name: linux-image-686-pae
-#    selection: hold
-#  when:
-#    - ansible_distribution == 'Debian'
-#    - ansible_architecture == 'i386'
-#    - result.matched == 0
-
-#- name: Hold amd64 kernel for Debian.
-#  dpkg_selections:
-#    name: linux-image-amd64
-#    selection: hold
-#  when:
-#    - ansible_distribution == 'Debian'
-#    - ansible_architecture == 'x86_64'
-#    - result.matched == 0
-
-#- name: Hold amd64 kernel for Ubuntu.
-#  dpkg_selections:
-#    name: linux-image-generic
-#    selection: hold
-#  when:
-#    - ansible_distribution == 'Ubuntu'
-#    - result.matched == 0
