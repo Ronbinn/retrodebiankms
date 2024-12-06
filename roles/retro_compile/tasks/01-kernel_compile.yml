@@ -21,6 +21,11 @@
     dest: "/home/kernelcompile"
   when: not debpackage.stat.exists
 
+- name: Install git.
+  apt:
+    name: "git"
+  when: not debpackage.stat.exists
+
 - name: Download kernel 15khz patches git
   git:
     repo: "https://github.com/D0023R/linux_kernel_15khz"
@@ -49,6 +54,7 @@
     src: "/home/patches/linux-{{ kernel_big_version }}/{{ item }}"
     basedir: "/home/kernelcompile/linux-{{ kernel_version }}"
     strip: 1
+    remote_src: true
   with_items:
      - "01_linux_15khz.patch"
      - "02_linux_15khz_interlaced_mode_fix.patch"
