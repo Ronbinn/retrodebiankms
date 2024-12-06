@@ -66,9 +66,17 @@
 #     - "07_linux_15khz_fix_ddc.patch"
   when: not debpackage.stat.exists
 
+- name: Find current kernel's config file.
+  find:
+    paths:
+      - "/boot"
+    patterns:
+      - "config-*"
+  register: currentconfig
+
 - name: Copy current kernel configuration.
   copy:
-    src: "/boot/config-{{ ansible_kernel  }}"
+    src: "{{ currentconfig.files[-1].path }}" #0 is first -1 is last
     dest: "/home/kernelcompile/linux-{{ kernel_version }}/.config"
     remote_src: yes
   when: not debpackage.stat.exists
