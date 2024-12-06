@@ -1,0 +1,176 @@
+---
+- name: Get latest release's tag.
+  uri:
+    url: https://api.github.com/repos/antonioginer/groovymame/releases/latest
+    return_content: true
+  register: json_reponse
+
+- name: Set facts.
+  set_fact:
+    release: "{{ json_reponse.json.tag_name  }}"
+    version: "{{ json_reponse.json.tag_name | replace('gm','') }}"
+    architecture: "{{ ansible_architecture | replace('x86_64','amd64') }}" #ansible uses x86_64 debian uses amd64
+    mamearch: "{{ ansible_architecture | replace('x86_64','x64') | replace('i386','x32') }}"
+    ptr64: "{{ ansible_architecture | replace('x86_64','1') | replace('i386','0') }}"
+    nowerror: "{{ ansible_architecture | replace('x86_64','0') | replace('i386','1') }}"
+    package_name: "groovymame_{{ json_reponse.json.tag_name | replace('gm','') }}_{{ ansible_architecture | replace('x86_64','amd64') }}"
+
+- name: Check if it's already installed.
+  stat:
+    path: "/usr/local/bin/groovymame"
+  register: groovymame_bin
+
+- name: Check if there is a package.
+  stat:
+    path: "/home/packages/{{ package_name }}.deb"
+  register: debpackage
+
+- name: Install devscripts package to obtain mk-build-deps binary.
+  apt:
+    name: "devscripts"
+  when: not groovymame_bin.stat.exists
+
+- name: Install build dependencies.
+  shell:
+    cmd: "yes | mk-build-deps mame --install --remove"
+  when: not groovymame_bin.stat.exists
+
+- name: Download latest release from github.
+  git:
+    repo: 'https://github.com/antonioginer/groovymame'
+    dest: /home/groovymamegit
+    version: "{{ release }}"
+#    recursive: true
+  when: not groovymame_bin.stat.exists
+
+- name: Apply restoregames patch.
+  patch:
+    src: "{{ role_path }}/files/restoregames.patch"
+    basedir: "/home/groovymamegit"
+    strip: 1
+  when: not groovymame_bin.stat.exists
+
+#make -j$(nproc) TARGET=mame TOOLS=1 SEPARATE_BIN=1 PTR64=1 OPTIMIZE=3 SYMBOLS=0 SYMLEVEL=1 REGENIE=1
+- name: Build groovymame.
+  make:
+    chdir: "/home/groovymamegit"
+    params:
+      NUM_THREADS: "{{ ansible_processor_nproc  }}"
+      TARGET: mame
+      TOOLS: 1
+      SEPARATE_BIN: 1
+      PTR64: "{{ ptr64 }}"
+      OPTIMIZE: 3
+      SYMBOLS: 0
+      SYMLEVEL: 1
+      REGENIE: 1
+      NOWERROR: "{{ nowerror }}"
+  when: not groovymame_bin.stat.exists
+
+- name: Install documentation dependencies.
+  apt:
+    name: "{{ packages }}"
+  vars:
+    packages:
+    - python3-sphinxcontrib.svg2pdfconverter
+    - latexmk
+    - texlive-latex-recommended
+    - texlive-latex-extra
+    - tex-gyre
+
+#make -f dist.mak PTR64=1
+- name: Build groovymame documentation.
+  make:
+    chdir: "/home/groovymamegit"
+    file: dist.mak
+    params:
+      PTR64: "{{ ptr64 }}"
+
+- name: Install groovymame.
+  copy:
+    src: "/home/groovymamegit/build/release/{{ mamearch }}/Release/mame/mame"
+    dest: "/usr/local/bin/groovymame"
+    mode: "0755"
+    remote_src: true
+  when: not groovymame_bin.stat.exists
+
+- name: Uninstall mame build dependencies.
+  apt:
+    name: "{{ packages }}"
+  vars:
+    packages:
+    - python3-sphinxcontrib.svg2pdfconverter
+    - latexmk
+    - texlive-latex-recommended
+    - texlive-latex-extra
+    - tex-gyre
+    - mame-build-deps
+  when: not groovymame_bin.stat.exists
+
+- name: Remove dependencies that are no longer required.
+  apt:
+    autoremove: yes
+  when: not groovymame_bin.stat.exists
+
+- name: Create package dirs.
+  file:
+    path: "/home/packages/{{ package_name }}/{{ item }}"
+    state: directory
+  with_items:
+     - usr/local/bin
+     - DEBIAN
+  when: not debpackage.stat.exists
+
+- name: Copy package files.
+  copy:
+    src: "/{{ item }}"
+    dest: "/home/packages/{{ package_name }}/{{ item }}"
+    mode: "preserve"
+    remote_src: true
+  with_items:
+     - "usr/local/bin/groovymame"
+  when: not debpackage.stat.exists
+
+- name: Copy package's control file.
+  template:
+    src: "{{ role_path }}/templates/control.j2"
+    dest: "/home/packages/{{ package_name }}/DEBIAN/control"
+    mode: 0644
+  vars:
+    package_internal_name: "groovymame"
+    package_version: "{{ version }}"
+    package_architecture: "{{ architecture }}"
+    package_depends: "libsdl2-2.0-0, libgl1, libqt5widgets5, libsdl2-ttf-2.0-0"
+    package_description: "MAME fork for CRTs"
+  when: not debpackage.stat.exists
+
+- name: Build package.
+  command:
+    chdir: "/home/packages"
+    argv:
+      - /usr/bin/dpkg-deb
+      - "--build"
+      - "--root-owner-group"
+      - "{{ package_name }}"
+  when: not debpackage.stat.exists
+
+- name: Archive mame folder's files.
+  archive:
+    path: "/home/groovymamegit/build/release/{{ mamearch }}/Release/mame/*"
+    dest: "/home/packages/{{ package_name }}_files.tar.gz"
+    format: gz
+    force_archive: true
+  when: not debpackage.stat.exists
+
+- name: Remove package source.
+  file:
+    path: "/home/packages/{{ package_name }}"
+    state: absent
+  when: not debpackage.stat.exists
+
+- name: Remove source code.
+  file:
+    path: "/home/groovymamegit"
+    state: absent
+  when: not groovymame_bin.stat.exists
+

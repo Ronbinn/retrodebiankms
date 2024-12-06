@@ -1,0 +1,152 @@
+---
+- name: Set release version.
+  set_fact:
+    release: "v1.19.1"
+
+- name: Check if it's already installed
+  stat:
+    path: "/usr/local/bin/retroarch"
+  register: retroarch_bin
+
+- name: Set package name.
+  set_fact:
+    package_name: "retroarch_{{ release }}_{{ ansible_architecture | replace('x86_64','amd64') }}"
+
+- name: Check if there is a package.
+  stat:
+    path: "/home/packages/{{ package_name }}.deb"
+  register: debpackage
+
+- name: Install devscripts package to obtain mk-build-deps binary.
+  apt:
+    name: "devscripts"
+  when: not retroarch_bin.stat.exists
+
+- name: Install build dependencies.
+  shell:
+    cmd: "yes | mk-build-deps retroarch --install --remove"
+  when: not retroarch_bin.stat.exists
+
+#- name: Install retroarch build dependencies.
+#  apt:
+#    name: "{{ packages }}"
+#  vars:
+#    packages:
+#    - x11proto-xext-dev
+#  when: not retroarch_bin.stat.exists
+
+- name: Download retroarch git.
+  git:
+    repo: "https://github.com/libretro/retroarch"
+    dest: "/home/retroarchgit"
+    version: "{{ release  }}"
+#    recursive: true
+  when: not retroarch_bin.stat.exists
+
+- name: Configure retroarch
+  command: ./configure
+  args:
+    chdir: "/home/retroarchgit"
+  when: not retroarch_bin.stat.exists
+
+- name: Build retroarch.
+  make:
+    chdir: "/home/retroarchgit"
+    params:
+      NUM_THREADS: "{{ ansible_processor_nproc  }}"
+  when: not retroarch_bin.stat.exists
+
+- name: Install retroarch.
+  make:
+    chdir: "/home/retroarchgit"
+    target: install
+  when: not retroarch_bin.stat.exists
+
+- name: Uninstall retroarch build dependencies.
+  apt:
+    name: "retroarch-build-deps"
+    state: absent
+  when: not retroarch_bin.stat.exists
+
+- name: Remove dependencies that are no longer required.
+  apt:
+    autoremove: yes
+  when: not retroarch_bin.stat.exists
+
+#- name: Uninstall retroarch build dependencies.
+#  apt:
+#    name: "{{ packages }}"
+#    state: absent
+#  vars:
+#    packages:
+#    - x11proto-xext-dev
+#  when: not retroarch_bin.stat.exists
+
+- name: Remove source code.
+  file:
+    path: "/home/retroarchgit"
+    state: absent
+  when: not retroarch_bin.stat.exists
+
+- name: Create package dirs.
+  file:
+    path: "/home/packages/{{ package_name }}/{{ item }}"
+    state: directory
+  with_items:
+     - "usr/local/bin"
+     - "etc"
+     - "usr/local/share/metainfo"
+     - "usr/local/share/applications"
+     - "usr/local/share/man/man6"
+     - "usr/local/share/pixmaps"
+     - "usr/local/share/doc/retroarch"
+     - "DEBIAN"
+  when: not debpackage.stat.exists
+
+- name: Copy package files.
+  copy:
+    src: "/{{ item }}"
+    dest: "/home/packages/{{ package_name }}/{{ item }}"
+    mode: "preserve"
+    remote_src: true
+  with_items:
+     - "usr/local/bin/retroarch"
+     - "usr/local/bin/retroarch-cg2glsl"
+     - "etc/retroarch.cfg"
+     - "usr/local/share/metainfo/com.libretro.RetroArch.appdata.xml"
+     - "usr/local/share/applications/org.libretro.RetroArch.desktop"
+     - "usr/local/share/man/man6/retroarch.6"
+     - "usr/local/share/man/man6/retroarch-cg2glsl.6"
+     - "usr/local/share/pixmaps/retroarch.svg"
+     - "usr/local/share/doc/retroarch/COPYING"
+     - "usr/local/share/doc/retroarch/README.md"
+  when: not debpackage.stat.exists
+
+- name: Copy package's control file.
+  template:
+    src: "{{ role_path }}/templates/control.j2"
+    dest: "/home/packages/{{ package_name }}/DEBIAN/control"
+    mode: 0644
+  vars:
+    package_internal_name: "retroarch"
+    package_version: "{{ release | replace('v','') }}"
+    package_architecture: "{{ ansible_architecture | replace('x86_64','amd64') }}" #ansible uses x86_64 debian uses amd64
+    package_depends: "libqt5core5a, libqt5gui5-gles, libasound2, libjack0, libpulse0, libxxf86vm1, libgl1, libsdl2-2.0-0, libv4l-0, libavcodec59, libavformat59, libswscale6"
+    package_description: "Emulator frontend"
+  when: not debpackage.stat.exists
+
+- name: Build package.
+  command:
+    chdir: "/home/packages"
+    argv:
+      - /usr/bin/dpkg-deb
+      - "--build"
+      - "--root-owner-group"
+      - "{{ package_name }}"
+  when: not debpackage.stat.exists
+
+- name: Remove package source.
+  file:
+    path: "/home/packages/{{ package_name }}"
+    state: absent
+  when: not debpackage.stat.exists

@@ -1,0 +1,129 @@
+---
+- name: Set new kernel version.
+  set_fact:
+    kernel_version: "6.6.63"
+    kernel_big_version: "6.6"
+
+- name: Check if there is a package.
+  stat:
+    path: "/home/packages/linux-image-{{ kernel_version }}-15khz_{{ kernel_version }}-1_{{ ansible_architecture | replace('x86_64','amd64') }}.deb"
+  register: debpackage
+
+- name: Create working dir.
+  file:
+    path: "/home/kernelcompile"
+    state: directory
+  when: not debpackage.stat.exists
+
+- name: Download kernel.
+  get_url:
+    url: "https://mirrors.edge.kernel.org/pub/linux/kernel/v6.x/linux-{{ kernel_version }}.tar.gz"
+    dest: "/home/kernelcompile"
+  when: not debpackage.stat.exists
+
+- name: Download kernel 15khz patches git
+  git:
+    repo: "https://github.com/D0023R/linux_kernel_15khz"
+    dest: "/home/patches"
+  when: not debpackage.stat.exists
+
+- name: Unarchive kernel source.
+  unarchive:
+    src: "/home/kernelcompile/linux-{{ kernel_version }}.tar.gz"
+    dest: "/home/kernelcompile"
+    remote_src: yes
+  when: not debpackage.stat.exists
+
+- name: Install devscripts package to obtain mk-build-deps binary.
+  apt:
+    name: "devscripts"
+  when: not debpackage.stat.exists
+
+- name: Install build dependencies.
+  shell:
+    cmd: "yes | mk-build-deps linux --install --remove"
+  when: not debpackage.stat.exists
+
+- name: Apply 15khz patches.
+  patch:
+    src: "/home/patches/linux-{{ kernel_big_version }}/{{ item }}"
+    basedir: "/home/kernelcompile/linux-{{ kernel_version }}"
+    strip: 1
+  with_items:
+     - "01_linux_15khz.patch"
+     - "02_linux_15khz_interlaced_mode_fix.patch"
+     - "03_linux_15khz_dcn1_dcn2_interlaced_mode_fix.patch"
+     - "04_linux_15khz_dce_interlaced_mode_fix.patch"
+     - "05_linux_15khz_amdgpu_pll_fix.patch"
+     - "06_linux_switchres_kms_drm_modesetting.patch"
+#     - "07_linux_15khz_fix_ddc.patch"
+  when: not debpackage.stat.exists
+
+- name: Copy current kernel configuration.
+  copy:
+    src: "/boot/config-{{ ansible_kernel  }}"
+    dest: "/home/kernelcompile/linux-{{ kernel_version }}/.config"
+    remote_src: yes
+  when: not debpackage.stat.exists
+
+- name: Make olddefconfig.
+  make:
+    chdir: "/home/kernelcompile/linux-{{ kernel_version }}"
+    target: olddefconfig
+  when: not debpackage.stat.exists
+
+- name: Configure for 15khz.
+  lineinfile:
+    dest: "/home/kernelcompile/linux-{{ kernel_version }}/.config"
+    regexp: "{{ item.old }}"
+    line: "{{ item.new }}"
+  with_items:
+     - { old: '^(.*)CONFIG_DRM_KMS_HELPER=(.*)$', new: 'CONFIG_DRM_KMS_HELPER=y' }
+     - { old: '^(.*)CONFIG_LOCALVERSION=(.*)$', new: 'CONFIG_LOCALVERSION="-15khz"' }
+  when: not debpackage.stat.exists
+
+#make -j`nproc` bindeb-pkg 
+- name: Compile kernel.
+  make:
+    chdir: "/home/kernelcompile/linux-{{ kernel_version }}"
+    target: bindeb-pkg
+    params:
+      NUM_THREADS: "{{ ansible_processor_nproc  }}"
+  when: not debpackage.stat.exists
+
+- name: Create package dir.
+  file:
+    path: "/home/packages"
+    state: directory
+  when: not debpackage.stat.exists
+
+- name: Copy generated deb packages.
+  copy:
+    src: "/home/kernelcompile/{{ item }}"
+    dest: "/home/packages/{{ item }}"
+    remote_src: yes
+  with_items:
+     - "linux-image-{{ kernel_version }}-15khz_{{ kernel_version }}-1_{{ ansible_architecture | replace('x86_64','amd64') }}.deb"
+     - "linux-headers-{{ kernel_version }}-15khz_{{ kernel_version }}-1_{{ ansible_architecture | replace('x86_64','amd64') }}.deb"
+     - "linux-libc-dev_{{ kernel_version }}-1_{{ ansible_architecture | replace('x86_64','amd64') }}.deb"
+  when: not debpackage.stat.exists
+
+- name: Remove sources.
+  file:
+    path: "{{ item }}"
+    state: absent
+  with_items:
+     - "/home/kernelcompile"
+     - "/home/patches"
+  when: not debpackage.stat.exists
+
+- name: Uninstall linux build dependencies.
+  apt:
+    name: "linux-build-deps"
+    state: absent
+  when: not debpackage.stat.exists
+
+- name: Remove dependencies that are no longer required.
+  apt:
+    autoremove: yes
+  when: not debpackage.stat.exists

@@ -1,0 +1,7 @@
+#!/bin/sh
+FILE=~/ES-DE/settings/es_input.xml
+if [ -f "$FILE" ]; then
+    es-de --no-splash
+else
+    es-de --force-input-config
+fi

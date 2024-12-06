@@ -1,0 +1,3 @@
+[hosts]
+/home/debianlive64		distro=debian suite=bookworm	arch=amd64
+/home/debianlive32		distro=debian suite=bookworm	arch=i386

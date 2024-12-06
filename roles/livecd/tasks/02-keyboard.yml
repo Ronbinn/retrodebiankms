@@ -1,0 +1,34 @@
+#this task configures spanish keyboard and UTF-8 charmap for the console
+---
+- name: Install keyboard-configuration and console-setup. Debian.
+  apt:
+    name: "{{ packages }}"
+  vars:
+    packages:
+    - keyboard-configuration
+    - console-setup
+    - console-data
+
+- name: Change /etc/default/keyboard for spanish keyboard
+  lineinfile:
+    dest: /etc/default/keyboard
+    regexp: 'XKBLAYOUT="us"'
+    line: 'XKBLAYOUT="es"'
+    backrefs: yes
+  register: keyboard
+
+- name: Change /etc/default/console-setup for spanish
+  lineinfile:
+    dest: /etc/default/console-setup
+    regexp: 'CHARMAP="ISO-8859-15"'
+    line: 'CHARMAP="UTF-8"'
+    backrefs: yes
+  register: charset
+
+- name: Dpkg-reconfigure keyboard-configuration
+  command: /usr/sbin/dpkg-reconfigure --frontend=noninteractive keyboard-configuration
+  when: keyboard is changed
+
+- name: Dpkg-reconfigure console-setup
+  command: /usr/sbin/dpkg-reconfigure --frontend=noninteractive console-setup
+  when: charset is changed

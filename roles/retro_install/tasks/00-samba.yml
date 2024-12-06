@@ -1,0 +1,24 @@
+#
+---
+- name: Install samba and cifs-utils.
+  apt:
+    name: "{{ item }}"
+  with_items:
+    - samba
+    - cifs-utils
+
+- name: Configure samba share.
+  blockinfile:
+    path: /etc/samba/smb.conf
+    block: |
+      [arcade]
+         comment = Arcade
+         path = /home/arcade
+         guest ok = yes
+         public = yes
+         browseable = yes
+         writeable = yes
+         create mask = 0644
+         directory mask = 0755
+         force user = arcade
+         force group = arcade

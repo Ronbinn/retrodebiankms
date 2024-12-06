@@ -1,0 +1,13 @@
+---
+  - include_tasks: 00-autologin.yml
+  - include_tasks: 00-dialog.yml
+  - include_tasks: 00-samba.yml
+  - include_tasks: 00-tweaks.yml
+  - include_tasks: 00-users.yml
+  - include_tasks: 01-kernel.yml
+  - include_tasks: 01-switchres.yml
+  - include_tasks: 02-attractplus.yml
+  - include_tasks: 02-emulationstation_de.yml
+#  - include_tasks: 02-emulationstation.yml
+  - include_tasks: 03-groovymame.yml
+  - include_tasks: 03-retroarch.yml

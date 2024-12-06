@@ -1,0 +1,21 @@
+#autologin
+---
+- name: Create /etc/systemd/system/getty@tty1.service.d directory.
+  file:
+    path: /etc/systemd/system/getty@tty1.service.d
+    state: directory
+
+- name: Create autologin service.
+  blockinfile:
+    path: /etc/systemd/system/getty@tty1.service.d/autologin.conf
+    create: true
+    block: |
+      [Service]
+      ExecStart=
+      ExecStart=-/sbin/agetty -o '-p -f -- \\u' --noclear --autologin arcade %I $TERM && /usr/local/bin/mymenu
+
+- name: Remove ansible text.
+  lineinfile:
+    dest: /etc/systemd/system/getty@tty1.service.d/autologin.conf
+    state: absent
+    regexp: "ANSIBLE"

@@ -1,0 +1,46 @@
+---
+- name: Install dependencies.
+  apt:
+    name: "libsdl2-2.0-0"
+
+- name: Check if exists a switchres installation.
+  stat:
+    path: "/usr/local/bin/switchres"
+  register: bin
+
+- name: Download switchres. 64 bit.
+  get_url:
+    url: "https://www.dropbox.com/scl/fi/9j5bi0oos0o11lkupdviq/switchres_v2.2.1_amd64.deb?rlkey=4w2ivuc8u3wt1zeyvptsmetxy&st=bsh21yro&dl=1"
+    dest: "/home/switchres.deb"
+  when:
+    - bin.stat.exists == false
+    - ansible_architecture == 'x86_64'
+
+- name: Download switchres. 32 bit.
+  get_url:
+    url: "https://www.dropbox.com/scl/fi/uysy2qdq5oa39a721rkgx/switchres_v2.2.1_i386.deb?rlkey=dzcsvn6yjgpa6co8azhiykd4y&st=wd3xzgvb&dl=1"
+    dest: "/home/switchres.deb"
+  when:
+    - bin.stat.exists == false
+    - ansible_architecture == 'i386'
+
+- name: Install switchres.
+  apt:
+    deb: "/home/switchres.deb"
+  when: bin.stat.exists == false
+
+- name: Remove deb file.
+  file:
+    path: "/home/switchres.deb"
+    state: absent
+
+- name: Copy switchres configuration examples.
+  copy:
+    src: "{{ role_path }}/files/etc/{{ item }}"
+    dest: "/etc/{{ item }}"
+    mode: 0644
+  with_items:
+   - switchres_lcd.ini
+   - switchres_arcade_31.ini
+   - switchres_generic_15_ati.ini
+   - switchres_generic_15_intel.ini

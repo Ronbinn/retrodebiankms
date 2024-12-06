@@ -1,0 +1,67 @@
+#this role will clean temporary files from a debootstraped system and compress it in a squashfs file
+---
+  - name: cleanup | sparse files
+    shell: /bin/rm -rf {{ inventory_hostname }}/live/squashfs-root/var/cache/apt/archives/*.deb
+
+  - name: cleanup | sparse files
+    shell: /bin/rm -rf {{ inventory_hostname }}/live/squashfs-root/var/cache/apt/archives/partial/*
+
+  - name: cleanup | sparse files
+    shell: /bin/rm -rf {{ inventory_hostname }}/live/squashfs-root/var/cache/debconf/*-old
+
+  - name: cleanup | sparse files
+    shell: /bin/rm -rf {{ inventory_hostname }}/live/squashfs-root/var/lib/apt/lists/*
+
+  - name: Copy vmlinuz Debian
+    copy:
+      src: "{{ inventory_hostname }}/live/squashfs-root/vmlinuz"
+      dest: "{{ inventory_hostname }}/vmlinuz"
+      mode: 0644
+    when: distro == 'debian'
+
+  - name: Copy initrd Debian
+    copy:
+      src: "{{ inventory_hostname }}/live/squashfs-root/initrd.img"
+      dest: "{{ inventory_hostname }}/initrd.img"
+      mode: 0644
+    when: distro == 'debian'
+
+  - name: Copy vmlinuz Ubuntu
+    copy:
+      src: "{{ inventory_hostname }}/live/squashfs-root/boot/vmlinuz"
+      dest: "{{ inventory_hostname }}/vmlinuz"
+      mode: 0644
+    when: distro == 'ubuntu'
+
+  - name: Copy initrd Ubuntu
+    copy:
+      src: "{{ inventory_hostname }}/live/squashfs-root/boot/initrd.img"
+      dest: "{{ inventory_hostname }}/initrd.img"
+      mode: 0644
+    when: distro == 'ubuntu'
+
+  - name: Create filesystem.squashfs file
+    command: chdir={{ inventory_hostname }}/live mksquashfs squashfs-root filesystem.squashfs
+
+  - name: Remove squashfs-root folder
+    file:
+      path="{{ inventory_hostname }}/live/squashfs-root"
+      state=absent
+
+  - name: Remove old md5 file.
+    file:
+      path: "{{ inventory_hostname }}/live/filesystem.md5"
+      state: absent
+
+  - name: Get md5 checksum.
+    stat:
+      path: "{{ inventory_hostname }}/live/filesystem.squashfs"
+      checksum_algorithm: md5
+      get_checksum: yes
+    register: md5
+
+  - name: Create md5 file.
+    lineinfile:
+      path: "{{ inventory_hostname }}/live/filesystem.md5"
+      line: "{{ md5.stat.checksum }} /run/live/medium/live/filesystem.squashfs"
+      create: "true"

@@ -1,0 +1,42 @@
+---
+- name: Install dependencies.
+  apt:
+    name: "{{ packages }}"
+  vars:
+    packages:
+    - libgl1
+    - libgbm1
+    - libavformat59
+    - libswscale6
+    - libopenal1
+
+- name: Check if exists a attractplus installation.
+  stat:
+    path: "/usr/local/bin/attractplus"
+  register: bin
+
+- name: Download attractplus. 64 bit.
+  get_url:
+    url: "https://www.dropbox.com/scl/fi/ssky1whv47x097bs11ub5/attractplus_3.0.9_amd64.deb?rlkey=49ggskq7z4io6g66uiq28atpf&st=dehd6wm4&dl=1"
+    dest: "/home/attractplus.deb"
+  when:
+    - bin.stat.exists == false
+    - ansible_architecture == 'x86_64'
+
+- name: Download attractplus. 32 bit.
+  get_url:
+    url: "https://www.dropbox.com/scl/fi/xnlrn06l8g5qka1gchqxt/attractplus_3.0.9_i386.deb?rlkey=k8mpps6ob23vhe5ns8fper7r9&st=sbtszqmy&dl=1"
+    dest: "/home/attractplus.deb"
+  when:
+    - bin.stat.exists == false
+    - ansible_architecture == 'i386'
+
+- name: Install attractplus.
+  apt:
+    deb: "/home/attractplus.deb"
+  when: bin.stat.exists == false
+
+- name: Remove deb file.
+  file:
+    path: "/home/attractplus.deb"
+    state: absent

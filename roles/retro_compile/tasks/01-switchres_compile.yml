@@ -1,0 +1,148 @@
+---
+- name: Check if it's already installed
+  stat:
+    path: "/usr/local/bin/switchres"
+  register: switchres_bin
+
+- name: Get latest release's tag.
+  uri:
+    url: https://api.github.com/repos/antonioginer/switchres/releases/latest
+    return_content: true
+  register: json_reponse
+
+- name: Set package name.
+  set_fact:
+    package_name: "switchres_{{ json_reponse.json.tag_name }}_{{ ansible_architecture | replace('x86_64','amd64') }}"
+
+- name: Check if there is a package.
+  stat:
+    path: "/home/packages/{{ package_name }}.deb"
+  register: debpackage
+
+- name: Install switchres build dependencies
+  apt:
+    name: "{{ packages }}"
+  vars:
+    packages:
+    - git
+    - build-essential
+    - pkg-config
+    - libxrandr-dev
+    - libdrm-dev
+    - libsdl2-dev
+  when: not switchres_bin.stat.exists
+
+- name: Download switchres git
+  git:
+    repo: 'https://github.com/antonioginer/switchres.git'
+    dest: "/home/switchres"
+    version: "{{ json_reponse.json.tag_name  }}"
+  when: not switchres_bin.stat.exists
+
+- name: Build switchres.
+  make:
+    chdir: "/home/switchres"
+    params:
+      NUM_THREADS: "{{ ansible_processor_nproc }}"
+  when: not switchres_bin.stat.exists
+
+- name: Install switchres.
+  make:
+    chdir: "/home/switchres"
+    target: install
+  when: not switchres_bin.stat.exists
+
+- name: copy switchres executable.
+  copy:
+    src: "/home/switchres/switchres"
+    dest: "/usr/local/bin/switchres"
+    remote_src: yes
+    mode: 0755
+  when: not switchres_bin.stat.exists
+
+- name: copy switchres configuration.
+  copy:
+    src: "/home/switchres/switchres.ini"
+    dest: "/etc/switchres.ini"
+    remote_src: yes
+    mode: 0644
+  when: not switchres_bin.stat.exists
+
+- name: Unistall switchres build dependencies
+  apt:
+    name: "{{ packages }}"
+    state: absent
+  vars:
+    packages:
+    - build-essential
+    - pkg-config
+    - libxrandr-dev
+    - libdrm-dev
+    - libsdl2-dev
+  when: not switchres_bin.stat.exists
+
+- name: Remove source code.
+  file:
+    path: "/home/switchres"
+    state: absent
+  when: not switchres_bin.stat.exists
+
+- name: Create package dirs.
+  file:
+    path: "/home/packages/{{ package_name }}/{{ item }}"
+    state: directory
+  with_items:
+     - "etc"
+     - "usr/local/bin"
+     - "usr/lib"
+     - "usr/include/switchres"
+     - "usr/lib/pkgconfig"
+     - "DEBIAN"
+  when: not debpackage.stat.exists
+
+- name: Copy package files.
+  copy:
+    src: "/{{ item }}"
+    dest: "/home/packages/{{ package_name }}/{{ item }}"
+    mode: "preserve"
+    remote_src: true
+  with_items:
+     - "etc/switchres.ini"
+     - "usr/local/bin/switchres"
+     - "usr/lib/libswitchres.so.2.2.1"
+     - "usr/lib/libswitchres.so.2" # it's a link
+     - "usr/lib/libswitchres.so" # it's a link
+     - "usr/include/switchres/switchres_defines.h"
+     - "usr/include/switchres/switchres_wrapper.h"
+     - "usr/include/switchres/switchres.h"
+     - "usr/lib/pkgconfig/switchres.pc"
+  when: not debpackage.stat.exists
+
+- name: Copy package's control file.
+  template:
+    src: "{{ role_path }}/templates/control.j2"
+    dest: "/home/packages/{{ package_name }}/DEBIAN/control"
+    mode: 0644
+  vars:
+    package_internal_name: "switchres"
+    package_version: "{{ json_reponse.json.tag_name | replace('v','') }}" #remove the "v" character from the number
+    package_architecture: "{{ ansible_architecture | replace('x86_64','amd64') }}" #ansible uses x86_64 debian uses amd64
+    package_depends: "libsdl2-2.0-0"
+    package_description: "Modeline generation engine for emulation"
+  when: not debpackage.stat.exists
+
+- name: Build package.
+  command:
+    chdir: "/home/packages"
+    argv:
+      - /usr/bin/dpkg-deb
+      - "--build"
+      - "--root-owner-group"
+      - "{{ package_name }}"
+  when: not debpackage.stat.exists
+
+- name: Remove package source.
+  file:
+    path: "/home/packages/{{ package_name }}"
+    state: absent
+  when: not debpackage.stat.exists

@@ -1,0 +1,6 @@
+#playbook to compile packages
+---
+- hosts: localhost
+  connection: local
+  roles:
+    - retro_compile

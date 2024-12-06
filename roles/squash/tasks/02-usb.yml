@@ -1,0 +1,147 @@
+#
+---
+- name: Check initrd.img size.
+  stat:
+    path: "{{ inventory_hostname }}/initrd.img"
+  register: initrd
+
+- name: Check vmlinuz size.
+  stat:
+    path: "{{ inventory_hostname }}/vmlinuz"
+  register: vmlinuz
+
+- name: Check filesystem.squash size.
+  stat:
+    path: "{{ inventory_hostname }}/live/filesystem.squashfs"
+  register: squash
+
+- name: Set image size, with 30MB extra.
+  set_fact:
+    image_size: "{{ initrd.stat.size +  vmlinuz.stat.size + squash.stat.size + 31457280 }}"
+
+- name: Create image.
+  command:
+    argv:
+      - "/usr/bin/fallocate"
+      - "-l"
+      - "{{ image_size }}"
+      - "{{ inventory_hostname }}/usb.img"
+
+- name: Mount loop.
+  command:
+    argv:
+      - "/usr/sbin/losetup"
+      - "-P"
+      - "/dev/loop0"
+      - "{{ inventory_hostname }}/usb.img"
+
+- name: Create partition table.
+  command:
+    argv:
+      - "/usr/sbin/parted"
+      - "-s"
+      - "/dev/loop0"
+      - "mklabel"
+      - "msdos"
+      - "mkpart"
+      - "primary"
+      - "fat32"
+      - "0%"
+      - "100%"
+      - "set"
+      - "1"
+      - "boot"
+      - "on"
+
+- name: Sync.
+  command: /usr/bin/sync
+
+- name: Format partition.
+  command:
+    argv:
+      - "/usr/sbin/mkfs.vfat"
+      - "/dev/loop0p1"
+      - "-F"
+      - "32"
+      - "-n"
+      - "BOOT"
+
+- name: Create mounting dir.
+  file:
+    path: "{{ inventory_hostname }}/usbdir"
+    state: directory
+
+- name: Mount partition.
+  mount:
+    src: "/dev/loop0p1"
+    path: "{{ inventory_hostname }}/usbdir"
+    fstype: "vfat"
+    opts: "umask=000"
+    state: "mounted"
+
+- name: gub-install i386.
+  command:
+    argv:
+      - "/usr/sbin/grub-install"
+      - "--no-floppy"
+      - "--boot-directory={{ inventory_hostname }}/usbdir/boot"
+      - "--target=i386-pc"
+      - "/dev/loop0"
+
+- name: gub-install efi32.
+  command:
+    argv:
+      - "/usr/sbin/grub-install"
+      - "--removable"
+      - "--boot-directory={{ inventory_hostname }}/usbdir/boot"
+      - "--efi-directory={{ inventory_hostname }}/usbdir"
+      - "--target=i386-efi"
+      - "/dev/loop0"
+
+- name: gub-install efi64.
+  command:
+    argv:
+      - "/usr/sbin/grub-install"
+      - "--removable"
+      - "--boot-directory={{ inventory_hostname }}/usbdir/boot"
+      - "--efi-directory={{ inventory_hostname }}/usbdir"
+      - "--target=x86_64-efi"
+      - "/dev/loop0"
+
+- name: Copy grub configuration.
+  copy:
+    src: "{{ role_path }}/files/grub.cfg"
+    dest: "{{ inventory_hostname }}/usbdir/boot/grub/grub.cfg"
+
+- name: Create live dir.
+  file:
+    path: "{{ inventory_hostname }}/usbdir/live"
+    state: directory
+
+- name: Copy system files.
+  copy:
+    src: "{{ inventory_hostname }}/{{ item }}"
+    dest: "{{ inventory_hostname }}/usbdir/{{ item }}"
+    remote_src: yes
+  with_items:
+    - initrd.img
+    - vmlinuz
+    - live/filesystem.squashfs
+    - live/filesystem.md5
+
+- name: Unmount partition.
+  mount:
+    path: "{{ inventory_hostname }}/usbdir"
+    state: "unmounted"
+
+- name: Unmount loop.
+  command:
+    argv:
+      - "/usr/sbin/losetup"
+      - "-d"
+      - "/dev/loop0"
+
+- name: Remove working dir.
+  file:
+    path: "{{ inventory_hostname }}/usbdir"
+    state: absent

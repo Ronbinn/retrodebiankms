@@ -1,0 +1,6 @@
+#playbook to install precompiled packages
+---
+- hosts: localhost
+  connection: local
+  roles:
+    - retro_install

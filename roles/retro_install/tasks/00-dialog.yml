@@ -1,0 +1,21 @@
+#
+---
+- name: Install whiptail and dialog.
+  apt:
+    name: "{{ packages }}"
+  vars:
+    packages:
+    - whiptail
+    - dialog
+
+- name: Copy launcher.
+  copy:
+    src: "{{ role_path }}/files/usr/local/bin/mymenu"
+    dest: "/usr/local/bin/mymenu"
+    mode: 0755
+
+#- name: Autolaunch at login.
+#  copy:
+#    src: "{{ role_path }}/files/etc/profile.d/99-mymenu.sh"
+#    dest: "/etc/profile.d/99-mymenu.sh"
+#    mode: 0644

@@ -1,0 +1,23 @@
+#this task configures the system locale
+---
+- name: Install locales. Debian.
+  apt:
+    name: "locales"
+  register: debianlocale
+  when: ansible_distribution == 'Debian'
+
+- name: Install spanish locales in ubuntu.
+  apt:
+    name: "language-pack-es"
+  register: ubuntulocale
+  when: ansible_distribution == 'Ubuntu'
+
+- name: Add spanish locale
+  locale_gen:
+    name: es_ES.UTF-8
+    state: present
+  register: spanish
+
+- name: Dpkg-reconfigure locales.
+  command: /usr/sbin/dpkg-reconfigure --frontend=noninteractive locales
+  when: (ubuntulocale is changed) or (debianlocale is changed) or (spanish is changed)

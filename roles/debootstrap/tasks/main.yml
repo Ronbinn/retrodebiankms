@@ -1,0 +1,57 @@
+#this role executes debootstrap using vars defined in the hosts file and the files inside "vars" dir. there is one for ubuntu and another one for debian
+---
+  - include_vars: "{{ distro }}.yml"
+
+  #http://changelogs.ubuntu.com/changelogs/pool/main/d/debootstrap/debootstrap_1.0.128+nmu2ubuntu4/changelog
+  - name: Create links for lunar and noble.
+    file:
+      src: "gutsy"
+      dest: "/usr/share/debootstrap/scripts/{{ item }}"
+      state: link
+    with_items:
+       - lunar
+       - noble
+
+  - name: Check if it already exists a squashfs-root folder.
+    stat:
+      path: "{{ inventory_hostname }}/live/squashfs-root"
+    register: squashdir
+
+  - name: Check if it already exists a filesystem.squashfs file.
+    stat:
+      path: "{{ inventory_hostname }}/live/filesystem.squashfs"
+    register: filesystem
+
+  - name: filesystem.squashfs exists but squshsfs-root doesn't. Extract the old file.
+    command: chdir={{ inventory_hostname }}/live unsquashfs filesystem.squashfs
+    when:
+      - filesystem.stat.exists == True
+      - squashdir.stat.exists == False
+
+  - name: Remove old squashfs file.
+    file:
+      path="{{ inventory_hostname }}/live/filesystem.squashfs"
+      state=absent
+    when:
+      - filesystem.stat.exists == True
+      - squashdir.stat.exists == False
+
+  - name: There is no filesystem file nor squashfs-root folder. Create the folder.
+    file:
+      path: "{{ inventory_hostname }}/live/squashfs-root"
+      state: directory
+      mode: 0755
+    when:
+      - filesystem.stat.exists == False
+      - squashdir.stat.exists == False
+
+  - name: Create new installation using debootstrap.
+    command: /usr/sbin/debootstrap
+             --arch={{ arch }}
+             --include=python-is-python3
+             --components={{ compo }}
+             --merged-usr
+             {{ suite }} {{ inventory_hostname }}/live/squashfs-root {{ repo }}
+    when:
+      - filesystem.stat.exists == False
+      - squashdir.stat.exists == False

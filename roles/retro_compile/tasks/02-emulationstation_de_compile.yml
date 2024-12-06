@@ -1,0 +1,167 @@
+---
+- name: Get latest release's tag.
+  uri:
+    url: https://gitlab.com/api/v4/projects/18817634/releases
+    return_content: true
+  register: json_reponse
+
+- name: Set release version.
+  set_fact:
+#    release: "stable-3.1"
+    release: "{{ json_reponse.json[0].tag_name }}"
+
+- name: Check if it's already installed.
+  stat:
+    path: "/usr/local/bin/es-de"
+  register: emulationstationde_bin
+
+- name: Set package name.
+  set_fact:
+    package_name: "emulationstation_de_{{ release }}_{{ ansible_architecture | replace('x86_64','amd64') }}"
+
+- name: Check if there is a package.
+  stat:
+    path: "/home/packages/{{ package_name }}.deb"
+  register: debpackage
+
+- name: Install emulationstation build dependencies.
+  apt:
+    name: "{{ packages }}"
+  vars:
+    packages:
+    - git
+    - build-essential
+    - cmake
+    - gettext
+    - libgl1-mesa-dev
+    - libcurl4-openssl-dev
+    - libfreeimage-dev
+    - libsdl2-dev
+    - libavcodec-dev
+    - libavfilter-dev
+    - libharfbuzz-dev
+    - libgit2-dev
+    - libpugixml-dev
+    - libpoppler-dev
+    - libpoppler-cpp-dev
+  when: not emulationstationde_bin.stat.exists
+
+- name: Download latest release from github.
+  git:
+    repo: "https://gitlab.com/es-de/emulationstation-de"
+    dest: /home/emulationstationdegit
+    version: "{{ release  }}"
+  when: not emulationstationde_bin.stat.exists
+
+- name: Execute cmake.
+  command:
+    argv:
+      - "/usr/bin/cmake"
+      - "-DAPPLICATION_UPDATER=off" #don't auto update
+      - "-DDEINIT_ON_LAUNCH=on" #for use with KMS
+      - "-DCMAKE_INSTALL_PREFIX=/usr/local" #files location
+      - "."
+    chdir: "/home/emulationstationdegit"
+  when: not emulationstationde_bin.stat.exists
+
+- name: Build emulationstation.
+  make:
+    chdir: "/home/emulationstationdegit"
+    params:
+      NUM_THREADS: "{{ ansible_processor_nproc  }}"
+  when: not emulationstationde_bin.stat.exists
+
+- name: Install emulationstation.
+  make:
+    chdir: "/home/emulationstationdegit"
+    target: install
+  when: not emulationstationde_bin.stat.exists
+
+- name: Remove build dependencies.
+  apt:
+    name: "{{ packages }}"
+    state: absent
+  vars:
+    packages:
+    - git
+    - build-essential
+    - cmake
+    - libgl1-mesa-dev
+    - libcurl4-openssl-dev
+    - libfreeimage-dev
+    - libsdl2-dev
+    - libavcodec-dev
+    - libavfilter-dev
+    - libharfbuzz-dev
+    - libgit2-dev
+    - libpugixml-dev
+    - libpoppler-dev
+    - libpoppler-cpp-dev
+  when: not emulationstationde_bin.stat.exists
+
+- name: Remove source code.
+  file:
+    path: "/home/emulationstationdegit"
+    state: absent
+  when: not emulationstationde_bin.stat.exists
+
+- name: Create package dirs.
+  file:
+    path: "/home/packages/{{ package_name }}/{{ item }}"
+    state: directory
+  with_items:
+     - usr/local/bin
+     - usr/local/share/man/man6
+     - usr/local/share/es-de
+     - usr/local/share/applications
+     - usr/local/share/pixmaps
+     - usr/local/share/icons/hicolor/scalable/apps
+     - usr/local/share/metainfo
+     - DEBIAN
+  when: not debpackage.stat.exists
+
+- name: Copy package files.
+  copy:
+    src: "/{{ item }}"
+    dest: "/home/packages/{{ package_name }}/{{ item }}"
+    mode: "preserve"
+    remote_src: true
+  with_items:
+     - "usr/local/bin/es-de"
+     - "usr/local/bin/es-pdf-convert"
+     - "usr/local/share/man/man6/es-de.6.gz"
+     - "usr/local/share/applications/org.es_de.frontend.desktop"
+     - "usr/local/share/pixmaps/org.es_de.frontend.svg"
+     - "usr/local/share/icons/hicolor/scalable/apps/org.es_de.frontend.svg"
+     - "usr/local/share/metainfo/org.es_de.frontend.appdata.xml"
+     - "usr/local/share/es-de/"
+  when: not debpackage.stat.exists
+
+- name: Copy package's control file.
+  template:
+    src: "{{ role_path }}/templates/control.j2"
+    dest: "/home/packages/{{ package_name }}/DEBIAN/control"
+    mode: 0644
+  vars:
+    package_internal_name: "emulationstationde"
+    package_version: "{{ release | replace('v','') }}"
+    package_architecture: "{{ ansible_architecture | replace('x86_64','amd64') }}" #ansible uses x86_64 debian uses amd64
+    package_depends: "libcurl4, libfreeimage3, libgit2-1.5, libpugixml1v5, libsdl2-2.0-0, libavcodec59, libavfilter8, libopengl0, libegl1"
+    package_description: "Emulator frontend"
+  when: not debpackage.stat.exists
+
+- name: Build package.
+  command:
+    chdir: "/home/packages"
+    argv:
+      - /usr/bin/dpkg-deb
+      - "--build"
+      - "--root-owner-group"
+      - "{{ package_name }}"
+  when: not debpackage.stat.exists
+
+- name: Remove package source.
+  file:
+    path: "/home/packages/{{ package_name }}"
+    state: absent
+  when: not debpackage.stat.exists

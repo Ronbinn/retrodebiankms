@@ -1,0 +1,89 @@
+---
+- name: Install dependencies.
+  apt:
+    name: "{{ packages }}"
+  vars:
+    packages:
+    - libcurl4
+    - libfreeimage3
+    - libgit2-1.5
+    - libpugixml1v5
+    - libsdl2-2.0-0
+    - libavcodec59
+    - libavfilter8
+    - libopengl0
+    - libegl1
+
+- name: Check if exists a emulationstation_de installation.
+  stat:
+    path: "/usr/local/bin/es-de"
+  register: bin
+
+- name: Download emulationstation_de. 64 bit.
+  get_url:
+    url: "https://www.dropbox.com/scl/fi/od70vls815dzh0to94sme/emulationstation_de_v3.1.0_amd64.deb?rlkey=poksa4fdrsck9qs3sifuwf349&st=o9g6mosk&dl=1"
+    dest: "/home/emulationstation_de.deb"
+  when:
+    - bin.stat.exists == false
+    - ansible_architecture == 'x86_64'
+
+- name: Download emulationstation_de. 32 bit.
+  get_url:
+    url: "https://www.dropbox.com/scl/fi/ku9eammnp9ino4gibyemp/emulationstation_de_v3.1.0_i386.deb?rlkey=3tv2x55ip3qgjekl7vv8uq9iq&st=r0q657uk&dl=1"
+    dest: "/home/emulationstation_de.deb"
+  when:
+    - bin.stat.exists == false
+    - ansible_architecture == 'i386'
+
+- name: Install emulationstation_de.
+  apt:
+    deb: "/home/emulationstation_de.deb"
+  when: bin.stat.exists == false
+
+- name: Remove deb file.
+  file:
+    path: "/home/emulationstation_de.deb"
+    state: absent
+
+- name: Install git.
+  apt:
+    name: "git"
+
+- name: Download themes.
+  git:
+    repo: "{{ item.url }}"
+    dest: "{{ item.dest }}"
+  with_items:
+    - { url: "https://github.com/Rose22/simplemenu-es-de", dest: "/usr/local/share/es-de/themes/simplemenu-es-de" }
+    - { url: "https://github.com/anthonycaccese/mister-menu-es-de", dest: "/usr/local/share/es-de/themes/mister-menu-es-de" }
+
+- name: Create ROMs dir.
+  command:
+    argv:
+      - "/usr/local/bin/es-de"
+      - "--create-system-dirs"
+      - "--home"
+      - "/home/arcade"
+
+- name: Change file ownership.
+  file:
+   dest: "{{ item }}"
+   owner: arcade
+   group: arcade
+   mode: u=rwX,g=rX,o=rX
+   recurse: yes
+  with_items:
+    - "/home/arcade/ROMs"
+    - "/home/arcade/ES-DE"
+
+- name: Copy launcher.
+  copy:
+    src: "{{ role_path }}/files/usr/local/bin/myesde"
+    dest: "/usr/local/bin/myesde"
+    mode: 0755
+
+- name: Copy rom.
+  copy:
+    src: "{{ role_path }}/files/wrally.zip"
+    dest: "/home/arcade/ROMs/arcade/wrally.zip"
+    mode: 0644

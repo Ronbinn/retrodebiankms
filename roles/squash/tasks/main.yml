@@ -1,0 +1,6 @@
+#
+---
+  - include_tasks: 01-squash.yml
+  - include_tasks: 02-iso.yml
+#  - include_tasks: 02-usb.yml
+

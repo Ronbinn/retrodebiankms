@@ -1,0 +1,32 @@
+#Disable speaker and enable audio
+---
+- name: Install openssh-server.
+  apt:
+    name: "openssh-server"
+
+- name: Install audio utils.
+  apt:
+    name: "{{ packages }}"
+  vars:
+    packages:
+    - alsa-utils
+    - pulseaudio
+    - pipewire
+
+- name: Copy listconnectors script.
+  copy:
+    src: "{{ role_path }}/files/usr/local/bin/listconnectors"
+    dest: "/usr/local/bin/listconnectors"
+    mode: 0755
+
+- name: Disable pcspeaker.
+  lineinfile:
+    create: yes
+    path: "/etc/modprobe.d/nobeep.conf"
+    line: "blacklist pcspkr"
+
+- name: Disable pcspeaker
+  replace:
+    dest: "/etc/inputrc"
+    regexp: "# set bell-style none"
+    replace: "set bell-style none"

@@ -1,0 +1,78 @@
+---
+- name: Install original MAME to get the dependencies.
+  apt:
+    name: mame
+
+- name: Install libdrm-dev and xorg-dev.
+  apt:
+    name: "{{ item }}"
+  with_items:
+    - libdrm-dev
+    - xorg-dev
+
+- name: Check if exists a groovymame installation.
+  stat:
+    path: "/usr/local/bin/groovymame"
+  register: bin
+
+- name: Download groovymame. 64 bit.
+  get_url:
+    url: "https://www.dropbox.com/scl/fi/rvulvednnum869pv38t5b/groovymame_0271sr221d_amd64.deb?rlkey=033x37k5akz2netpzndwffsqw&st=tsefdws3&dl=1"
+    dest: "/home/groovymame.deb"
+  when:
+    - bin.stat.exists == false
+    - ansible_architecture == 'x86_64'
+
+- name: Download groovymame. 32 bit.
+  get_url:
+    url: "https://www.dropbox.com/scl/fi/vsndxtofrlykg9zpwxku4/groovymame_0271sr221d_i386.deb?rlkey=ulyn8rvpjleq8pnmloof0bdyc&st=h1p8spl6&dl=1"
+    dest: "/home/groovymame.deb"
+  when:
+    - bin.stat.exists == false
+    - ansible_architecture == 'i386'
+
+- name: Install groovymame.
+  apt:
+    deb: "/home/groovymame.deb"
+  when: bin.stat.exists == false
+
+- name: Remove deb file.
+  file:
+    path: "/home/groovymame.deb"
+    state: absent
+
+- name: Create mame dirs.
+  file:
+    path: "/home/arcade/.mame/roms"
+    state: directory
+    owner: arcade
+    group: arcade
+
+- name: Copy mame.ini.
+  copy:
+    src: "{{ role_path }}/files/etc/groovymame.ini"
+    dest: "/home/arcade/.mame/mame.ini"
+    owner: arcade
+    group: arcade
+
+- name: Create link.
+  file:
+    src: "/usr/local/bin/groovymame"
+    dest: "/usr/local/bin/mame"
+    state: link
+
+#- name: Create mame.ini configuration file.
+#  command:
+#    chdir: "/home/arcade/.mame"
+#    argv:
+#      - "/usr/local/bin/groovymame"
+#      - "-createconfig"
+
+#- name: Download and extract groovymame. 64 bit.
+#  unarchive:
+#    src: "https://github.com/antonioginer/GroovyMAME/releases/download/gm0269sr221d/groovymame_0269.221d_linux.tar.bz2"
+#    dest: /usr/local/bin
+#    remote_src: yes
+#  when:
+#    - bin.stat.exists == false
+#    - ansible_architecture == 'x86_64'

@@ -1,0 +1,118 @@
+---
+- name: Install original retroarch to get the dependencies.
+  apt:
+    name: retroarch
+
+- name: Download retroarch. 64 bit.
+  get_url:
+    url: "https://www.dropbox.com/scl/fi/oy475jwjxw18hs3ymbmrs/retroarch_v1.19.1_amd64.deb?rlkey=ruykkuch2sqp8zh09hw3psh7o&st=zlozld2b&dl=1"
+    dest: "/home/retroarch.deb"
+  when:
+    - bin.stat.exists == false
+    - ansible_architecture == 'x86_64'
+
+- name: Download retroarch. 32 bit.
+  get_url:
+    url: "https://www.dropbox.com/scl/fi/7vixh26cbjwhgcp0igixr/retroarch_v1.19.1_i386.deb?rlkey=wopsdr8qrfnc1wd8f4602df4d&st=10elo36h&dl=1"
+    dest: "/home/retroarch.deb"
+  when:
+    - bin.stat.exists == false
+    - ansible_architecture == 'i386'
+
+- name: Install retroarch.
+  apt:
+    deb: "/home/retroarch.deb"
+  when: bin.stat.exists == false
+
+- name: Remove deb file.
+  file:
+    path: "/home/retroarch.deb"
+    state: absent
+
+- name: Remove retroarch original configuration.
+  file:
+    path: "/etc/retroarch.cfg"
+    state: absent
+
+- name: Copy retroarch configuration file.
+  copy:
+    src: "{{ role_path }}/files/etc/retroarch.cfg"
+    dest: "/etc/retroarch.cfg"
+    mode: 0644
+
+- name: Autolaunch at login.
+  copy:
+    src: "{{ role_path }}/files/etc/profile.d/99-retroarch.sh"
+    dest: "/etc/profile.d/99-retroarch.sh"
+    mode: 0644
+
+- name: Create retroarch dirs.
+  file:
+    path: "/home/arcade/.config/retroarch/{{ item }}"
+    state: directory
+    owner: arcade
+    group: arcade
+  with_items:
+    - cores
+    - autoconfig
+
+- name: Download retroarch core info files and joypad profiiles.
+  unarchive:
+    src: "{{ item.url }}"
+    dest: "{{ item.dest }}"
+    remote_src: yes
+  with_items:
+    - { url: "https://buildbot.libretro.com/assets/frontend/autoconfig.zip", dest: "/home/arcade/.config/retroarch/autoconfig" }
+    - { url: "https://buildbot.libretro.com/assets/frontend/info.zip", dest: "/home/arcade/.config/retroarch/cores" }
+
+- name: Install 7z extractor.
+  apt:
+    name: p7zip-full
+
+- name: Check 15khz kernels.
+  find:
+    paths:
+      - "/home/arcade/.config/retroarch/cores"
+    patterns:
+      - "*.so"
+  register: result
+
+- name: Download retroarch cores. 32 bit.
+  get_url:
+    url: "https://buildbot.libretro.com/stable/1.19.1/linux/x86/RetroArch_cores.7z"
+    dest: "/home/arcade/RetroArch_cores.7z"
+  when:
+    - ansible_architecture == 'i386'
+    - result.matched == 0
+
+- name: Download retroarch cores. 64 bit.
+  get_url:
+    url: "https://buildbot.libretro.com/stable/1.19.1/linux/x86_64/RetroArch_cores.7z"
+    dest: "/home/arcade/RetroArch_cores.7z"
+  when:
+    - ansible_architecture == 'x86_64'
+    - result.matched == 0
+
+- name: Extract retroarch cores.
+  command:
+    argv:
+      - "/usr/bin/7z"
+      - "e"
+      - "/home/arcade/RetroArch_cores.7z"
+      - "-o/home/arcade/.config/retroarch/cores"
+      - "*.so"
+      - "-r"
+  when: result.matched == 0
+
+- name: Change file ownership.
+  file:
+   dest: /home/arcade/.config/retroarch
+   owner: arcade
+   group: arcade
+   mode: u=rwX,g=rX,o=rX
+   recurse: yes
+
+- name: Remove cores 7z file.
+  file:
+   dest: /home/arcade/RetroArch_cores.7z
+   state: absent

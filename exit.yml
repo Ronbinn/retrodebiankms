@@ -1,0 +1,24 @@
+#this will be executed before exiting the chroot
+---
+- name: Remove useless packages from the cache
+  apt:
+    autoclean: yes
+
+- name: Remove dependencies that are no longer required
+  apt:
+    autoremove: yes
+
+- name: Umount proc
+  mount:
+    path: /proc
+    state: absent
+
+- name: Umount sys
+  mount:
+    path: /sys
+    state: absent
+
+- name: Umount devpts
+  mount:
+    path: /dev/pts
+    state: absent

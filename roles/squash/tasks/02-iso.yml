@@ -1,0 +1,41 @@
+#
+---
+- name: Create iso dir.
+  file:
+    path: "{{ inventory_hostname }}/iso/boot/grub"
+    state: directory
+
+- name: Copy grub configuration.
+  copy:
+    src: "{{ role_path }}/files/grub.cfg"
+    dest: "{{ inventory_hostname }}/iso/boot/grub/grub.cfg"
+
+- name: Create live dir.
+  file:
+    path: "{{ inventory_hostname }}/iso/live"
+    state: directory
+
+- name: Copy system files.
+  copy:
+    src: "{{ inventory_hostname }}/{{ item }}"
+    dest: "{{ inventory_hostname }}/iso/{{ item }}"
+    remote_src: yes
+  with_items:
+    - initrd.img
+    - vmlinuz
+    - live/filesystem.squashfs
+    - live/filesystem.md5
+
+#grub-mkrescue -o proba.iso iso/
+- name: Create image.
+  command:
+    argv:
+      - "/usr/bin/grub-mkrescue"
+      - "-o"
+      - "{{ inventory_hostname }}/myiso.iso"
+      - "{{ inventory_hostname }}/iso/"
+
+- name: Remove working dir.
+  file:
+    path: "{{ inventory_hostname }}/iso"
+    state: absent

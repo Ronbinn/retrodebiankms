@@ -1,2 +1,3 @@
 # retrodebiankms
-Ansible role to setup debian + KMS for 15khz gaming 
+Ansible role to setup debian for 15khz kms gaming
+Work In Progress...

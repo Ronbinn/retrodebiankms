@@ -1,0 +1,11 @@
+#Install tasksel and standard packages. If you want to know what's installed...
+#tasksel --new-install install standard --debconf-apt-progress "--logfile packages"
+---
+- name: Install tasksel.
+  apt:
+    name: tasksel
+    install_recommends: no
+
+- name: Install standard tasksel packages.
+  shell:
+    cmd: DEBIAN_FRONTEND=noninteractive tasksel --new-install install standard

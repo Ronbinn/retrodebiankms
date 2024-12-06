@@ -1,0 +1,147 @@
+#Install kernel and configure grub
+---
+- name: Install extra firmwares.
+  apt:
+    name: "{{ packages }}"
+  vars:
+    packages:
+    - firmware-linux-nonfree
+    - firmware-misc-nonfree
+    - firmware-sof-signed
+  when: ansible_distribution == 'Debian'
+
+- name: Check 15khz kernels.
+  find:
+    paths:
+      - "/boot"
+    patterns:
+      - "*15khz*"
+  register: result
+
+- name: Download kernel debs. 64 bit.
+  get_url:
+    url: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+  with_items:
+     - { src: "https://www.dropbox.com/scl/fi/f92gp2sn9iz3ogahqr29y/linux-image-6.6.63-15khz_6.6.63-1_amd64.deb?rlkey=3lnd0wn8c5sqlpf95jptcq2a3&st=o02h24wd&dl=1", dest: "/root/linux_image.deb" }
+     - { src: "https://www.dropbox.com/scl/fi/gwvwvgdu5pxepl3qi8vs2/linux-headers-6.6.63-15khz_6.6.63-1_amd64.deb?rlkey=n8blgf80y2vhu3o2o2knklyhc&st=tteb8jqy&dl=1", dest: "/root/linux_headers.deb" }
+     - { src: "https://www.dropbox.com/scl/fi/93tqz73esy6gqsd3adlln/linux-libc-dev_6.6.63-1_amd64.deb?rlkey=xa1cygr9pfcy3ve1140tzegnl&st=8eqmbiwj&dl=1", dest: "/root/linux_libc.deb" }
+  when:
+    - ansible_architecture == 'x86_64'
+    - result.matched == 0
+
+- name: Download kernel debs. 32 bit.
+  get_url:
+    url: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+  with_items:
+     - { src: "https://www.dropbox.com/scl/fi/9kty4a198trlko91nmtun/linux-image-6.6.63-15khz_6.6.63-1_i386.deb?rlkey=785yvbd1274x9ct9hayecz73z&st=mfp8usll&dl=1", dest: "/root/linux_image.deb" }
+     - { src: "https://www.dropbox.com/scl/fi/9p6513o5w2mhcnyl0rxwd/linux-headers-6.6.63-15khz_6.6.63-1_i386.deb?rlkey=5bpjlaoq6yzthu8c5nej7a1yd&st=2czo47jl&dl=1", dest: "/root/linux_headers.deb" }
+     - { src: "https://www.dropbox.com/scl/fi/w363zr1ljjghsug4ol64b/linux-libc-dev_6.6.63-1_i386.deb?rlkey=8zeglaqic8fbeb6u0lerugt8h&st=ttp3bv9l&dl=1", dest: "/root/linux_libc.deb" }
+  when:
+    - ansible_architecture == 'i386'
+    - result.matched == 0
+
+- name: Install 15khz kernel debs.
+  apt:
+    deb: "{{ item }}"
+  with_items:
+    - "/root/linux_image.deb"
+    - "/root/linux_headers.deb"
+    - "/root/linux_libc.deb"
+  when: result.matched == 0
+
+- name: Remove deb files.
+  file:
+    path: "{{ item }}"
+    state: absent
+  with_items:
+    - "/root/linux_image.deb"
+    - "/root/linux_headers.deb"
+    - "/root/linux_libc.deb"
+  when: result.matched == 0
+
+- name: Find new kernel's initrd.
+  find:
+    paths:
+      - "/boot"
+    patterns:
+      - "initrd*15khz*"
+  register: initrd15
+  when: result.matched == 0
+
+- name: Find new kernel's vmlinuz.
+  find:
+    paths:
+      - "/boot"
+    patterns:
+      - "vmlinuz*15khz*"
+  register: vmlinuz15
+  when: result.matched == 0
+
+- name: Create new links. Debian.
+  file:
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+    state: link
+  with_items:
+     - { src: "{{ initrd15.files[-1].path | replace('/boot','boot') }}", dest: "/initrd.img" } #0 is first -1 is last
+     - { src: "{{ vmlinuz15.files[-1].path | replace('/boot','boot') }}", dest: "/vmlinuz" } #remove first slash
+  when:
+    - ansible_distribution == 'Debian'
+    - result.matched == 0
+
+- name: Create new links. Ubuntu.
+  file:
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+    state: link
+  with_items:
+     - { src: "{{ initrd15.files[-1].path }}", dest: "/boot/initrd.img" }
+     - { src: "{{ vmlinuz15.files[-1].path }}", dest: "/boot/vmlinuz" }
+  when:
+    - ansible_distribution == 'Debian'
+    - result.matched == 0
+
+- name: Modify grub.
+  lineinfile:
+    dest: /etc/default/grub
+    regexp: '^(.*)GRUB_CMDLINE_LINUX_DEFAULT=(.*)$'
+    line: 'GRUB_CMDLINE_LINUX_DEFAULT="video=VGA-1:1280x480iec"'
+  when: result.matched == 0
+
+- name: Uninstall old kernel.
+  apt:
+    name: "{{ item }}"
+    state: absent
+  with_items:
+     - linux-image-686-pae
+     - linux-image-amd64
+     - linux-image-generic
+  when: result.matched == 0
+
+#- name: Hold i386 kernel for Debian.
+#  dpkg_selections:
+#    name: linux-image-686-pae
+#    selection: hold
+#  when:
+#    - ansible_distribution == 'Debian'
+#    - ansible_architecture == 'i386'
+#    - result.matched == 0
+
+#- name: Hold amd64 kernel for Debian.
+#  dpkg_selections:
+#    name: linux-image-amd64
+#    selection: hold
+#  when:
+#    - ansible_distribution == 'Debian'
+#    - ansible_architecture == 'x86_64'
+#    - result.matched == 0
+
+#- name: Hold amd64 kernel for Ubuntu.
+#  dpkg_selections:
+#    name: linux-image-generic
+#    selection: hold
+#  when:
+#    - ansible_distribution == 'Ubuntu'
+#    - result.matched == 0
