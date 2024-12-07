@@ -17,6 +17,7 @@
         - grub-pc-bin
         - grub-efi-ia32-bin
         - grub-efi-amd64-bin
+        - mtools
         - parted
         - xorriso
 
