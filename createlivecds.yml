@@ -35,8 +35,6 @@
     - include_role:
         name: livecd
     - include_role:
-        name: retro_compile
-    - include_role:
         name: retro_install
     - include_tasks: exit.yml
 
