@@ -90,7 +90,7 @@
     url: "https://buildbot.libretro.com/stable/1.19.1/linux/x86/RetroArch_cores.7z"
     dest: "/home/arcade/RetroArch_cores.7z"
     timeout: 60
- when:
+  when:
     - ansible_architecture == 'i386'
     - result.matched == 0
 
