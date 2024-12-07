@@ -35,6 +35,11 @@
     cmd: "yes | mk-build-deps mame --install --remove"
   when: not groovymame_bin.stat.exists
 
+- name: Install git to download the source code.
+  apt:
+    name: "git"
+  when: not groovymame_bin.stat.exists
+
 - name: Download latest release from github.
   git:
     repo: 'https://github.com/antonioginer/groovymame'
@@ -77,6 +82,7 @@
     - texlive-latex-recommended
     - texlive-latex-extra
     - tex-gyre
+  when: not groovymame_bin.stat.exists
 
 #make -f dist.mak PTR64=1
 - name: Build groovymame documentation.
@@ -85,6 +91,7 @@
     file: dist.mak
     params:
       PTR64: "{{ ptr64 }}"
+  when: not groovymame_bin.stat.exists
 
 - name: Install groovymame.
   copy:
@@ -173,4 +180,3 @@
     path: "/home/groovymamegit"
     state: absent
   when: not groovymame_bin.stat.exists
-
