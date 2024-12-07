@@ -73,9 +73,12 @@
     - { url: "https://buildbot.libretro.com/assets/frontend/autoconfig.zip", dest: "/home/arcade/.config/retroarch/autoconfig" }
     - { url: "https://buildbot.libretro.com/assets/frontend/info.zip", dest: "/home/arcade/.config/retroarch/cores" }
 
-- name: Install 7z extractor.
+- name: Install 7z and zip extractor.
   apt:
-    name: p7zip-full
+    name: {{ items }}
+  with_items:
+    - "7zip"
+    - "unzip"
 
 - name: Check installed cores.
   find:
