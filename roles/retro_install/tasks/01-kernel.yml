@@ -13,7 +13,7 @@
     url: "{{ item.src }}"
     dest: "{{ item.dest }}"
     timeout: 60
-with_items:
+  with_items:
      - { src: "https://www.dropbox.com/scl/fi/f92gp2sn9iz3ogahqr29y/linux-image-6.6.63-15khz_6.6.63-1_amd64.deb?rlkey=3lnd0wn8c5sqlpf95jptcq2a3&st=o02h24wd&dl=1", dest: "/root/linux_image.deb" }
      - { src: "https://www.dropbox.com/scl/fi/gwvwvgdu5pxepl3qi8vs2/linux-headers-6.6.63-15khz_6.6.63-1_amd64.deb?rlkey=n8blgf80y2vhu3o2o2knklyhc&st=tteb8jqy&dl=1", dest: "/root/linux_headers.deb" }
      - { src: "https://www.dropbox.com/scl/fi/93tqz73esy6gqsd3adlln/linux-libc-dev_6.6.63-1_amd64.deb?rlkey=xa1cygr9pfcy3ve1140tzegnl&st=8eqmbiwj&dl=1", dest: "/root/linux_libc.deb" }
