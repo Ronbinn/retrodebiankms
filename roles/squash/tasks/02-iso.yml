@@ -32,7 +32,7 @@
     argv:
       - "/usr/bin/grub-mkrescue"
       - "-o"
-      - "{{ inventory_hostname }}/myiso.iso"
+      - "{{ inventory_hostname }}/retrodebiankms_{{ arch }}.iso"
       - "{{ inventory_hostname }}/iso/"
 
 - name: Remove working dir.
