@@ -70,6 +70,7 @@
   with_items:
     - "p7zip-full"
     - "unzip"
+    - "atool"
 
 - name: Download core info files and joypad configs.
   get_url:
@@ -134,7 +135,11 @@
    mode: u=rwX,g=rX,o=rX
    recurse: yes
 
-- name: Remove cores 7z file.
+- name: Remove cores, joypad configs and info zip files.
   file:
-   dest: /home/arcade/RetroArch_cores.7z
+   dest: "{{ item }}"
    state: absent
+  with_items:
+    - "/home/arcade/autoconfig.zip"
+    - "/home/arcade/info.zip"
+    - "/home/arcade/RetroArch_cores.7z"
