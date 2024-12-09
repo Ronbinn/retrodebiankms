@@ -87,45 +87,45 @@
     dest: "{{ item.dest }}"
     remote_src: yes
   with_items:
-    - { url: "/home/arcade/autoconfig.zip", dest: "/home/arcade/.config/retroarch/autoconfig" }
-    - { url: "/home/arcade/info.zip", dest: "/home/arcade/.config/retroarch/cores" }
+    - { file: "/home/arcade/autoconfig.zip", dest: "/home/arcade/.config/retroarch/autoconfig" }
+    - { file: "/home/arcade/info.zip", dest: "/home/arcade/.config/retroarch/cores" }
 
-- name: Check installed cores.
-  find:
-    paths:
-      - "/home/arcade/.config/retroarch/cores"
-    patterns:
-      - "*.so"
-  register: result
+#- name: Check installed cores.
+#  find:
+#    paths:
+#      - "/home/arcade/.config/retroarch/cores"
+#    patterns:
+#      - "*.so"
+#  register: result
 
-- name: Download retroarch cores. 32 bit.
-  get_url:
-    url: "https://buildbot.libretro.com/stable/1.19.1/linux/x86/RetroArch_cores.7z"
-    dest: "/home/arcade/RetroArch_cores.7z"
-    timeout: 60
-  when:
-    - ansible_architecture == 'i386'
-    - result.matched == 0
+#- name: Download retroarch cores. 32 bit.
+#  get_url:
+#    url: "https://buildbot.libretro.com/stable/1.19.1/linux/x86/RetroArch_cores.7z"
+#    dest: "/home/arcade/RetroArch_cores.7z"
+#    timeout: 60
+#  when:
+#    - ansible_architecture == 'i386'
+3    - result.matched == 0
 
-- name: Download retroarch cores. 64 bit.
-  get_url:
-    url: "https://buildbot.libretro.com/stable/1.19.1/linux/x86_64/RetroArch_cores.7z"
-    dest: "/home/arcade/RetroArch_cores.7z"
-    timeout: 60
-  when:
-    - ansible_architecture == 'x86_64'
-    - result.matched == 0
+#- name: Download retroarch cores. 64 bit.
+#  get_url:
+#    url: "https://buildbot.libretro.com/stable/1.19.1/linux/x86_64/RetroArch_cores.7z"
+#    dest: "/home/arcade/RetroArch_cores.7z"
+#    timeout: 60
+#  when:
+#    - ansible_architecture == 'x86_64'
+#    - result.matched == 0
 
-- name: Extract retroarch cores.
-  command:
-    argv:
-      - "/usr/bin/7z"
-      - "e"
-      - "/home/arcade/RetroArch_cores.7z"
-      - "-o/home/arcade/.config/retroarch/cores"
-      - "*.so"
-      - "-r"
-  when: result.matched == 0
+#- name: Extract retroarch cores.
+#  command:
+#    argv:
+#      - "/usr/bin/7z"
+#      - "e"
+#      - "/home/arcade/RetroArch_cores.7z"
+#      - "-o/home/arcade/.config/retroarch/cores"
+#      - "*.so"
+#      - "-r"
+#  when: result.matched == 0
 
 - name: Change file ownership.
   file:
