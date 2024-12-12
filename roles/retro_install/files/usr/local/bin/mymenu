@@ -57,13 +57,13 @@ while true; do
       myesde
       ;;
     4 )
-      myesde
+      startx retroarch
       ;;
     5 )
-      myesde
+      startx mame
       ;;
     6 )
-      myesde
+      startx es-de
       ;;
   esac
 done
