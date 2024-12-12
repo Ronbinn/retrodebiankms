@@ -14,8 +14,8 @@
     dest: "/usr/local/bin/mymenu"
     mode: 0755
 
-#- name: Autolaunch at login.
-#  copy:
-#    src: "{{ role_path }}/files/etc/profile.d/99-mymenu.sh"
-#    dest: "/etc/profile.d/99-mymenu.sh"
-#    mode: 0644
+- name: Autolaunch at login.
+  copy:
+    src: "{{ role_path }}/files/etc/profile.d/99-mymenu.sh"
+    dest: "/etc/profile.d/99-mymenu.sh"
+    mode: 0644
