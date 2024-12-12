@@ -51,7 +51,7 @@ while true; do
       retroarch
       ;;
     2 )
-      groovymame -homepath $HOME/mame -switchres_ini
+      mame
       ;;
     3 )
       myesde
@@ -63,7 +63,7 @@ while true; do
       startx mame
       ;;
     6 )
-      startx es-de
+      startx myesde
       ;;
   esac
 done
