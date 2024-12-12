@@ -1,0 +1,5 @@
+#!/bin/sh
+matchbox-window-manager -use_titlebar no &
+pid=$!
+$1
+kill pid
