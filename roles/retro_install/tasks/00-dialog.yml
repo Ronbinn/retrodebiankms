@@ -22,10 +22,10 @@
     dest: "/etc/profile.d/99-mymenu.sh"
     mode: 0644
 
-- name: Autolaunch at login.
+- name: Copy xinitrc.
   copy:
     src: "{{ role_path }}/files/xinitrc"
     dest: "/home/arcade/.xinitrc"
-    user: "arcade"
+    owner: "arcade"
     group: "arcade"
     mode: 0644
