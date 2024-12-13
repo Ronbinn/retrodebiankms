@@ -144,3 +144,10 @@
     - "/home/arcade/autoconfig.zip"
     - "/home/arcade/info.zip"
     - "/home/arcade/RetroArch_cores.7z"
+
+- name: Create bios dir.
+  file:
+    path: "/home/arcade/bios_files"
+    state: directory
+    owner: arcade
+    group: arcade
