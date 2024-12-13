@@ -93,7 +93,8 @@
   lineinfile:
     dest: /etc/default/grub
     regexp: '^(.*)GRUB_CMDLINE_LINUX_DEFAULT=(.*)$'
-    line: 'GRUB_CMDLINE_LINUX_DEFAULT="video=VGA-1:1280x480iec"'
+#    line: 'GRUB_CMDLINE_LINUX_DEFAULT="video=VGA-1:1280x480iec"'
+    line: 'GRUB_CMDLINE_LINUX_DEFAULT="video=1280x480iS"'
   when: result.matched == 0
 
 - name: Uninstall old kernel.
