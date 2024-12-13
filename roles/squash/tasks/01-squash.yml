@@ -34,11 +34,17 @@
       mode: 0644
     when: distro == 'ubuntu'
 
+  - name: Check if there are compiled packages.
+    stat:
+      path: "{{ inventory_hostname }}/live/squashfs-root/home/packages"
+    register: packages
+
   - name: Copy packages
     copy:
       src: "{{ inventory_hostname }}/live/squashfs-root/home/packages"
       dest: "{{ inventory_hostname }}"
       mode: "preserve"
+    when: packages.stat.exists == true
 
   - name: Remove packages
     file:
