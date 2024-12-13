@@ -1,0 +1,16 @@
+#dialog menu
+---
+- name: Install xorg and openbox.
+  apt:
+    name: "{{ packages }}"
+  vars:
+    packages:
+    - xorg
+    - openbox
+
+- name: Autolaunch retroarch.
+  copy:
+    src: "{{ role_path }}/files/etc/xdg/openbox/autostart"
+    dest: "/etc/xdg/openbox/autostart"
+    mode: 0755
+

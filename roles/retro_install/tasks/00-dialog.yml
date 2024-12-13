@@ -7,8 +7,9 @@
     packages:
     - whiptail
     - dialog
-    - xorg
-    - matchbox
+#    - xorg
+#    - openbox
+#    - matchbox
 
 - name: Copy launcher.
   copy:

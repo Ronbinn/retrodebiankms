@@ -1,0 +1,2 @@
+#!/bin/sh
+exec /usr/bin/openbox --startup "/usr/local/bin/startup $1"
