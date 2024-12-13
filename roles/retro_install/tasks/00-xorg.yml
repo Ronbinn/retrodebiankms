@@ -8,9 +8,16 @@
     - xorg
     - openbox
 
-- name: Autolaunch retroarch.
+- name: Create openbox configuration dir.
+  file:
+    path: "/home/arcade/.config/openbox"
+    state: directory
+    owner: arcade
+    group: arcade
+
+- name: Autolaunch retroarch with openbox.
   copy:
     src: "{{ role_path }}/files/etc/xdg/openbox/autostart"
-    dest: "/etc/xdg/openbox/autostart"
-    mode: 0755
+    dest: "/home/arcade/.config/openbox/autostart"
+    mode: 0644
 
