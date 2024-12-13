@@ -19,5 +19,6 @@
   copy:
     src: "{{ role_path }}/files/etc/xdg/openbox/autostart"
     dest: "/home/arcade/.config/openbox/autostart"
+    owner: arcade
+    group: arcade
     mode: 0644
-
