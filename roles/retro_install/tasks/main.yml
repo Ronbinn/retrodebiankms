@@ -1,9 +1,9 @@
 ---
+  - include_tasks: 00-users.yml
   - include_tasks: 00-autologin.yml
   - include_tasks: 00-dialog.yml
   - include_tasks: 00-samba.yml
   - include_tasks: 00-tweaks.yml
-  - include_tasks: 00-users.yml
   - include_tasks: 01-kernel.yml
   - include_tasks: 01-switchres.yml
   - include_tasks: 02-attractplus.yml
