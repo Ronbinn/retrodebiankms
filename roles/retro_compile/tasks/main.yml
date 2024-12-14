@@ -1,7 +1,7 @@
 ---
   - include_tasks: 01-kernel_compile.yml
   - include_tasks: 01-switchres_compile.yml
-  - include_tasks: 02-attractplus_compile.yml
+#  - include_tasks: 02-attractplus_compile.yml
   - include_tasks: 02-emulationstation_de_compile.yml
   - include_tasks: 03-groovymame_compile.yml
   - include_tasks: 03-retroarch_compile.yml
