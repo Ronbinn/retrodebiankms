@@ -73,6 +73,7 @@
     patterns:
       - "config-*"
   register: currentconfig
+  when: not debpackage.stat.exists
 
 - name: Copy current kernel configuration.
   copy:
