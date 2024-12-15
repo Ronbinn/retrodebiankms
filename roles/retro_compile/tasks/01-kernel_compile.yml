@@ -135,8 +135,13 @@
 
 - name: Uninstall linux build dependencies.
   apt:
-    name: "linux-build-deps"
+    name: "{{ packages }}"
     state: absent
+  vars:
+    packages:
+    - linux-build-deps
+    - devscripts
+    - git
   when: not debpackage.stat.exists
 
 - name: Remove dependencies that are no longer required.
