@@ -112,6 +112,8 @@
     - texlive-latex-extra
     - tex-gyre
     - mame-build-deps
+    - devscripts
+    - git
   when: not groovymame_bin.stat.exists
 
 - name: Remove dependencies that are no longer required.
@@ -180,3 +182,8 @@
     path: "/home/groovymamegit"
     state: absent
   when: not groovymame_bin.stat.exists
+
+- name: Remove dependencies that are no longer required.
+  apt:
+    autoremove: yes
+  when: not debpackage.stat.exists
