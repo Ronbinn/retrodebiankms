@@ -27,14 +27,6 @@
     cmd: "yes | mk-build-deps retroarch --install --remove"
   when: not retroarch_bin.stat.exists
 
-#- name: Install retroarch build dependencies.
-#  apt:
-#    name: "{{ packages }}"
-#  vars:
-#    packages:
-#    - x11proto-xext-dev
-#  when: not retroarch_bin.stat.exists
-
 - name: Download retroarch git.
   git:
     repo: "https://github.com/libretro/retroarch"
@@ -72,15 +64,6 @@
   apt:
     autoremove: yes
   when: not retroarch_bin.stat.exists
-
-#- name: Uninstall retroarch build dependencies.
-#  apt:
-#    name: "{{ packages }}"
-#    state: absent
-#  vars:
-#    packages:
-#    - x11proto-xext-dev
-#  when: not retroarch_bin.stat.exists
 
 - name: Remove source code.
   file:
@@ -149,4 +132,9 @@
   file:
     path: "/home/packages/{{ package_name }}"
     state: absent
+  when: not debpackage.stat.exists
+
+- name: Remove dependencies that are no longer required.
+  apt:
+    autoremove: yes
   when: not debpackage.stat.exists
