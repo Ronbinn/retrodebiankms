@@ -75,6 +75,7 @@
     state: absent
   vars:
     packages:
+    - git
     - build-essential
     - pkg-config
     - cmake
@@ -151,4 +152,9 @@
   file:
     path: "/home/packages/{{ package_name }}"
     state: absent
+  when: not debpackage.stat.exists
+
+- name: Remove dependencies that are no longer required.
+  apt:
+    autoremove: yes
   when: not debpackage.stat.exists
