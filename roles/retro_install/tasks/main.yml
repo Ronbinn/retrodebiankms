@@ -1,6 +1,7 @@
 ---
   - include_tasks: 00-users.yml
-  - include_tasks: 00-autologin.yml
+#  - include_tasks: 00-autologin.yml
+  - include_tasks: 00-autologin_compile.yml
   - include_tasks: 00-xorg.yml
 #  - include_tasks: 00-dialog.yml
   - include_tasks: 00-samba.yml
