@@ -44,7 +44,7 @@
   apt:
     name: "devscripts"
   when: not debpackage.stat.exists
-
+#apt-rdepends --build-depends --follow=DEPENDS --state-show=NotInstalled linux
 - name: Install build dependencies.
   shell:
     cmd: "yes | mk-build-deps linux --install --remove"
