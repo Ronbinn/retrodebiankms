@@ -36,6 +36,11 @@
     - python3-sphinx-rtd-theme
     - texlive-latex-base
     - texlive-latex-extra
+    - bc
+    - libelf-dev
+    - libssl-dev
+    - pahole
+    - rsync
   when: not debpackage.stat.exists
 
 - name: Create working dir.
@@ -169,6 +174,11 @@
     - python3-sphinx-rtd-theme
     - texlive-latex-base
     - texlive-latex-extra
+    - bc
+    - libelf-dev
+    - libssl-dev
+    - pahole
+    - rsync
   when: "ansible_facts.packages[item] is not defined" #just remove the new installed packages
 
 - name: Remove dependencies that are no longer required.
