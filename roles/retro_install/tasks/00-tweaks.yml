@@ -8,6 +8,7 @@
     - firmware-linux-nonfree
     - firmware-misc-nonfree
     - firmware-sof-signed
+    - firmware-intel-sound
   when: ansible_distribution == 'Debian'
 
 - name: Install openssh-server.
