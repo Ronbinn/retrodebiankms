@@ -1,13 +1,42 @@
 ---
+- name: Get the list of packages installed in this system.
+  package_facts:
+    manager: apt
+
 - name: Set new kernel version.
   set_fact:
     kernel_version: "6.6.65"
     kernel_big_version: "6.6"
 
-- name: Check if there is a package.
+- name: Check if there is a compiled package.
   stat:
     path: "/home/packages/linux-image-{{ kernel_version }}-15khz_{{ kernel_version }}-1_{{ ansible_architecture | replace('x86_64','amd64') }}.deb"
   register: debpackage
+
+#apt-rdepends --build-depends --follow=DEPENDS --state-show=NotInstalled linux
+- name: Install build dependencies.
+  apt:
+    name: "{{ item }}"
+  with_items:
+    - git
+    - bison
+    - cpio
+    - debhelper #debhelper-compat
+    - dh-exec
+    - dh-python
+    - flex
+    - python3
+    - python3-jinja2
+    - quilt
+    - xz-utils
+    - dvipng
+    - graphviz
+    - patchutils
+    - python3-sphinx
+    - python3-sphinx-rtd-theme
+    - texlive-latex-base
+    - texlive-latex-extra
+  when: not debpackage.stat.exists
 
 - name: Create working dir.
   file:
@@ -22,11 +51,6 @@
     timeout: 60
   when: not debpackage.stat.exists
 
-- name: Install git.
-  apt:
-    name: "git"
-  when: not debpackage.stat.exists
-
 - name: Download kernel 15khz patches git
   git:
     repo: "https://github.com/D0023R/linux_kernel_15khz"
@@ -38,16 +62,6 @@
     src: "/home/kernelcompile/linux-{{ kernel_version }}.tar.gz"
     dest: "/home/kernelcompile"
     remote_src: yes
-  when: not debpackage.stat.exists
-
-- name: Install devscripts package to obtain mk-build-deps binary.
-  apt:
-    name: "devscripts"
-  when: not debpackage.stat.exists
-#apt-rdepends --build-depends --follow=DEPENDS --state-show=NotInstalled linux
-- name: Install build dependencies.
-  shell:
-    cmd: "yes | mk-build-deps linux --install --remove"
   when: not debpackage.stat.exists
 
 - name: Apply 15khz patches.
@@ -131,20 +145,32 @@
   with_items:
      - "/home/kernelcompile"
      - "/home/patches"
-  when: not debpackage.stat.exists
 
 - name: Uninstall linux build dependencies.
   apt:
-    name: "{{ packages }}"
+    name: "{{ item }}"
     state: absent
-  vars:
-    packages:
-    - linux-build-deps
-    - devscripts
+  with_items:
     - git
-  when: not debpackage.stat.exists
+    - bison
+    - cpio
+    - debhelper #debhelper-compat
+    - dh-exec
+    - dh-python
+    - flex
+    - python3
+    - python3-jinja2
+    - quilt
+    - xz-utils
+    - dvipng
+    - graphviz
+    - patchutils
+    - python3-sphinx
+    - python3-sphinx-rtd-theme
+    - texlive-latex-base
+    - texlive-latex-extra
+  when: "ansible_facts.packages[item] is not defined" #just remove the new installed packages
 
 - name: Remove dependencies that are no longer required.
   apt:
     autoremove: yes
-  when: not debpackage.stat.exists
