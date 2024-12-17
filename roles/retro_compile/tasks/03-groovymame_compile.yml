@@ -1,4 +1,8 @@
 ---
+- name: Get the list of packages installed in this system.
+  package_facts:
+    manager: apt
+
 - name: Get latest release's tag.
   uri:
     url: https://api.github.com/repos/antonioginer/groovymame/releases/latest
@@ -25,19 +29,32 @@
     path: "/home/packages/{{ package_name }}.deb"
   register: debpackage
 
-- name: Install devscripts package to obtain mk-build-deps binary.
+#apt-rdepends --build-depends --follow=DEPENDS --state-show=NotInstalled mame
+- name: Install mame build dependencies.
   apt:
-    name: "devscripts"
-  when: not groovymame_bin.stat.exists
-
-- name: Install build dependencies.
-  shell:
-    cmd: "yes | mk-build-deps mame --install --remove"
-  when: not groovymame_bin.stat.exists
-
-- name: Install git to download the source code.
-  apt:
-    name: "git"
+    name: "{{ item }}"
+  with_items:
+    - git
+    - debhelper-compat
+    - libasio-dev
+    - libexpat1-dev
+    - libflac-dev
+    - libfontconfig1-dev
+    - libglm-dev
+    - libjpeg-dev
+    - liblua5.3-dev
+    - libportmidi-dev
+    - libpugixml-dev
+    - libsdl2-dev
+    - libsdl2-ttf-dev
+    - libsqlite3-dev
+    - libutf8proc-dev
+    - libxinerama-dev
+    - portaudio19-dev
+    - python3-dev
+    - qtbase5-dev
+    - rapidjson-dev
+    - python3-sphinx
   when: not groovymame_bin.stat.exists
 
 - name: Download latest release from github.
@@ -45,7 +62,6 @@
     repo: 'https://github.com/antonioginer/groovymame'
     dest: /home/groovymamegit
     version: "{{ release }}"
-#    recursive: true
   when: not groovymame_bin.stat.exists
 
 - name: Apply restoregames patch.
@@ -99,26 +115,6 @@
     dest: "/usr/local/bin/groovymame"
     mode: "0755"
     remote_src: true
-  when: not groovymame_bin.stat.exists
-
-- name: Uninstall mame build dependencies.
-  apt:
-    name: "{{ packages }}"
-  vars:
-    packages:
-    - python3-sphinxcontrib.svg2pdfconverter
-    - latexmk
-    - texlive-latex-recommended
-    - texlive-latex-extra
-    - tex-gyre
-    - mame-build-deps
-    - devscripts
-    - git
-  when: not groovymame_bin.stat.exists
-
-- name: Remove dependencies that are no longer required.
-  apt:
-    autoremove: yes
   when: not groovymame_bin.stat.exists
 
 - name: Create package dirs.
@@ -175,15 +171,45 @@
   file:
     path: "/home/packages/{{ package_name }}"
     state: absent
-  when: not debpackage.stat.exists
 
 - name: Remove source code.
   file:
     path: "/home/groovymamegit"
     state: absent
-  when: not groovymame_bin.stat.exists
+
+- name: Uninstall mame build dependencies.
+  apt:
+    name: "{{ item }}"
+    state: absent
+  with_items:
+    - git
+    - debhelper-compat
+    - libasio-dev
+    - libexpat1-dev
+    - libflac-dev
+    - libfontconfig1-dev
+    - libglm-dev
+    - libjpeg-dev
+    - liblua5.3-dev
+    - libportmidi-dev
+    - libpugixml-dev
+    - libsdl2-dev
+    - libsdl2-ttf-dev
+    - libsqlite3-dev
+    - libutf8proc-dev
+    - libxinerama-dev
+    - portaudio19-dev
+    - python3-dev
+    - qtbase5-dev
+    - rapidjson-dev
+    - python3-sphinx
+    - python3-sphinxcontrib.svg2pdfconverter
+    - latexmk
+    - texlive-latex-recommended
+    - texlive-latex-extra
+    - tex-gyre
+  when: "ansible_facts.packages[item] is not defined" #just remove the new installed packages
 
 - name: Remove dependencies that are no longer required.
   apt:
     autoremove: yes
-  when: not debpackage.stat.exists
