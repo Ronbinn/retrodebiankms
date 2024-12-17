@@ -13,7 +13,7 @@
     path: "/home/packages/linux-image-{{ kernel_version }}-15khz_{{ kernel_version }}-1_{{ ansible_architecture | replace('x86_64','amd64') }}.deb"
   register: debpackage
 
-#apt-rdepends --build-depends --follow=DEPENDS --state-show=NotInstalled linux
+#apt-rdepends --build-depends --follow=DEPENDS linux
 - name: Install build dependencies.
   apt:
     name: "{{ item }}"
