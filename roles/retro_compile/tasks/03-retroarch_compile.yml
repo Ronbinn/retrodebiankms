@@ -1,4 +1,8 @@
 ---
+- name: Get the list of packages installed in this system.
+  package_facts:
+    manager: apt
+
 - name: Set release version.
   set_fact:
     release: "v1.19.1"
@@ -17,14 +21,47 @@
     path: "/home/packages/{{ package_name }}.deb"
   register: debpackage
 
-- name: Install devscripts package to obtain mk-build-deps binary.
+- name: Install retroarch build dependencies.
   apt:
-    name: "devscripts"
-  when: not retroarch_bin.stat.exists
-
-- name: Install build dependencies.
-  shell:
-    cmd: "yes | mk-build-deps retroarch --install --remove"
+    name: "{{ item }}"
+  with_items:
+    - git
+    - debhelper-compat
+    - glslang-dev
+    - libasound2-dev
+    - libavcodec-dev
+    - libavdevice-dev
+    - libavformat-dev
+    - libavutil-dev
+    - libdbus-1-dev
+    - libdrm-dev
+    - libegl-dev
+    - libflac-dev
+    - libfreetype-dev
+    - libgbm-dev
+    - libglm-dev
+    - libjack-jackd2-dev
+    - libminiupnpc-dev
+    - libopenal-dev
+    - libpulse-dev
+    - libsdl2-dev
+    - libstb-dev
+    - libswscale-dev
+    - libudev-dev
+    - libusb-1.0-0-dev
+    - libv4l-dev
+    - libvulkan-dev
+    - libx11-xcb-dev
+    - libxinerama-dev
+    - libxml2-dev
+    - libxv-dev
+    - libxxf86vm-dev
+    - pkg-config
+    - python3-dev
+    - qtbase5-dev
+    - wayland-protocols
+    - x11proto-xext-dev
+    - zlib1g-dev
   when: not retroarch_bin.stat.exists
 
 - name: Download retroarch git.
@@ -32,7 +69,6 @@
     repo: "https://github.com/libretro/retroarch"
     dest: "/home/retroarchgit"
     version: "{{ release  }}"
-#    recursive: true
   when: not retroarch_bin.stat.exists
 
 - name: Configure retroarch
@@ -54,27 +90,10 @@
     target: install
   when: not retroarch_bin.stat.exists
 
-- name: Uninstall retroarch build dependencies.
-  apt:
-    name: "{{ packages }}"
-    state: absent
-  vars:
-    packages:
-    - retroarch-build-deps
-    - devscripts
-    - git
-  when: not retroarch_bin.stat.exists
-
-- name: Remove dependencies that are no longer required.
-  apt:
-    autoremove: yes
-  when: not retroarch_bin.stat.exists
-
 - name: Remove source code.
   file:
     path: "/home/retroarchgit"
     state: absent
-  when: not retroarch_bin.stat.exists
 
 - name: Create package dirs.
   file:
@@ -137,9 +156,51 @@
   file:
     path: "/home/packages/{{ package_name }}"
     state: absent
-  when: not debpackage.stat.exists
+
+- name: Uninstall retroarch build dependencies.
+  apt:
+    name: "{{ item }}"
+    state: absent
+  with_items:
+    - git
+    - debhelper-compat
+    - glslang-dev
+    - libasound2-dev
+    - libavcodec-dev
+    - libavdevice-dev
+    - libavformat-dev
+    - libavutil-dev
+    - libdbus-1-dev
+    - libdrm-dev
+    - libegl-dev
+    - libflac-dev
+    - libfreetype-dev
+    - libgbm-dev
+    - libglm-dev
+    - libjack-jackd2-dev
+    - libminiupnpc-dev
+    - libopenal-dev
+    - libpulse-dev
+    - libsdl2-dev
+    - libstb-dev
+    - libswscale-dev
+    - libudev-dev
+    - libusb-1.0-0-dev
+    - libv4l-dev
+    - libvulkan-dev
+    - libx11-xcb-dev
+    - libxinerama-dev
+    - libxml2-dev
+    - libxv-dev
+    - libxxf86vm-dev
+    - pkg-config
+    - python3-dev
+    - qtbase5-dev
+    - wayland-protocols
+    - x11proto-xext-dev
+    - zlib1g-dev
+  when: "ansible_facts.packages[item] is not defined" #just remove the new installed packages
 
 - name: Remove dependencies that are no longer required.
   apt:
     autoremove: yes
-  when: not debpackage.stat.exists
