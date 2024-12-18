@@ -129,7 +129,6 @@
   file:
     path: "/home/packages/{{ package_name }}"
     state: absent
-  when: not debpackage.stat.exists
 
 - name: Configure autologin user and command.
   lineinfile:

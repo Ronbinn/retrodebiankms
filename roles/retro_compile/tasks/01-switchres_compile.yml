@@ -147,7 +147,6 @@
   file:
     path: "/home/packages/{{ package_name }}"
     state: absent
-  when: not debpackage.stat.exists
 
 - name: Remove dependencies that are no longer required.
   apt:
