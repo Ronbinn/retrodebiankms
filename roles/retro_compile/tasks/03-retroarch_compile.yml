@@ -24,6 +24,7 @@
 - name: Install retroarch build dependencies.
   apt:
     name: "{{ item }}"
+    install_recommends: no
   with_items:
     - git
     - debhelper-compat

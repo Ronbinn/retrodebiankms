@@ -33,6 +33,7 @@
 - name: Install mame build dependencies.
   apt:
     name: "{{ item }}"
+    install_recommends: no
   with_items:
     - git
     - g++
@@ -94,6 +95,7 @@
 - name: Install documentation dependencies.
   apt:
     name: "{{ packages }}"
+    install_recommends: no
   vars:
     packages:
     - python3-sphinxcontrib.svg2pdfconverter

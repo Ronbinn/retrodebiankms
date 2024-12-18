@@ -20,6 +20,7 @@
 - name: Install attractplus build dependencies.
   apt:
     name: "{{ packages }}"
+    install_recommends: no
   vars:
     packages:
     - git
@@ -157,4 +158,3 @@
 - name: Remove dependencies that are no longer required.
   apt:
     autoremove: yes
-  when: not debpackage.stat.exists
