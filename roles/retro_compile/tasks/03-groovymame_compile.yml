@@ -35,6 +35,7 @@
     name: "{{ item }}"
   with_items:
     - git
+    - g++
     - debhelper
     - dpkg-dev
     - libasio-dev
@@ -185,6 +186,7 @@
     state: absent
   with_items:
     - git
+    - g++
     - debhelper-compat
     - dpkg-dev
     - libasio-dev
