@@ -97,6 +97,10 @@ echo "cleaning..."
 mv system/squashfs-root/* system/
 rmdir system/squashfs-root
 rm system/filesystem.squashfs
+#copy configuration files
+cp /etc/retroarch.cfg system/etc/retroarch.cfg
+cp /etc/switchres.ini system/etc/switchres.ini
+cp /etc/default/grub system/etc/default/grub
 
 #install grub in first partition
 echo "installing grub..."
@@ -107,14 +111,6 @@ mount /dev/${1}${p}1 system$grubmount
 mount -B /dev system/dev
 mount -B /proc system/proc
 mount -B /sys system/sys
-
-if grep -q 640 /proc/cmdline #ati card
-then
-    sed -i 's,1280x480iec,640x480iec,g' system/etc/default/grub #ugly hack for update-grub
-    sed -i 's,"2560","1",g' system/etc/retroarch.cfg
-    sed -i 's,dotclock_min              0,dotclock_min              25.0,g' system/etc/switchres.ini
-fi
-
 if test -d "/sys/firmware/efi"; then
     mount -B /sys/firmware/efi/efivars system/sys/firmware/efi/efivars
     chroot system /usr/sbin/grub-install /dev/${1}${p}

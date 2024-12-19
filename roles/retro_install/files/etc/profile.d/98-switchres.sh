@@ -7,6 +7,8 @@ then
     sed -i '24s,monitor.*,monitor generic_15,g' /etc/switchres.ini
     sed -i '41s,lcd_range.*,lcd_range auto,g' /etc/switchres.ini
     sed -i 's,dotclock_min.*,dotclock_min 0,g' /etc/switchres.ini
+    sed -i 's,GRUB_CMDLINE_LINUX_DEFAULT=.*,GRUB_CMDLINE_LINUX_DEFAULT="video=640x480iS",g' /etc/default/grub
+
 fi
 
 if grep -q 1280 /proc/cmdline #non ati card
@@ -16,6 +18,7 @@ then
     sed -i '24s,monitor.*,monitor generic_15,g' /etc/switchres.ini
     sed -i '41s,lcd_range.*,lcd_range auto,g' /etc/switchres.ini
     sed -i 's,dotclock_min.*,dotclock_min 25.0,g' /etc/switchres.ini
+    sed -i 's,GRUB_CMDLINE_LINUX_DEFAULT=.*,GRUB_CMDLINE_LINUX_DEFAULT="video=1280x480iS",g' /etc/default/grub
 fi
 
 if grep -q -v video /proc/cmdline #lcd
@@ -25,6 +28,7 @@ then
     sed -i '24s,monitor.*,monitor lcd,g' /etc/switchres.ini
     sed -i '41s,lcd_range.*,lcd_range 50-61,g' /etc/switchres.ini
     sed -i 's,dotclock_min.*,dotclock_min 25.0,g' /etc/switchres.ini
+    sed -i 's,GRUB_CMDLINE_LINUX_DEFAULT=.*,GRUB_CMDLINE_LINUX_DEFAULT="",g' /etc/default/grub
 fi
 
 #crt_switch_resolution = "0" #off
