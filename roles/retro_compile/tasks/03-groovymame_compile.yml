@@ -36,6 +36,8 @@
     install_recommends: no
   with_items:
     - git
+    - build-essential
+    - pkg-config
     - g++
     - debhelper
     - dpkg-dev
@@ -188,8 +190,10 @@
     state: absent
   with_items:
     - git
+    - build-essential
+    - pkg-config
     - g++
-    - debhelper-compat
+    - debhelper
     - dpkg-dev
     - libasio-dev
     - libexpat1-dev

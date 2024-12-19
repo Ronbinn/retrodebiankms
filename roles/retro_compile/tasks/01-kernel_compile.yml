@@ -20,6 +20,8 @@
     install_recommends: no
   with_items:
     - git
+    - build-essential
+    - pkg-config
     - bison
     - cpio
     - debhelper #debhelper-compat
@@ -166,6 +168,8 @@
     state: absent
   with_items:
     - git
+    - build-essential
+    - pkg-config
     - bison
     - cpio
     - debhelper #debhelper-compat

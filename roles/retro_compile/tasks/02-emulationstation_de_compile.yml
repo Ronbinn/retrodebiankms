@@ -32,6 +32,7 @@
     packages:
     - git
     - build-essential
+    - pkg-config
     - cmake
     - gettext
     - libgl1-mesa-dev
@@ -86,6 +87,7 @@
     packages:
     - git
     - build-essential
+    - pkg-config
     - cmake
     - gettext
     - libgl1-mesa-dev
