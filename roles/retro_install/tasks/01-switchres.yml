@@ -47,9 +47,3 @@
    - switchres_arcade_31.ini
    - switchres_generic_15_ati.ini
    - switchres_generic_15_intel.ini
-
-- name: Configure at login.
-  copy:
-    src: "{{ role_path }}/files/etc/profile.d/98-switchres.sh"
-    dest: "/etc/profile.d/98-switchres.sh"
-    mode: 0644
