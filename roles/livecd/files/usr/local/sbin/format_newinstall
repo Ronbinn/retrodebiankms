@@ -101,6 +101,8 @@ rm system/filesystem.squashfs
 cp /etc/retroarch.cfg system/etc/retroarch.cfg
 cp /etc/switchres.ini system/etc/switchres.ini
 cp /etc/default/grub system/etc/default/grub
+cp /etc/profile.d/99-launcher.sh system/etc/profile.d/99-launcher.sh
+rm system/etc/systemd/system/multi-user.target.wants/configurator.service
 
 #install grub in first partition
 echo "installing grub..."

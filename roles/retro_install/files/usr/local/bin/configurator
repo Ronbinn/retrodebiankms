@@ -1,5 +1,10 @@
 #!/bin/sh
 
+#crt_switch_resolution = "0" #off
+#crt_switch_resolution = "4" #ini
+#crt_switch_resolution_super = "0" #native
+#crt_switch_resolution_super = "1" #dynamic
+
 if grep -q 640 /proc/cmdline #ati card
 then
     sed -i 's,crt_switch_resolution.*,crt_switch_resolution = "4",g' /etc/retroarch.cfg
@@ -31,7 +36,7 @@ then
     sed -i 's,GRUB_CMDLINE_LINUX_DEFAULT=.*,GRUB_CMDLINE_LINUX_DEFAULT="",g' /etc/default/grub
 fi
 
-#crt_switch_resolution = "0" #off
-#crt_switch_resolution = "4" #ini
-#crt_switch_resolution_super = "0" #native
-#crt_switch_resolution_super = "1" #dynamic
+if grep -q esde /proc/cmdline #emulationstation
+then
+    sed -i 's,retroarch,myesde,g' /etc/profile.d/99-launcher.sh
+fi

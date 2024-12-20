@@ -48,12 +48,6 @@
     dest: "/etc/retroarch.cfg"
     mode: 0644
 
-- name: Autolaunch at login.
-  copy:
-    src: "{{ role_path }}/files/etc/profile.d/99-retroarch.sh"
-    dest: "/etc/profile.d/99-retroarch.sh"
-    mode: 0644
-
 - name: Create retroarch dirs.
   file:
     path: "/home/arcade/.config/retroarch/{{ item }}"
