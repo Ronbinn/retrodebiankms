@@ -1,109 +1,131 @@
 #!/bin/bash
-if test -d "/sys/firmware/efi"; then
-    echo "this is a efi system"
-    partitiontable="gpt"
-    firstpartition="ESP"
-    target="x86_64-efi"
-    bootdirectory="sda1/EFI/boot"
-    installation="--efi-directory=sda1"
-    grubcfg="sda1/EFI/boot/grub/grub.cfg"
-    grubmount="/boot/efi"
-else
-    echo "this is a bios system"
-    partitiontable="msdos"
-    firstpartition="primary"
-    target="i386-pc"
-    bootdirectory="sda1"
-    installation="/dev/${1}${p}"
-    grubcfg="sda1/grub/grub.cfg"
-    grubmount="/boot/grub"
-fi
 
+#check arguments
 if [ $# -eq 0 ]
   then
     echo "You have to choose a disk"
     lsblk | grep disk
     exit
 fi
-for n in /dev/$1* ; do umount $n ; done
-swapoff --all
 
+#/dev/sda1 vs /dev/nvme0n1p1
 p=""
-
 if [[ $1 = nvme* || $1 = mmc* ]]
   then
     p="p"
 fi
 
-#create partition table
-#dd if=/dev/zero of=/dev/$1 bs=10240 count=1
-#parted -s /dev/$1 mklabel $partitiontable  \
-# mkpart $firstpartition fat32 0% 200MB  \
-# mkpart primary ext4 200MB 20GB  \
-# mkpart primary linux-swap 20GB 24GB  \
-# mkpart primary ext4 24GB 100%  \
-# set 1 boot on
-#sync
+#set variables
+if test -d "/sys/firmware/efi"; then
+    echo "this is a efi system"
+    partitiontable="gpt"
+    firstpartition="ESP"
+    grubmount="/boot/efi"
+else
+    echo "this is a bios system"
+    partitiontable="msdos"
+    firstpartition="primary"
+    grubmount="/boot/grub"
+fi
+
+#umount disk
+for n in /dev/$1* ; do umount $n ; done
+swapoff --all
+
+#get disk size
+disksize=$(lsblk /dev/$1 | grep disk | awk '{ print $4 }' | tr -d G)
+nodecimal=${disksize%,*}
 
 #format partitions
-mkfs.vfat /dev/${1}${p}1 -F 32 -n BOOT
-mkfs.ext4 /dev/${1}${p}2 -FL system
-mkswap /dev/${1}${p}3
-#mkfs.ext4 /dev/${1}${p}4 -FL home
+mkfs.vfat /dev/${1}${p}1 -F 32 -n BOOT > /dev/null 2>&1
+mkfs.ext4 /dev/${1}${p}2 -FL system > /dev/null 2>&1
+mkswap /dev/${1}${p}3 > /dev/null 2>&1
 
 #get UUIDs
 uuid1=`blkid -s UUID -o value /dev/${1}${p}1`
 uuid2=`blkid -s UUID -o value /dev/${1}${p}2`
 uuid3=`blkid -s UUID -o value /dev/${1}${p}3`
-uuid4=`blkid -s UUID -o value /dev/${1}${p}4`
 
-#install system
-mkdir sda1
-mount /dev/${1}${p}1 sda1
-mkdir sda2
-mount /dev/${1}${p}2 sda2
+if [ "$nodecimal" -gt 20 ]; then
+   echo "It's greater than 20GB, there is a home partition"
+   uuid4=`blkid -s UUID -o value /dev/${1}${p}4`
+else
+   echo "It's greater than 20GB, there is no home partition"
+   uuid4="none"
+fi
+
+#install system in second partition
+mkdir system
+mount /dev/${1}${p}2 system
 echo "copying the image..."
-pv /lib/live/mount/medium/live/filesystem.squashfs > sda2/filesystem.squashfs
-cd sda2
+pv /lib/live/mount/medium/live/filesystem.squashfs > system/filesystem.squashfs
+echo "copying the md5 file..."
+pv /lib/live/mount/medium/live/filesystem.md5 > system/filesystem.md5
+cd system
 echo "extracting the image..."
 unsquashfs filesystem.squashfs
 cd ..
 echo "cleaning..."
-mv sda2/squashfs-root/* sda2/
-rmdir sda2/squashfs-root
-rm sda2/filesystem.squashfs
+mv system/squashfs-root/* system/
+rmdir system/squashfs-root
+rm system/filesystem.squashfs
 
-#install grub
+#copy configuration files
+cp /etc/retroarch.cfg system/etc/retroarch.cfg
+cp /etc/switchres.ini system/etc/switchres.ini
+cp /etc/default/grub system/etc/default/grub
+cp /etc/profile.d/99-launcher.sh system/etc/profile.d/99-launcher.sh
+rm system/etc/systemd/system/multi-user.target.wants/configurator.service
+
+#move home dir
+#if [ "$uuid4" != "none" ]; then
+#    echo "moving home dir..."
+#    mkdir home
+#    mount /dev/${1}${p}4 home
+#    mv system/home/arcade home/arcade
+#    umount /dev/${1}${p}4
+#    rmdir home
+#fi
+
+#install grub in first partition
 echo "installing grub..."
-mkdir -p sda1/EFI/boot
-grub-install --target=$target --boot-directory=$bootdirectory $installation
-mkdir sda2/sys
-mkdir sda2/proc
-mount --bind /dev sda2/dev
-mount --bind /sys sda2/sys
-mount --bind /proc sda2/proc
-chroot sda2 /usr/sbin/update-grub
-umount sda2/dev
-umount sda2/sys
-umount sda2/proc
-cp sda2/boot/grub/grub.cfg $grubcfg
+mkdir system/proc
+mkdir system/sys
+mkdir -p system$grubmount
+mount /dev/${1}${p}1 system$grubmount
+mount -B /dev system/dev
+mount -B /proc system/proc
+mount -B /sys system/sys
+if test -d "/sys/firmware/efi"; then
+    mount -B /sys/firmware/efi/efivars system/sys/firmware/efi/efivars
+    chroot system /usr/sbin/grub-install /dev/${1}${p}
+    chroot system /usr/sbin/update-grub
+    umount system/sys/firmware/efi/efivars
+else
+    chroot system /usr/sbin/grub-install /dev/${1}${p}
+    chroot system /usr/sbin/update-grub
+fi
+umount system/sys
+umount system/proc
+umount system/dev
+umount /dev/${1}${p}1
 
 #generate fstab
 echo "updating fstab..."
-echo "UUID=$uuid1        $grubmount           vfat    defaults                0 0" > sda2/etc/fstab
-echo "UUID=$uuid2    /                   ext4    defaults                0 0" >> sda2/etc/fstab
-echo "UUID=$uuid3    swap        swap    defaults                0 0" >> sda2/etc/fstab
-echo "UUID=$uuid4    /home       ext4    defaults                0 0" >> sda2/etc/fstab
-echo "#none    /home       tmpfs    defaults                0 0" >> sda2/etc/fstab
+echo "UUID=$uuid1        $grubmount           vfat    defaults                0 0" > system/etc/fstab
+echo "UUID=$uuid2    /                   ext4    defaults                0 0" >> system/etc/fstab
+echo "UUID=$uuid3    swap        swap    defaults                0 0" >> system/etc/fstab
+if [ "$uuid4" != "none" ]; then
+    echo "UUID=$uuid4    /home       ext4    defaults                0 0" >> system/etc/fstab
+fi
 
 #remove livecd tweaks
 echo "restoring systemd journal"
-sed -i.bak 's,Storage=none,#Storage=auto,g' sda2/etc/systemd/journald.conf
-echo "disabling getnamebymac service"
-if test -f "sda2/etc/systemd/system/multi-user.target.wants/getnamebymac.service"; then
-    rm sda2/etc/systemd/system/multi-user.target.wants/getnamebymac.service
-fi
-umount /dev/${1}${p}1
+sed -i.bak 's,Storage=none,#Storage=auto,g' system/etc/systemd/journald.conf
+echo "removing livecd services"
+rm -R system/etc/systemd/system/ifup@.service.d
+rm -R system/etc/systemd/system/networking.service.d
+
+#umount second partition
 umount /dev/${1}${p}2
-rmdir sda1
-rmdir sda2
+rmdir system

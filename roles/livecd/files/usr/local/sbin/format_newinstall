@@ -97,12 +97,23 @@ echo "cleaning..."
 mv system/squashfs-root/* system/
 rmdir system/squashfs-root
 rm system/filesystem.squashfs
+
 #copy configuration files
 cp /etc/retroarch.cfg system/etc/retroarch.cfg
 cp /etc/switchres.ini system/etc/switchres.ini
 cp /etc/default/grub system/etc/default/grub
 cp /etc/profile.d/99-launcher.sh system/etc/profile.d/99-launcher.sh
 rm system/etc/systemd/system/multi-user.target.wants/configurator.service
+
+#move home dir
+if [ "$uuid4" != "none" ]; then
+    echo "moving home dir..."
+    mkdir home
+    mount /dev/${1}${p}4 home
+    mv system/home/arcade home/arcade
+    umount /dev/${1}${p}4
+    rmdir home
+fi
 
 #install grub in first partition
 echo "installing grub..."
