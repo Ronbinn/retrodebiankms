@@ -139,7 +139,6 @@ echo "none    /home       tmpfs    defaults                0 0" >> system/etc/fs
 echo "restoring systemd journal"
 sed -i.bak 's,Storage=none,#Storage=auto,g' system/etc/systemd/journald.conf
 echo "removing livecd services"
-rm system/etc/systemd/system/multi-user.target.wants/getnamebymac.service
 rm -R system/etc/systemd/system/ifup@.service.d
 rm -R system/etc/systemd/system/networking.service.d
 
