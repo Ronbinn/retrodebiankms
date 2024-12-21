@@ -73,6 +73,14 @@
       - "--home"
       - "/home/arcade"
 
+- name: Create config dirs.
+  file:
+    path: "{{ item }}"
+    state: directory
+  with_items:
+    - "/home/arcade/ES-DE/gamelists/arcade"
+    - "/home/arcade/ES-DE/settings"
+
 - name: Copy config files.
   copy:
     src: "{{ role_path }}/files/{{ item }}"
