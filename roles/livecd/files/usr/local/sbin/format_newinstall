@@ -132,8 +132,9 @@ echo "updating fstab..."
 echo "UUID=$uuid1        $grubmount           vfat    defaults                0 0" > system/etc/fstab
 echo "UUID=$uuid2    /                   ext4    defaults                0 0" >> system/etc/fstab
 echo "UUID=$uuid3    swap        swap    defaults                0 0" >> system/etc/fstab
-echo "#UUID=$uuid4    /home       ext4    defaults                0 0" >> system/etc/fstab
-echo "none    /home       tmpfs    defaults                0 0" >> system/etc/fstab
+if [ "$uuid4" != "none" ]; then
+    echo "UUID=$uuid4    /home       ext4    defaults                0 0" >> system/etc/fstab
+fi
 
 #remove livecd tweaks
 echo "restoring systemd journal"
