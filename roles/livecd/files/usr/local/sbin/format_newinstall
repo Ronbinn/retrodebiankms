@@ -122,7 +122,6 @@ else
     chroot system /usr/sbin/grub-install /dev/${1}${p}
     chroot system /usr/sbin/update-grub
 fi
-sed -i 's,'$uuid2',$uuid,g' system/etc/grub.d/50_ipxe #restore file after update-grub
 umount system/sys
 umount system/proc
 umount system/dev
