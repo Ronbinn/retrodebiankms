@@ -60,6 +60,11 @@
     - { url: "https://github.com/Rose22/simplemenu-es-de", dest: "/usr/local/share/es-de/themes/simplemenu-es-de" }
     - { url: "https://github.com/anthonycaccese/mister-menu-es-de", dest: "/usr/local/share/es-de/themes/mister-menu-es-de" }
 
+- name: Uninstall git.
+  apt:
+    name: "git"
+    state: absent
+
 - name: Create ROMs dir.
   command:
     argv:
