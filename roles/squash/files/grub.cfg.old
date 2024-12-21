@@ -1,0 +1,43 @@
+set menu_color_normal=white/black
+set menu_color_highlight=black/light-gray
+set timeout=2
+
+menuentry "Retro ati AMDGPU" --hotkey=1 {
+ linux /vmlinuz boot=live video=640x480iS radeon.cik_support=0 amdgpu.cik_support=1 radeon.si_support=0 amdgpu.si_support=1
+ initrd /initrd.img
+}
+
+menuentry "Retro ati RADEON" --hotkey=2 {
+ linux /vmlinuz boot=live video=640x480iS radeon.cik_support=1 amdgpu.cik_support=0 radeon.si_support=1 amdgpu.si_support=0
+ initrd /initrd.img
+}
+
+menuentry "Retro GENERIC" --hotkey=3 {
+ linux /vmlinuz boot=live video=1280x480iS i915.modeset=1 nouveau.modeset=1
+ initrd /initrd.img
+}
+
+menuentry "Retro LCD" --hotkey=4 {
+ linux /vmlinuz boot=live
+ initrd /initrd.img
+}
+
+menuentry "Retro ati AMDGPU ES-DE" --hotkey=5 {
+ linux /vmlinuz boot=live video=640x480iS radeon.cik_support=0 amdgpu.cik_support=1 radeon.si_support=0 amdgpu.si_support=1 esde
+ initrd /initrd.img
+}
+
+menuentry "Retro ati RADEON ES-DE" --hotkey=6 {
+ linux /vmlinuz boot=live video=640x480iS radeon.cik_support=1 amdgpu.cik_support=0 radeon.si_support=1 amdgpu.si_support=0 esde
+ initrd /initrd.img
+}
+
+menuentry "Retro GENERIC ES-DE" --hotkey=7 {
+ linux /vmlinuz boot=live video=1280x480iS i915.modeset=1 nouveau.modeset=1 esde
+ initrd /initrd.img
+}
+
+menuentry "Retro LCD ES-DE" --hotkey=8 {
+ linux /vmlinuz boot=live esde
+ initrd /initrd.img
+}
