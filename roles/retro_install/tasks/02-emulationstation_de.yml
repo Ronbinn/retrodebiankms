@@ -73,6 +73,15 @@
       - "--home"
       - "/home/arcade"
 
+- name: Copy config files.
+  copy:
+    src: "{{ role_path }}/files/{{ item }}"
+    dest: "/home/arcade/{{ item }}"
+    mode: 0644
+  with_items:
+    - "ES-DE/gamelists/arcade/gamelist.xml"
+    - "ES-DE/settings/es_settings.xml"
+
 - name: Change file ownership.
   file:
    dest: "{{ item }}"
