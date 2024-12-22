@@ -48,9 +48,15 @@
     path: "/home/emulationstation_de.deb"
     state: absent
 
+- name: Check if simplemenu theme is installed.
+  stat:
+    path: "/usr/local/share/es-de/themes/simplemenu-es-de"
+  register: theme
+
 - name: Install git.
   apt:
     name: "git"
+  when: theme.stat.exists == false
 
 - name: Download themes.
   git:
@@ -59,11 +65,13 @@
   with_items:
     - { url: "https://github.com/Rose22/simplemenu-es-de", dest: "/usr/local/share/es-de/themes/simplemenu-es-de" }
     - { url: "https://github.com/anthonycaccese/mister-menu-es-de", dest: "/usr/local/share/es-de/themes/mister-menu-es-de" }
+  when: theme.stat.exists == false
 
 - name: Uninstall git.
   apt:
     name: "git"
     state: absent
+  when: theme.stat.exists == false
 
 - name: Create ROMs dir.
   command:
@@ -110,3 +118,16 @@
     src: "{{ role_path }}/files/wrally.zip"
     dest: "/home/arcade/ROMs/arcade/wrally.zip"
     mode: 0644
+
+#- name: Change emu order.
+#  replace:
+#    dest: "/usr/local/share/es-de/resources/systems/linux/es_systems.xml"
+#    after: "<name>arcade</name>"
+#    before: "<platform>arcade</platform>"
+#    regexp: "{{ item.orig }}"
+#    replace: "{{ item.change }}"
+#  with_items:
+#     - { orig: '^(.*)MAME - Current(.*)$', change: 'first' }
+#     - { orig: '^(.*)MAME \(Standalone\)(.*)$', change: 'sixth' }
+#     - { orig: 'first', change: '        <command label="MAME (Standalone)">%STARTDIR%=~/.mame %EMULATOR_MAME% -rompath %GAMEDIR%\;%ROMPATH%/arcade %BASENAME%</command>' }
+#     - { orig: 'sixth', change: '        <command label="MAME - Current">%EMULATOR_RETROARCH% -L %CORE_RETROARCH%/mame_libretro.so %ROM%</command>' }
