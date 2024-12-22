@@ -1,4 +1,12 @@
 <?xml version="1.0"?>
 <alternativeEmulator>
-        <label>MAME (Standalone)</label>
+	<label>MAME (Standalone)</label>
 </alternativeEmulator>
+<gameList>
+	<game>
+		<path>./wrally.zip</path>
+		<name>World Rally</name>
+		<playcount>1</playcount>
+		<lastplayed>20241222T124810</lastplayed>
+	</game>
+</gameList>
