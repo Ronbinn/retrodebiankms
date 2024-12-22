@@ -89,12 +89,18 @@
      - { src: "{{ vmlinuz15.files[-1].path }}", dest: "/boot/vmlinuz" }
   when: ansible_distribution == 'Ubuntu'
 
-- name: Modify grub.
+- name: Modify grub default line.
   lineinfile:
     dest: /etc/default/grub
     regexp: '^(.*)GRUB_CMDLINE_LINUX_DEFAULT=(.*)$'
 #    line: 'GRUB_CMDLINE_LINUX_DEFAULT="video=VGA-1:1280x480iec"'
     line: 'GRUB_CMDLINE_LINUX_DEFAULT="video=1280x480iS"'
+
+- name: Modify grub timeout.
+  lineinfile:
+    dest: /etc/default/grub
+    regexp: '^(.*)GRUB_TIMEOUT=(.*)$'
+    line: 'GRUB_TIMEOUT=2'
 
 - name: Uninstall old kernel.
   apt:
