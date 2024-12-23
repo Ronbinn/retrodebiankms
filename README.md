@@ -26,6 +26,7 @@ ansible-playbook compile.yml
 Or create a livecd
 ```
 cd retrodebiankms
-ansible-playbook createlivecds.yml
+ansible-playbook -i 64bit createlivecds.yml
+ansible-playbook -i 32bit createlivecds.yml
 ```
-The livecd is for testing purposes only. The recommended way is to use the ansible playbook. 
+First one will compile everything for amd64 architecture and second one is for i386. It will take too many hours to complete. The livecd is for testing purposes only. I recommend to use the ansible playbook in your own debian installation.
