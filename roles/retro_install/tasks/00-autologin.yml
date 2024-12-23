@@ -12,7 +12,7 @@
     block: |
       [Service]
       ExecStart=
-      ExecStart=-/sbin/agetty -o '-p -f -- \\u' --noclear --autologin arcade %I $TERM && /usr/local/bin/mymenu
+      ExecStart=-/sbin/agetty -o '-p -f -- \\u' --noclear --autologin arcade %I $TERM
 
 - name: Remove ansible text.
   lineinfile:
