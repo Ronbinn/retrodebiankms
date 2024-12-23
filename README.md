@@ -9,7 +9,7 @@ Clone my repo
 ```
 git clone https://github.com/ronbinn/retrodebiankms
 ```
-Change dir and run the ansible playbook. This will download and install a patched kernel, retroarch and switchres (packages compiled by me).
+Change dir and run the ansible playbook. This will download and install a patched kernel, retroarch and switchres (packages compiled by me, see the releases page).
 ```
 cd retrodebiankms
 ansible-playbook install.yml
