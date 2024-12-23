@@ -1,0 +1,31 @@
+#configure live system based on grub info and set hostname
+---
+- name: Copy configurator executable.
+  copy:
+    src: "{{ role_path }}/files/usr/local/bin/configurator"
+    dest: "/usr/local/bin/configurator"
+    mode: 0755
+
+- name: Copy configurator service.
+  copy:
+    src: "{{ role_path }}/files/etc/systemd/system/configurator.service"
+    dest: "/etc/systemd/system/configurator.service"
+    mode: 0644
+
+- name: Enable configurator service.
+  file:
+    src: "/etc/systemd/system/configurator.service"
+    dest: "/etc/systemd/system/multi-user.target.wants/configurator.service"
+    state: link
+
+- name: Remove hostname file
+  file:
+    path: "/etc/hostname"
+    state: absent
+
+- name: Create hostname file.
+  blockinfile:
+    path: "/etc/hostname"
+    create: true
+    block: |
+      retro
