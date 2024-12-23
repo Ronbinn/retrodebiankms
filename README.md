@@ -7,7 +7,7 @@ Clone my repo
 ```
 git clone https://github.com/ronbinn/retrodebiankms
 ```
-Change dir and run the ansible playbook. This will download and install a patched kernel, retroarch and switchres.
+Change dir and run the ansible playbook. This will download and install a patched kernel, retroarch and switchres (packages compiled by me).
 ```
 cd retrodebiankms
 ansible-playbook install.yml
@@ -18,7 +18,7 @@ The playbook will install [ES-DE](https://gitlab.com/es-de/) and [GroovyMAME](ht
 
 If you prefer a step by step guide and do everything by yourself, [read the wiki](https://github.com/ronbinn/retrodebiankms/wiki)
 
-You can also compile the packages in your own pc
+You can also compile the packages with this playbook
 ```
 cd retrodebiankms
 ansible-playbook compile.yml
@@ -30,3 +30,5 @@ ansible-playbook -i 64bit createlivecds.yml
 ansible-playbook -i 32bit createlivecds.yml
 ```
 First one will compile everything for amd64 architecture and second one is for i386. It will take too many hours to complete. The livecd is for testing purposes only. I recommend to use the ansible playbook in your own debian installation.
+
+Anyway, you can download my livecd images from the releases page.
