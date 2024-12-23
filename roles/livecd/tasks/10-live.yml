@@ -63,3 +63,15 @@
   with_items:
      - format_newinstall
      - format_update
+
+- name: Remove hostname file
+  file:
+    path: "/etc/hostname"
+    state: absent
+
+- name: Create hostname file.
+  blockinfile:
+    path: "/etc/hostname"
+    create: true
+    block: |
+      retro
