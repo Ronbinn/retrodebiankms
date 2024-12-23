@@ -1,10 +1,15 @@
 #install and configure es-de
 ---
+- name: Get the list of packages installed in this system.
+  package_facts:
+    manager: apt
+
 - name: Install dependencies.
   apt:
     name: "{{ packages }}"
   vars:
     packages:
+    - git #we will use it to download themes
     - libcurl4
     - libfreeimage3
     - libgit2-1.5
@@ -48,16 +53,6 @@
     path: "/home/emulationstation_de.deb"
     state: absent
 
-- name: Check if simplemenu theme is installed.
-  stat:
-    path: "/usr/local/share/es-de/themes/simplemenu-es-de"
-  register: theme
-
-- name: Install git.
-  apt:
-    name: "git"
-  when: theme.stat.exists == false
-
 - name: Download themes.
   git:
     repo: "{{ item.url }}"
@@ -65,13 +60,12 @@
   with_items:
     - { url: "https://github.com/Rose22/simplemenu-es-de", dest: "/usr/local/share/es-de/themes/simplemenu-es-de" }
     - { url: "https://github.com/anthonycaccese/mister-menu-es-de", dest: "/usr/local/share/es-de/themes/mister-menu-es-de" }
-  when: theme.stat.exists == false
 
 - name: Uninstall git.
   apt:
     name: "git"
     state: absent
-  when: theme.stat.exists == false
+  when: ansible_facts.packages['git'] is not defined #just remove the new installed packages
 
 - name: Create ROMs dir.
   command:
