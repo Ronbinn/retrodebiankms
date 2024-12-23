@@ -20,24 +20,6 @@
     state: absent
     regexp: "ANSIBLE"
 
-- name: Copy configurator executable.
-  copy:
-    src: "{{ role_path }}/files/usr/local/bin/configurator"
-    dest: "/usr/local/bin/configurator"
-    mode: 0755
-
-- name: Copy configurator service.
-  copy:
-    src: "{{ role_path }}/files/etc/systemd/system/configurator.service"
-    dest: "/etc/systemd/system/configurator.service"
-    mode: 0644
-
-- name: Enable configurator service.
-  file:
-    src: "/etc/systemd/system/configurator.service"
-    dest: "/etc/systemd/system/multi-user.target.wants/configurator.service"
-    state: link
-
 - name: Copy autolauncher.
   copy:
     src: "{{ role_path }}/files/etc/profile.d/99-launcher.sh"
