@@ -1,6 +1,5 @@
 #this task will replicate the debian installer steps
 #configure locale, keyboard and timezone
-#add users with sudo privileges
 #install kernel, add some repositories and install basic packages (tasksel)
 ---
   - include_vars: "{{ ansible_distribution }}.yml"
@@ -22,3 +21,5 @@
   - include_tasks: 09-grub.yml
 
   - include_tasks: 10-live.yml
+
+  - include_tasks: 11-configurator.yml
