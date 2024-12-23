@@ -1,5 +1,7 @@
 # retrodebiankms
-This is an asible role to configure a debian system for 15khz kms gaming. As root install git and ansible.
+This is an asible role to configure a debian system for 15khz kms gaming.
+
+As root install git and ansible.
 ```
 apt-get install ansible git
 ```
