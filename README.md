@@ -18,4 +18,4 @@ Poweroff, connect your pc to a 15khz tv, power on and you should see retroarch's
 
 The playbook will install [ES-DE](https://gitlab.com/es-de/) and [GroovyMAME](https://github.com/antonioginer/groovymame) too. Edit the ``/etc/profile.d/99-launcher.sh`` file to use them at next boot.
 
-If you prefer a step by step guide and do everything by yourself, [read the wiki](https://github.com/ronbinn/retrodebiankms/wiki)
+If you prefer a step by step guide and do everything by yourself, [read the wiki](https://github.com/ronbinn/retrodebiankms/wiki) (still in progress)
