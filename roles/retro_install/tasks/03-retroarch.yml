@@ -11,7 +11,7 @@
 
 - name: Download retroarch. 64 bit.
   get_url:
-    url: "https://www.dropbox.com/scl/fi/oy475jwjxw18hs3ymbmrs/retroarch_v1.19.1_amd64.deb?rlkey=ruykkuch2sqp8zh09hw3psh7o&st=zlozld2b&dl=1"
+    url: "https://github.com/Ronbinn/retrodebiankms/releases/download/23_12_2024/retroarch_v1.19.1_amd64.deb"
     dest: "/home/retroarch.deb"
     timeout: 60
   when:
@@ -20,7 +20,7 @@
 
 - name: Download retroarch. 32 bit.
   get_url:
-    url: "https://www.dropbox.com/scl/fi/7vixh26cbjwhgcp0igixr/retroarch_v1.19.1_i386.deb?rlkey=wopsdr8qrfnc1wd8f4602df4d&st=10elo36h&dl=1"
+    url: "https://github.com/Ronbinn/retrodebiankms/releases/download/23_12_2024/retroarch_v1.19.1_i386.deb"
     dest: "/home/retroarch.deb"
     timeout: 60
   when:

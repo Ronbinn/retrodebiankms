@@ -14,9 +14,9 @@
     dest: "{{ item.dest }}"
     timeout: 60
   with_items:
-     - { src: "https://www.dropbox.com/scl/fi/f92gp2sn9iz3ogahqr29y/linux-image-6.6.63-15khz_6.6.63-1_amd64.deb?rlkey=3lnd0wn8c5sqlpf95jptcq2a3&st=o02h24wd&dl=1", dest: "/root/linux_image.deb" }
-     - { src: "https://www.dropbox.com/scl/fi/gwvwvgdu5pxepl3qi8vs2/linux-headers-6.6.63-15khz_6.6.63-1_amd64.deb?rlkey=n8blgf80y2vhu3o2o2knklyhc&st=tteb8jqy&dl=1", dest: "/root/linux_headers.deb" }
-     - { src: "https://www.dropbox.com/scl/fi/93tqz73esy6gqsd3adlln/linux-libc-dev_6.6.63-1_amd64.deb?rlkey=xa1cygr9pfcy3ve1140tzegnl&st=8eqmbiwj&dl=1", dest: "/root/linux_libc.deb" }
+     - { src: "https://github.com/Ronbinn/retrodebiankms/releases/download/23_12_2024/linux-image-6.6.65-15khz_6.6.65-1_amd64.deb", dest: "/root/linux_image.deb" }
+     - { src: "https://github.com/Ronbinn/retrodebiankms/releases/download/23_12_2024/linux-headers-6.6.65-15khz_6.6.65-1_amd64.deb", dest: "/root/linux_headers.deb" }
+     - { src: "https://github.com/Ronbinn/retrodebiankms/releases/download/23_12_2024/linux-libc-dev_6.6.65-1_amd64.deb", dest: "/root/linux_libc.deb" }
   when:
     - ansible_architecture == 'x86_64'
     - result.matched == 0
@@ -27,9 +27,9 @@
     dest: "{{ item.dest }}"
     timeout: 60
   with_items:
-     - { src: "https://www.dropbox.com/scl/fi/9kty4a198trlko91nmtun/linux-image-6.6.63-15khz_6.6.63-1_i386.deb?rlkey=785yvbd1274x9ct9hayecz73z&st=mfp8usll&dl=1", dest: "/root/linux_image.deb" }
-     - { src: "https://www.dropbox.com/scl/fi/9p6513o5w2mhcnyl0rxwd/linux-headers-6.6.63-15khz_6.6.63-1_i386.deb?rlkey=5bpjlaoq6yzthu8c5nej7a1yd&st=2czo47jl&dl=1", dest: "/root/linux_headers.deb" }
-     - { src: "https://www.dropbox.com/scl/fi/w363zr1ljjghsug4ol64b/linux-libc-dev_6.6.63-1_i386.deb?rlkey=8zeglaqic8fbeb6u0lerugt8h&st=ttp3bv9l&dl=1", dest: "/root/linux_libc.deb" }
+     - { src: "https://github.com/Ronbinn/retrodebiankms/releases/download/23_12_2024/linux-image-6.6.65-15khz_6.6.65-1_i386.deb", dest: "/root/linux_image.deb" }
+     - { src: "https://github.com/Ronbinn/retrodebiankms/releases/download/23_12_2024/linux-headers-6.6.65-15khz_6.6.65-1_i386.deb", dest: "/root/linux_headers.deb" }
+     - { src: "https://github.com/Ronbinn/retrodebiankms/releases/download/23_12_2024/linux-libc-dev_6.6.65-1_i386.deb", dest: "/root/linux_libc.deb" }
   when:
     - ansible_architecture == 'i386'
     - result.matched == 0

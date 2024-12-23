@@ -22,7 +22,7 @@
 
 - name: Download emulationstation_de. 64 bit.
   get_url:
-    url: "https://www.dropbox.com/scl/fi/od70vls815dzh0to94sme/emulationstation_de_v3.1.0_amd64.deb?rlkey=poksa4fdrsck9qs3sifuwf349&st=o9g6mosk&dl=1"
+    url: "https://github.com/Ronbinn/retrodebiankms/releases/download/23_12_2024/emulationstation_de_v3.1.1_amd64.deb"
     dest: "/home/emulationstation_de.deb"
     timeout: 60
   when:
@@ -31,7 +31,7 @@
 
 - name: Download emulationstation_de. 32 bit.
   get_url:
-    url: "https://www.dropbox.com/scl/fi/ku9eammnp9ino4gibyemp/emulationstation_de_v3.1.0_i386.deb?rlkey=3tv2x55ip3qgjekl7vv8uq9iq&st=r0q657uk&dl=1"
+    url: "https://github.com/Ronbinn/retrodebiankms/releases/download/23_12_2024/emulationstation_de_v3.1.1_i386.deb"
     dest: "/home/emulationstation_de.deb"
     timeout: 60
   when:
@@ -120,16 +120,3 @@
     src: "{{ role_path }}/files/wrally.zip"
     dest: "/home/arcade/ROMs/arcade/wrally.zip"
     mode: 0644
-
-#- name: Change emu order.
-#  replace:
-#    dest: "/usr/local/share/es-de/resources/systems/linux/es_systems.xml"
-#    after: "<name>arcade</name>"
-#    before: "<platform>arcade</platform>"
-#    regexp: "{{ item.orig }}"
-#    replace: "{{ item.change }}"
-#  with_items:
-#     - { orig: '^(.*)MAME - Current(.*)$', change: 'first' }
-#     - { orig: '^(.*)MAME \(Standalone\)(.*)$', change: 'sixth' }
-#     - { orig: 'first', change: '        <command label="MAME (Standalone)">%STARTDIR%=~/.mame %EMULATOR_MAME% -rompath %GAMEDIR%\;%ROMPATH%/arcade %BASENAME%</command>' }
-#     - { orig: 'sixth', change: '        <command label="MAME - Current">%EMULATOR_RETROARCH% -L %CORE_RETROARCH%/mame_libretro.so %ROM%</command>' }
