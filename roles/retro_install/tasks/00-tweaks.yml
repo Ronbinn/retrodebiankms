@@ -24,6 +24,10 @@
     - pulseaudio
     - pipewire
 
+- name: Install joystick.
+  apt:
+    name: "joystick"
+
 - name: Copy listconnectors script.
   copy:
     src: "{{ role_path }}/files/usr/local/bin/listconnectors"
