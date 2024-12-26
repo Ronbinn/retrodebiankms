@@ -34,6 +34,7 @@ then
     sed -i '41s,lcd_range.*,lcd_range 50-61,g' /etc/switchres.ini
     sed -i 's,dotclock_min.*,dotclock_min 25.0,g' /etc/switchres.ini
     sed -i 's,GRUB_CMDLINE_LINUX_DEFAULT=.*,GRUB_CMDLINE_LINUX_DEFAULT="",g' /etc/default/grub
+    echo 'video_scale_integer = "true"' >> /etc/retroarch.cfg
 fi
 
 if grep -q esde /proc/cmdline #emulationstation
