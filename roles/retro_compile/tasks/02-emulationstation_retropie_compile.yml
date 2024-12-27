@@ -98,6 +98,12 @@
     - vlc-bin
   when: not emulationstation_bin.stat.exists
 
+- name: Copy resource files.
+  copy:
+    src: "/home/emulationstationgit/resources"
+    dest: "/usr/local/share/resources"
+    mode: "preserve"
+
 - name: Remove source code.
   file:
     path: "/home/emulationstationgit"
@@ -112,6 +118,7 @@
      - /usr/local/include
      - /usr/local/lib/cmake/pugixml
      - /usr/local/bin
+     - /usr/local/share/resources
      - DEBIAN
   when: not debpackage.stat.exists
 
@@ -128,6 +135,7 @@
      - "/usr/local/lib/cmake/pugixml/pugixml-config.cmake"
      - "/usr/local/lib/cmake/pugixml/pugixml-config-noconfig.cmake"
      - "/usr/local/bin/emulationstation"
+     - "/usr/local/share/resources"
   when: not debpackage.stat.exists
 
 - name: Copy package's control file.
