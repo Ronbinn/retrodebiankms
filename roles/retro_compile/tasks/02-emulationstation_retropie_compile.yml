@@ -1,0 +1,163 @@
+---
+- name: Get latest release's tag.
+  uri:
+    url: https://api.github.com/repos/retropie/emulationstation/releases/latest
+    return_content: true
+  register: json_reponse
+
+- name: Set release version.
+  set_fact:
+    release: "{{ json_reponse.json.tag_name }}"
+
+- name: Check if it's already installed.
+  stat:
+    path: "/usr/local/bin/emulationstation"
+  register: emulationstation_bin
+
+- name: Set package name.
+  set_fact:
+    package_name: "emulationstation_de_{{ release }}_{{ ansible_architecture | replace('x86_64','amd64') }}"
+
+- name: Check if there is a package.
+  stat:
+    path: "/home/packages/{{ package_name }}.deb"
+  register: debpackage
+
+- name: Install emulationstation build dependencies.
+  apt:
+    name: "{{ packages }}"
+    install_recommends: no
+  vars:
+    packages:
+    - git
+    - build-essential
+    - pkg-config
+    - cmake
+    - libsdl2-dev
+    - libfreeimage-dev
+    - libfreetype6-dev
+    - libcurl4-openssl-dev
+    - rapidjson-dev
+    - libasound2-dev
+    - libgles2-mesa-dev
+    - fonts-droid-fallback
+    - libvlc-dev
+    - libvlccore-dev
+    - vlc-bin
+  when: not emulationstation_bin.stat.exists
+
+- name: Download latest release from github.
+  git:
+    repo: "https://github.com/retropie/emulationstation"
+    dest: /home/emulationstationgit
+    version: "{{ release  }}"
+    recursive: true
+  when: not emulationstation_bin.stat.exists
+
+- name: Execute cmake.
+  command:
+    argv:
+      - "/usr/bin/cmake"
+      - "."
+    chdir: "/home/emulationstationgit"
+  when: not emulationstation_bin.stat.exists
+
+- name: Build emulationstation.
+  make:
+    chdir: "/home/emulationstationgit"
+    params:
+      NUM_THREADS: "{{ ansible_processor_nproc  }}"
+  when: not emulationstation_bin.stat.exists
+
+- name: Install emulationstation.
+  make:
+    chdir: "/home/emulationstationgit"
+    target: install
+  when: not emulationstation_bin.stat.exists
+
+- name: Remove build dependencies.
+  apt:
+    name: "{{ packages }}"
+    state: absent
+  vars:
+    packages:
+    - git
+    - build-essential
+    - pkg-config
+    - cmake
+    - libsdl2-dev
+    - libfreeimage-dev
+    - libfreetype6-dev
+    - libcurl4-openssl-dev
+    - rapidjson-dev
+    - libasound2-dev
+    - libgles2-mesa-dev
+    - fonts-droid-fallback
+    - libvlc-dev
+    - libvlccore-dev
+    - vlc-bin
+  when: not emulationstation_bin.stat.exists
+
+- name: Remove source code.
+  file:
+    path: "/home/emulationstationgit"
+    state: absent
+  when: not emulationstation_bin.stat.exists
+
+- name: Create package dirs.
+  file:
+    path: "/home/packages/{{ package_name }}/{{ item }}"
+    state: directory
+  with_items:
+     - /usr/local/include
+     - /usr/local/lib/cmake/pugixml
+     - /usr/local/bin
+     - DEBIAN
+  when: not debpackage.stat.exists
+
+- name: Copy package files.
+  copy:
+    src: "/{{ item }}"
+    dest: "/home/packages/{{ package_name }}/{{ item }}"
+    mode: "preserve"
+    remote_src: true
+  with_items:
+     - "/usr/local/lib/libpugixml.a"
+     - "/usr/local/include/pugixml.hpp"
+     - "/usr/local/include/pugiconfig.hpp"
+     - "/usr/local/lib/cmake/pugixml/pugixml-config.cmake"
+     - "/usr/local/lib/cmake/pugixml/pugixml-config-noconfig.cmake"
+     - "/usr/local/bin/emulationstation"
+  when: not debpackage.stat.exists
+
+- name: Copy package's control file.
+  template:
+    src: "{{ role_path }}/templates/control.j2"
+    dest: "/home/packages/{{ package_name }}/DEBIAN/control"
+    mode: 0644
+  vars:
+    package_internal_name: "emulationstation"
+    package_version: "{{ release | replace('v','') }}"
+    package_architecture: "{{ ansible_architecture | replace('x86_64','amd64') }}" #ansible uses x86_64 debian uses amd64
+    package_depends: "libfreeimage3, libsdl2-2.0-0, libcurl4, libvlc5, libgl1, libegl1"
+    package_description: "Emulator frontend"
+  when: not debpackage.stat.exists
+
+- name: Build package.
+  command:
+    chdir: "/home/packages"
+    argv:
+      - /usr/bin/dpkg-deb
+      - "--build"
+      - "--root-owner-group"
+      - "{{ package_name }}"
+  when: not debpackage.stat.exists
+
+- name: Remove package source.
+  file:
+    path: "/home/packages/{{ package_name }}"
+    state: absent
+
+- name: Remove dependencies that are no longer required.
+  apt:
+    autoremove: yes
