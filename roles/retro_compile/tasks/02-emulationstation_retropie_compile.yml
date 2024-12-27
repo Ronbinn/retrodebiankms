@@ -108,7 +108,7 @@
 - name: Copy resource files.
   copy:
     src: "/home/emulationstationgit/resources"
-    dest: "/usr/local/share/resources"
+    dest: "/usr/local/share"
     mode: "preserve"
 
 - name: Remove source code.
@@ -142,7 +142,7 @@
      - "/usr/local/lib/cmake/pugixml/pugixml-config.cmake"
      - "/usr/local/lib/cmake/pugixml/pugixml-config-noconfig.cmake"
      - "/usr/local/bin/emulationstation"
-     - "/usr/local/share/resources"
+     - "/usr/local/share/resources/"
   when: not debpackage.stat.exists
 
 - name: Copy package's control file.
