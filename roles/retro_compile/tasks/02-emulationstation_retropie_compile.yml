@@ -54,6 +54,13 @@
     recursive: true
   when: not emulationstation_bin.stat.exists
 
+- name: Apply datasource patch.
+  patch:
+    src: "{{ role_path }}/files/emulationstation_datasource.patch"
+    basedir: "/home/emulationstationgit"
+    strip: 1
+#    remote_src: true
+
 - name: Execute cmake.
   command:
     argv:
