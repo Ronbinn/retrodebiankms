@@ -1,4 +1,8 @@
 ---
+- name: Get the list of packages installed in this system.
+  package_facts:
+    manager: apt
+
 - name: Check if it's already installed
   stat:
     path: "/usr/local/bin/switchres"

@@ -1,4 +1,8 @@
 ---
+- name: Get the list of packages installed in this system.
+  package_facts:
+    manager: apt
+
 - name: Set release version.
   set_fact:
     release: "3.0.9"
@@ -97,13 +101,12 @@
     - libglu1-mesa-dev
     - libboost-filesystem-dev
     - libboost-system-dev
-  when: not attractplus_bin.stat.exists
+  when: "ansible_facts.packages[item] is not defined" #just remove the new installed packages
 
 - name: Remove source code.
   file:
     path: "/home/attractplus"
     state: absent
-  when: not attractplus_bin.stat.exists
 
 - name: Create package dirs.
   file:
