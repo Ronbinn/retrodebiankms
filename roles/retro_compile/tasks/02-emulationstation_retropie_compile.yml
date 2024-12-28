@@ -1,4 +1,8 @@
 ---
+- name: Get the list of packages installed in this system.
+  package_facts:
+    manager: apt
+
 - name: Get latest release's tag.
   uri:
     url: https://api.github.com/repos/retropie/emulationstation/releases/latest
@@ -103,24 +107,25 @@
     - libvlc-dev
     - libvlccore-dev
     - vlc-bin
-  when: not emulationstation_bin.stat.exists
+  when: "ansible_facts.packages[item] is not defined" #just remove the new installed packages
 
 - name: Create configuration dir.
   file:
     path: "/usr/local/share/emulationstation"
     state: directory
+  when: not emulationstation_bin.stat.exists
 
 - name: Copy resource files.
   copy:
     src: "/home/emulationstationgit/resources"
     dest: "/usr/local/share/emulationstation"
     mode: "preserve"
+  when: not emulationstation_bin.stat.exists
 
 - name: Remove source code.
   file:
     path: "/home/emulationstationgit"
     state: absent
-  when: not emulationstation_bin.stat.exists
 
 - name: Create package dirs.
   file:
