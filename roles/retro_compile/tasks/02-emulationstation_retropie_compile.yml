@@ -88,10 +88,9 @@
 
 - name: Remove build dependencies.
   apt:
-    name: "{{ packages }}"
+    name: "{{ item }}"
     state: absent
-  vars:
-    packages:
+  with_items:
     - git
     - build-essential
     - pkg-config

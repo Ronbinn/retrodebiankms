@@ -76,10 +76,9 @@
 
 - name: Uninstall attractplus build dependencies.
   apt:
-    name: "{{ packages }}"
+    name: "{{ item }}"
     state: absent
-  vars:
-    packages:
+  with_items:
     - git
     - build-essential
     - pkg-config

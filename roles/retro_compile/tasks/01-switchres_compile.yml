@@ -75,17 +75,16 @@
 
 - name: Unistall switchres build dependencies
   apt:
-    name: "{{ packages }}"
+    name: "{{ item }}"
     state: absent
-  vars:
-    packages:
+  with_items:
     - git
     - build-essential
     - pkg-config
     - libxrandr-dev
     - libdrm-dev
     - libsdl2-dev
-  when: not switchres_bin.stat.exists
+  when: "ansible_facts.packages[item] is not defined" #just remove the new installed packages
 
 - name: Remove source code.
   file:
