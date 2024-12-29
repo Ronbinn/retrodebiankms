@@ -86,17 +86,18 @@ fi
 mkdir system
 mount /dev/${1}${p}2 system
 echo "copying the image..."
-pv /lib/live/mount/medium/live/filesystem.squashfs > system/filesystem.squashfs
+#pv /lib/live/mount/medium/live/filesystem.squashfs > system/filesystem.squashfs
+rsync -avz /lib/live/mount/rootfs/filesystem.squashfs/ system/
 echo "copying the md5 file..."
 pv /lib/live/mount/medium/live/filesystem.md5 > system/filesystem.md5
-cd system
-echo "extracting the image..."
-unsquashfs filesystem.squashfs
-cd ..
-echo "cleaning..."
-mv system/squashfs-root/* system/
-rmdir system/squashfs-root
-rm system/filesystem.squashfs
+#cd system
+#echo "extracting the image..."
+#unsquashfs filesystem.squashfs
+#cd ..
+#echo "cleaning..."
+#mv system/squashfs-root/* system/
+#rmdir system/squashfs-root
+#rm system/filesystem.squashfs
 
 #copy configuration files
 cp /etc/retroarch.cfg system/etc/retroarch.cfg

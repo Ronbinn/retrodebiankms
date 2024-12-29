@@ -54,6 +54,7 @@
     - squashfs-tools
     - parted
     - dosfstools
+    - rsync
 
 - name: Copy installers
   copy:
