@@ -122,6 +122,12 @@
       - "-r"
   when: result.matched == 0
 
+- name: Disable interlace in mGBA core.
+  copy:
+    src: "{{ role_path }}/files/retroarch/config/mGBA/mGBA.switchres.ini"
+    dest: "/home/arcade/.config/mGBA/mGBA.switchres.ini"
+    mode: 0644
+
 - name: Change file ownership.
   file:
    dest: /home/arcade/.config/retroarch
