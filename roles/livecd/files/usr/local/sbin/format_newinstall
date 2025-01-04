@@ -34,7 +34,8 @@ swapoff --all
 
 #get disk size
 disksize=$(lsblk /dev/$1 | grep disk | awk '{ print $4 }' | tr -d G)
-nodecimal=${disksize%.*}
+nodot=${disksize%.*}
+nodecimal=${nodot%,*}
 
 if [ "$nodecimal" -gt 20 ]; then
    #create partition table

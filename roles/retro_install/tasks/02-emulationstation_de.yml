@@ -60,6 +60,7 @@
   with_items:
     - { url: "https://github.com/Rose22/simplemenu-es-de", dest: "/usr/local/share/es-de/themes/simplemenu-es-de" }
     - { url: "https://github.com/anthonycaccese/mister-menu-es-de", dest: "/usr/local/share/es-de/themes/mister-menu-es-de" }
+    - { url: "https://github.com/anthonycaccese/minui-menu-es-de", dest: "/usr/local/share/es-de/themes/minui-menu-es-de" }
 
 - name: Create ROMs dir.
   command:
@@ -75,7 +76,7 @@
     state: directory
   with_items:
     - "/home/arcade/ES-DE/settings"
-    - "/home/arcade/ES-DE/gamelists/arcade"
+#    - "/home/arcade/ES-DE/gamelists/arcade"
     - "/home/arcade/ES-DE/controllers"
 
 - name: Copy config files.
@@ -85,7 +86,7 @@
     mode: 0644
   with_items:
     - "ES-DE/settings/es_settings.xml"
-    - "ES-DE/gamelists/arcade/gamelist.xml"
+ #   - "ES-DE/gamelists/arcade/gamelist.xml"
     - "ES-DE/controllers/es_controller_mappings.cfg"
 
 - name: Change file ownership.
