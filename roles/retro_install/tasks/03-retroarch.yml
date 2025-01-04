@@ -122,6 +122,13 @@
       - "-r"
   when: result.matched == 0
 
+- name: Create mGBA dir.
+  file:
+    path: "/home/arcade/.config/mGBA"
+    state: directory
+    owner: arcade
+    group: arcade
+
 - name: Disable interlace in mGBA core.
   copy:
     src: "{{ role_path }}/files/retroarch/config/mGBA/mGBA.switchres.ini"
