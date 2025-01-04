@@ -10,7 +10,7 @@
   apt:
     name: "{{ item }}"
   with_items:
-    - "language-pack-es"
+#    - "language-pack-es"
     - "language-pack-en"
   register: ubuntulocale
   when: ansible_distribution == 'Ubuntu'
@@ -20,7 +20,7 @@
     name: "{{ item }}"
     state: present
   with_items:
-    - "es_ES.UTF-8"
+ #   - "es_ES.UTF-8"
     - "en_US.UTF-8"
   register: spanish
 
