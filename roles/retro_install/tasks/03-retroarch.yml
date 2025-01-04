@@ -117,8 +117,8 @@
       - "e"
       - "/home/arcade/RetroArch_cores.7z"
       - "-o/home/arcade/.config/retroarch/cores"
-#      - "*.so"
-      - "fbneo_libretro.so"
+      - "*.so"
+#      - "fbneo_libretro.so"
       - "-r"
   when: result.matched == 0
 
