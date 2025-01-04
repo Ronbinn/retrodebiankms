@@ -6,16 +6,22 @@
   register: debianlocale
   when: ansible_distribution == 'Debian'
 
-- name: Install spanish locales in ubuntu.
+- name: Install locales in ubuntu.
   apt:
-    name: "language-pack-es"
+    name: "{{ item }}"
+  with_items:
+    - "language-pack-es"
+    - "language-pack-en"
   register: ubuntulocale
   when: ansible_distribution == 'Ubuntu'
 
-- name: Add spanish locale
+- name: Add locales.
   locale_gen:
-    name: es_ES.UTF-8
+    name: "{{ item }}"
     state: present
+  with_items:
+    - "es_ES.UTF-8"
+    - "en_US.UTF-8"
   register: spanish
 
 - name: Dpkg-reconfigure locales.
