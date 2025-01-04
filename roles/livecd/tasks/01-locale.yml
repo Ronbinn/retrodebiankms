@@ -23,5 +23,5 @@
   when: (ubuntulocale is changed) or (debianlocale is changed) or (spanish is changed)
 
 - name: Update locales.
-  command: /usr/sbin/update-locale LANG=es_ES.UTF-8 LANGUAGE=es_ES.UTF-8 LC_ALL=es_ES.UTF-8
+  command: /usr/sbin/update-locale LANG=en_US.UTF-8 LANGUAGE=en_US.UTF-8 LC_ALL=en_US.UTF-8
   when: (ubuntulocale is changed) or (debianlocale is changed) or (spanish is changed)
