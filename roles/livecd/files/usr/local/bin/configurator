@@ -16,6 +16,17 @@ then
 
 fi
 
+if grep -q 320 /proc/cmdline #ati card 240p
+then
+    sed -i 's,crt_switch_resolution =.*,crt_switch_resolution = "4",g' /etc/retroarch.cfg
+    sed -i 's,crt_switch_resolution_super.*,crt_switch_resolution_super = "1",g' /etc/retroarch.cfg
+    sed -i '24s,monitor.*,monitor generic_15,g' /etc/switchres.ini
+    sed -i '41s,lcd_range.*,lcd_range auto,g' /etc/switchres.ini
+    sed -i 's,dotclock_min.*,dotclock_min 0,g' /etc/switchres.ini
+    sed -i 's,GRUB_CMDLINE_LINUX_DEFAULT=.*,GRUB_CMDLINE_LINUX_DEFAULT="video=320x240S",g' /etc/default/grub
+
+fi
+
 if grep -q 1280 /proc/cmdline #non ati card
 then
     sed -i 's,crt_switch_resolution =.*,crt_switch_resolution = "4",g' /etc/retroarch.cfg
