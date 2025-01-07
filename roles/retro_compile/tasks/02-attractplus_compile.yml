@@ -3,9 +3,16 @@
   package_facts:
     manager: apt
 
+- name: Get latest release's tag.
+  uri:
+    url: https://api.github.com/repos/oomek/attractplus/releases/latest
+    return_content: true
+  register: json_reponse
+
 - name: Set release version.
   set_fact:
-    release: "3.0.9"
+#    release: "3.0.9"
+    release: "{{ json_reponse.json.tag_name }}"
 
 - name: Check if it's already installed
   stat:

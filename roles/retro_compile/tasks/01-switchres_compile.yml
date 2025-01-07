@@ -14,9 +14,13 @@
     return_content: true
   register: json_reponse
 
+- name: Set release version.
+  set_fact:
+    release: "{{ json_reponse.json.tag_name }}"
+
 - name: Set package name.
   set_fact:
-    package_name: "switchres_{{ json_reponse.json.tag_name }}_{{ ansible_architecture | replace('x86_64','amd64') }}"
+    package_name: "switchres_{{ release }}_{{ ansible_architecture | replace('x86_64','amd64') }}"
 
 - name: Check if there is a package.
   stat:
@@ -41,7 +45,7 @@
   git:
     repo: 'https://github.com/antonioginer/switchres.git'
     dest: "/home/switchres"
-    version: "{{ json_reponse.json.tag_name  }}"
+    version: "{{ release  }}"
   when: not switchres_bin.stat.exists
 
 - name: Build switchres.
@@ -130,7 +134,7 @@
     mode: 0644
   vars:
     package_internal_name: "switchres"
-    package_version: "{{ json_reponse.json.tag_name | replace('v','') }}" #remove the "v" character from the number
+    package_version: "{{ release | replace('v','') }}" #remove the "v" character from the number
     package_architecture: "{{ ansible_architecture | replace('x86_64','amd64') }}" #ansible uses x86_64 debian uses amd64
     package_depends: "libsdl2-2.0-0"
     package_description: "Modeline generation engine for emulation"
