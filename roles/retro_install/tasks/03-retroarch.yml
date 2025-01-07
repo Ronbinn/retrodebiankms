@@ -110,7 +110,7 @@
     - ansible_architecture == 'x86_64'
     - result.matched == 0
 
-- name: Extract fbneo core.
+- name: Extract cores.
   command:
     argv:
       - "/usr/bin/7z"
