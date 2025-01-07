@@ -12,11 +12,11 @@
   uri:
     url: https://api.github.com/repos/antonioginer/switchres/releases/latest
     return_content: true
-  register: json_reponse
+  register: json_response
 
 - name: Set release version.
   set_fact:
-    release: "{{ json_reponse.json.tag_name }}"
+    release: "{{ json_response.json.tag_name }}"
 
 - name: Set package name.
   set_fact:

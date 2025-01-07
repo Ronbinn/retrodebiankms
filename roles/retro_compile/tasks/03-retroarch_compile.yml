@@ -7,12 +7,12 @@
   uri:
     url: https://api.github.com/repos/oomek/attractplus/releases/latest
     return_content: true
-  register: json_reponse
+  register: json_response
 
 - name: Set release version.
   set_fact:
 #    release: "v1.19.1"
-    release: "{{ json_reponse.json.tag_name }}"
+    release: "{{ json_response.json.tag_name }}"
 
 - name: Check if it's already installed
   stat:

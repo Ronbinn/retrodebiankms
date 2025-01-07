@@ -7,17 +7,17 @@
   uri:
     url: https://api.github.com/repos/antonioginer/groovymame/releases/latest
     return_content: true
-  register: json_reponse
+  register: json_response
 
 - name: Set facts.
   set_fact:
-    release: "{{ json_reponse.json.tag_name  }}"
-    version: "{{ json_reponse.json.tag_name | replace('gm','') }}"
+    release: "{{ json_response.json.tag_name  }}"
+    version: "{{ json_response.json.tag_name | replace('gm','') }}"
     architecture: "{{ ansible_architecture | replace('x86_64','amd64') }}" #ansible uses x86_64 debian uses amd64
     mamearch: "{{ ansible_architecture | replace('x86_64','x64') | replace('i386','x32') }}"
     ptr64: "{{ ansible_architecture | replace('x86_64','1') | replace('i386','0') }}"
     nowerror: "{{ ansible_architecture | replace('x86_64','0') | replace('i386','1') }}"
-    package_name: "groovymame_{{ json_reponse.json.tag_name | replace('gm','') }}_{{ ansible_architecture | replace('x86_64','amd64') }}"
+    package_name: "groovymame_{{ json_response.json.tag_name | replace('gm','') }}_{{ ansible_architecture | replace('x86_64','amd64') }}"
 
 - name: Check if it's already installed.
   stat:
