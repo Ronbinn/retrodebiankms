@@ -5,7 +5,7 @@
 
 - name: Set new kernel version.
   set_fact:
-    kernel_version: "6.6.65"
+    kernel_version: "6.6.69"
     kernel_big_version: "6.6"
 
 - name: Check if there is a compiled package.
