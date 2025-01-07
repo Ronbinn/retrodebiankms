@@ -165,14 +165,6 @@
      - "linux-libc-dev_{{ kernel_version }}-1_{{ ansible_architecture | replace('x86_64','amd64') }}.deb"
   when: not debpackage.stat.exists
 
-- name: Install 15khz kernel debs.
-  apt:
-    deb: "{{ item }}"
-  with_items:
-    - "/home/packages/linux-image-{{ kernel_version }}-15khz_{{ kernel_version }}-1_{{ ansible_architecture | replace('x86_64','amd64') }}.deb"
-    - "/home/packages/linux-headers-{{ kernel_version }}-15khz_{{ kernel_version }}-1_{{ ansible_architecture | replace('x86_64','amd64') }}.deb"
-    - "/home/packages/linux-libc-dev_{{ kernel_version }}-1_{{ ansible_architecture | replace('x86_64','amd64') }}.deb"
-
 - name: Remove sources.
   file:
     path: "{{ item }}"
@@ -219,3 +211,11 @@
 - name: Remove dependencies that are no longer required.
   apt:
     autoremove: yes
+
+- name: Install 15khz kernel debs.
+  apt:
+    deb: "{{ item }}"
+  with_items:
+    - "/home/packages/linux-image-{{ kernel_version }}-15khz_{{ kernel_version }}-1_{{ ansible_architecture | replace('x86_64','amd64') }}.deb"
+    - "/home/packages/linux-headers-{{ kernel_version }}-15khz_{{ kernel_version }}-1_{{ ansible_architecture | replace('x86_64','amd64') }}.deb"
+    - "/home/packages/linux-libc-dev_{{ kernel_version }}-1_{{ ansible_architecture | replace('x86_64','amd64') }}.deb"
