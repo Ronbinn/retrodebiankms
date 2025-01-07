@@ -101,16 +101,3 @@
     dest: /etc/default/grub
     regexp: '^(.*)GRUB_TIMEOUT=(.*)$'
     line: 'GRUB_TIMEOUT=2'
-
-- name: Uninstall old kernel.
-  apt:
-    name: "{{ item }}"
-    state: absent
-  with_items:
-     - linux-image-686-pae
-     - linux-image-amd64
-     - linux-image-generic
-
-- name: Remove dependencies that are no longer required.
-  apt:
-    autoremove: yes

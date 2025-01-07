@@ -13,6 +13,25 @@
     path: "/home/packages/linux-image-{{ kernel_version }}-15khz_{{ kernel_version }}-1_{{ ansible_architecture | replace('x86_64','amd64') }}.deb"
   register: debpackage
 
+- name: Install i386 kernel for Debian.
+  apt:
+    name: "linux-image-686-pae"
+  when:
+    - ansible_distribution == 'Debian'
+    - ansible_architecture == 'i386'
+
+- name: Install amd64 kernel for Debian.
+  apt:
+    name: "linux-image-amd64"
+  when:
+    - ansible_distribution == 'Debian'
+    - ansible_architecture == 'x86_64'
+
+- name: Install amd64 kernel for Ubuntu.
+  apt:
+    name: "linux-image-generic"
+  when: ansible_distribution == 'Ubuntu'
+
 #apt-rdepends --build-depends --follow=DEPENDS linux
 - name: Install build dependencies.
   apt:
@@ -192,6 +211,9 @@
     - libssl-dev
     - pahole
     - rsync
+    - linux-image-686-pae
+    - linux-image-amd64
+    - linux-image-generic
   when: "ansible_facts.packages[item] is not defined" #just remove the new installed packages
 
 - name: Remove dependencies that are no longer required.
