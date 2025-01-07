@@ -12,7 +12,7 @@
 
   - include_tasks: 05-timezone.yml
 
-#  - include_tasks: 06-kernel.yml
+  - include_tasks: 06-kernel.yml
 
   - include_tasks: 07-repositories.yml
 
