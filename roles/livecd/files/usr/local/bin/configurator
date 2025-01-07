@@ -5,6 +5,10 @@
 #crt_switch_resolution_super = "0" #native
 #crt_switch_resolution_super = "1" #dynamic
 
+#lspci | grep -i vga | grep -i amd
+#lspci | grep -i vga | grep -i intel
+#lspci | grep -i vga | grep -i nvidia
+
 if grep -q 640 /proc/cmdline #ati card
 then
     sed -i 's,crt_switch_resolution =.*,crt_switch_resolution = "4",g' /etc/retroarch.cfg
