@@ -1,6 +1,6 @@
 #configure samba
 ---
-- name: Install samba and cifs-utils.
+- name: Install samba, cifs-utils and wsdd..
   apt:
     name: "{{ item }}"
   with_items:
@@ -22,3 +22,17 @@
          directory mask = 0755
          force user = arcade
          force group = arcade
+
+- name: Fetch current smbpasswd users
+  command: /usr/bin/pdbedit -L
+  register: pdb_users
+
+- name: Set Samba password for arcade user #Note that we need to provide the password twice, because smbpasswd wants both the password and a confirmation.
+  command:
+    cmd: /usr/bin/smbpasswd -s -a arcade
+    stdin: |
+      {{ smbuser_password }}
+      {{ smbuser_password }}
+  when: pdb_users.stdout.find('arcade') == -1
+  vars:
+    smbuser_password: arcade
