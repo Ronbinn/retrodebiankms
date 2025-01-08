@@ -5,7 +5,7 @@
 
 - name: Get latest release's tag.
   uri:
-    url: https://api.github.com/repos/oomek/attractplus/releases/latest
+    url: https://api.github.com/repos/libretro/retroarch/releases/latest
     return_content: true
   register: json_response
 
