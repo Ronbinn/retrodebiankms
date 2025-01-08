@@ -130,11 +130,14 @@
      - "usr/local/bin/retroarch"
      - "usr/local/bin/retroarch-cg2glsl"
      - "etc/retroarch.cfg"
-     - "usr/local/share/metainfo/com.libretro.RetroArch.appdata.xml"
-     - "usr/local/share/applications/org.libretro.RetroArch.desktop"
+#     - "usr/local/share/metainfo/com.libretro.RetroArch.appdata.xml" #v1.19.1
+     - "usr/local/share/metainfo/com.libretro.RetroArch.metainfo.xml" #v1.20.0
+#     - "usr/local/share/applications/org.libretro.RetroArch.desktop" #v1.19.1
+     - "usr/local/share/applications/com.libretro.RetroArch.desktop" #v1.20.0
      - "usr/local/share/man/man6/retroarch.6"
      - "usr/local/share/man/man6/retroarch-cg2glsl.6"
-     - "usr/local/share/pixmaps/retroarch.svg"
+#     - "usr/local/share/pixmaps/retroarch.svg" #v1.19.1
+     - "usr/local/share/pixmaps/com.libretro.RetroArch.svg" #v1.20.0
      - "usr/local/share/doc/retroarch/COPYING"
      - "usr/local/share/doc/retroarch/README.md"
   when: not debpackage.stat.exists
