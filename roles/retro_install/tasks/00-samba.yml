@@ -1,11 +1,12 @@
 #configure samba
 ---
-- name: Install samba, cifs-utils and wsdd..
+- name: Install samba, cifs-utils and wsdd.
   apt:
     name: "{{ item }}"
   with_items:
     - samba
     - cifs-utils
+    - wsdd
 
 - name: Configure samba share.
   blockinfile:
