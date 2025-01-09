@@ -85,6 +85,7 @@
   apt:
     name: "{{ item }}"
     state: absent
+    purge: true
   with_items:
     - git
     - build-essential
@@ -166,3 +167,4 @@
 - name: Remove dependencies that are no longer required.
   apt:
     autoremove: yes
+    purge: true
