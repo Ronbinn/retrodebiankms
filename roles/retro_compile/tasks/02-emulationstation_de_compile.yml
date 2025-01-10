@@ -28,6 +28,16 @@
     path: "/home/packages/{{ package_name }}.deb"
   register: debpackage
 
+- name: Get the list of packages installed before build-dep.
+  package_facts:
+    manager: apt
+  when: not emulationstationde_bin.stat.exists
+
+- name: Save "before" status.
+  set_fact:
+    before: "{{ ansible_facts.packages }}"
+  when: not emulationstationde_bin.stat.exists
+
 - name: Install emulationstation build dependencies.
   apt:
     name: "{{ packages }}"
@@ -50,6 +60,16 @@
     - libpugixml-dev
     - libpoppler-dev
     - libpoppler-cpp-dev
+  when: not emulationstationde_bin.stat.exists
+
+- name: Get the list of packages installed after build-dep.
+  package_facts:
+    manager: apt
+  when: not emulationstationde_bin.stat.exists
+
+- name: Save "after" status.
+  set_fact:
+    after: "{{ ansible_facts.packages }}"
   when: not emulationstationde_bin.stat.exists
 
 - name: Download latest release from github.
@@ -83,30 +103,12 @@
     target: install
   when: not emulationstationde_bin.stat.exists
 
-- name: Remove build dependencies.
+- name: Uninstall retroarch build dependencies.
   apt:
-    name: "{{ item }}"
+    name: "{{ after | difference(before) }}"
     state: absent
     purge: true
-  with_items:
-    packages:
-    - git
-    - build-essential
-    - pkg-config
-    - cmake
-    - gettext
-    - libgl1-mesa-dev
-    - libcurl4-openssl-dev
-    - libfreeimage-dev
-    - libsdl2-dev
-    - libavcodec-dev
-    - libavfilter-dev
-    - libharfbuzz-dev
-    - libgit2-dev
-    - libpugixml-dev
-    - libpoppler-dev
-    - libpoppler-cpp-dev
-  when: "ansible_facts.packages[item] is not defined" #just remove the new installed packages
+  when: not emulationstationde_bin.stat.exists
 
 - name: Remove source code.
   file:
@@ -172,8 +174,3 @@
   file:
     path: "/home/packages/{{ package_name }}"
     state: absent
-
-- name: Remove dependencies that are no longer required.
-  apt:
-    autoremove: yes
-    purge: true

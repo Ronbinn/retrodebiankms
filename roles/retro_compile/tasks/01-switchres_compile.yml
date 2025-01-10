@@ -27,6 +27,16 @@
     path: "/home/packages/{{ package_name }}.deb"
   register: debpackage
 
+- name: Get the list of packages installed before build-dep.
+  package_facts:
+    manager: apt
+  when: not switchres_bin.stat.exists
+
+- name: Save "before" status.
+  set_fact:
+    before: "{{ ansible_facts.packages }}"
+  when: not switchres_bin.stat.exists
+
 - name: Install switchres build dependencies
   apt:
     name: "{{ packages }}"
@@ -39,6 +49,16 @@
     - libxrandr-dev
     - libdrm-dev
     - libsdl2-dev
+  when: not switchres_bin.stat.exists
+
+- name: Get the list of packages installed after build-dep.
+  package_facts:
+    manager: apt
+  when: not switchres_bin.stat.exists
+
+- name: Save "after" status.
+  set_fact:
+    after: "{{ ansible_facts.packages }}"
   when: not switchres_bin.stat.exists
 
 - name: Download switchres git
@@ -77,18 +97,12 @@
     mode: 0644
   when: not switchres_bin.stat.exists
 
-- name: Unistall switchres build dependencies
+- name: Uninstall switchres build dependencies.
   apt:
-    name: "{{ item }}"
+    name: "{{ after | difference(before) }}"
     state: absent
-  with_items:
-    - git
-    - build-essential
-    - pkg-config
-    - libxrandr-dev
-    - libdrm-dev
-    - libsdl2-dev
-  when: "ansible_facts.packages[item] is not defined" #just remove the new installed packages
+    purge: true
+  when: not switchres_bin.stat.exists
 
 - name: Remove source code.
   file:
@@ -154,7 +168,3 @@
   file:
     path: "/home/packages/{{ package_name }}"
     state: absent
-
-- name: Remove dependencies that are no longer required.
-  apt:
-    autoremove: yes
