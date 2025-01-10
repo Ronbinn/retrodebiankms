@@ -28,50 +28,30 @@
     path: "/home/packages/{{ package_name }}.deb"
   register: debpackage
 
+- name: Get the list of packages installed before build-dep.
+  package_facts:
+    manager: apt
+  when: not retroarch_bin.stat.exists
+
+- name: Save "before" status.
+  set_fact:
+    before: "{{ ansible_facts.packages }}"
+  when: not retroarch_bin.stat.exists
+
 - name: Install retroarch build dependencies.
   apt:
-    name: "{{ item }}"
-    install_recommends: no
-  with_items:
-    - git
-    - build-essential
-    - pkg-config
-    - debhelper
-    - glslang-dev
-    - libasound2-dev
-    - libavcodec-dev
-    - libavdevice-dev
-    - libavformat-dev
-    - libavutil-dev
-    - libdbus-1-dev
-    - libdrm-dev
-    - libegl-dev
-    - libflac-dev
-    - libfreetype-dev
-    - libgbm-dev
-    - libglm-dev
-    - libjack-jackd2-dev
-    - libminiupnpc-dev
-    - libopenal-dev
-    - libpulse-dev
-    - libsdl2-dev
-    - libstb-dev
-    - libswscale-dev
-    - libudev-dev
-    - libusb-1.0-0-dev
-    - libv4l-dev
-    - libvulkan-dev
-    - libx11-xcb-dev
-    - libxinerama-dev
-    - libxml2-dev
-    - libxv-dev
-    - libxxf86vm-dev
-    - pkg-config
-    - python3-dev
-    - qtbase5-dev
-    - wayland-protocols
-    - x11proto-xext-dev
-    - zlib1g-dev
+    pkg: retroarch
+    state: build-dep
+  when: not retroarch_bin.stat.exists
+
+- name: Get the list of packages installed after build-dep.
+  package_facts:
+    manager: apt
+  when: not retroarch_bin.stat.exists
+
+- name: Save "after" status.
+  set_fact:
+    after: "{{ ansible_facts.packages }}"
   when: not retroarch_bin.stat.exists
 
 - name: Download retroarch git.
@@ -172,52 +152,7 @@
 
 - name: Uninstall retroarch build dependencies.
   apt:
-    name: "{{ item }}"
+    name: "{{ after | difference(before) }}"
     state: absent
     purge: true
-  with_items:
-    - git
-    - build-essential
-    - pkg-config
-    - debhelper
-    - glslang-dev
-    - libasound2-dev
-    - libavcodec-dev
-    - libavdevice-dev
-    - libavformat-dev
-    - libavutil-dev
-    - libdbus-1-dev
-    - libdrm-dev
-    - libegl-dev
-    - libflac-dev
-    - libfreetype-dev
-    - libgbm-dev
-    - libglm-dev
-    - libjack-jackd2-dev
-    - libminiupnpc-dev
-    - libopenal-dev
-    - libpulse-dev
-    - libsdl2-dev
-    - libstb-dev
-    - libswscale-dev
-    - libudev-dev
-    - libusb-1.0-0-dev
-    - libv4l-dev
-    - libvulkan-dev
-    - libx11-xcb-dev
-    - libxinerama-dev
-    - libxml2-dev
-    - libxv-dev
-    - libxxf86vm-dev
-    - pkg-config
-    - python3-dev
-    - qtbase5-dev
-    - wayland-protocols
-    - x11proto-xext-dev
-    - zlib1g-dev
-  when: "ansible_facts.packages[item] is not defined" #just remove the new installed packages
-
-- name: Remove dependencies that are no longer required.
-  apt:
-    autoremove: yes
-    purge: true
+  when: not retroarch_bin.stat.exists

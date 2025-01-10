@@ -1,8 +1,4 @@
 ---
-- name: Get the list of packages installed in this system.
-  package_facts:
-    manager: apt
-
 - name: Set new kernel version.
   set_fact:
     kernel_version: "6.6.69"
@@ -13,56 +9,30 @@
     path: "/home/packages/linux-image-{{ kernel_version }}-15khz_{{ kernel_version }}-1_{{ ansible_architecture | replace('x86_64','amd64') }}.deb"
   register: debpackage
 
-- name: Install i386 kernel for Debian.
-  apt:
-    name: "linux-image-686-pae"
-  when:
-    - ansible_distribution == 'Debian'
-    - ansible_architecture == 'i386'
+- name: Get the list of packages installed before build-dep.
+  package_facts:
+    manager: apt
+  when: not debpackage.stat.exists
 
-- name: Install amd64 kernel for Debian.
-  apt:
-    name: "linux-image-amd64"
-  when:
-    - ansible_distribution == 'Debian'
-    - ansible_architecture == 'x86_64'
+- name: Save "before" status.
+  set_fact:
+    before: "{{ ansible_facts.packages }}"
+  when: not debpackage.stat.exists
 
-- name: Install amd64 kernel for Ubuntu.
+- name: Install linux build dependencies.
   apt:
-    name: "linux-image-generic"
-  when: ansible_distribution == 'Ubuntu'
+    pkg: linux
+    state: build-dep
+  when: not debpackage.stat.exists
 
-#apt-rdepends --build-depends --follow=DEPENDS linux
-- name: Install build dependencies.
-  apt:
-    name: "{{ item }}"
-    install_recommends: no
-  with_items:
-    - git
-    - build-essential
-    - pkg-config
-    - bison
-    - cpio
-    - debhelper #debhelper-compat
-    - dh-exec
-    - dh-python
-    - flex
-    - python3
-    - python3-jinja2
-    - quilt
-    - xz-utils
-    - dvipng
-    - graphviz
-    - patchutils
-    - python3-sphinx
-    - python3-sphinx-rtd-theme
-    - texlive-latex-base
-    - texlive-latex-extra
-    - bc
-    - libelf-dev
-    - libssl-dev
-    - pahole
-    - rsync
+- name: Get the list of packages installed after build-dep.
+  package_facts:
+    manager: apt
+  when: not debpackage.stat.exists
+
+- name: Save "after" status.
+  set_fact:
+    after: "{{ ansible_facts.packages }}"
   when: not debpackage.stat.exists
 
 - name: Create working dir.
@@ -175,44 +145,10 @@
 
 - name: Uninstall linux build dependencies.
   apt:
-    name: "{{ item }}"
+    name: "{{ after | difference(before) }}"
     state: absent
     purge: true
-  with_items:
-    - git
-    - build-essential
-    - pkg-config
-    - bison
-    - cpio
-    - debhelper #debhelper-compat
-    - dh-exec
-    - dh-python
-    - flex
-    - python3
-    - python3-jinja2
-    - quilt
-    - xz-utils
-    - dvipng
-    - graphviz
-    - patchutils
-    - python3-sphinx
-    - python3-sphinx-rtd-theme
-    - texlive-latex-base
-    - texlive-latex-extra
-    - bc
-    - libelf-dev
-    - libssl-dev
-    - pahole
-    - rsync
-    - linux-image-686-pae
-    - linux-image-amd64
-    - linux-image-generic
-  when: "ansible_facts.packages[item] is not defined" #just remove the new installed packages
-
-- name: Remove dependencies that are no longer required.
-  apt:
-    autoremove: yes
-    purge: true
+  when: not debpackage.stat.exists
 
 - name: Install 15khz kernel debs.
   apt:

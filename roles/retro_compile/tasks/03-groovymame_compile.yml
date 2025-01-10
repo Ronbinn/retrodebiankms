@@ -29,38 +29,30 @@
     path: "/home/packages/{{ package_name }}.deb"
   register: debpackage
 
-#apt-rdepends --build-depends --follow=DEPENDS mame
+- name: Get the list of packages installed before build-dep.
+  package_facts:
+    manager: apt
+  when: not groovymame_bin.stat.exists
+
+- name: Save "before" status.
+  set_fact:
+    before: "{{ ansible_facts.packages }}"
+  when: not groovymame_bin.stat.exists
+
 - name: Install mame build dependencies.
   apt:
-    name: "{{ item }}"
-    install_recommends: no
-  with_items:
-    - git
-    - build-essential
-    - pkg-config
-    - g++
-    - debhelper
-    - dpkg-dev
-    - libasio-dev
-    - libexpat1-dev
-    - libflac-dev
-    - libfontconfig1-dev
-    - libglm-dev
-    - libjpeg-dev
-    - liblua5.3-dev
-    - libportmidi-dev
-    - libpugixml-dev
-    - libsdl2-dev
-    - libsdl2-ttf-dev
-    - libsqlite3-dev
-    - libutf8proc-dev
-    - libxinerama-dev
-    - portaudio19-dev
-    - python3-dev
-    - qtbase5-dev
-    - rapidjson-dev
-    - zlib1g-dev
-    - python3-sphinx
+    pkg: mame
+    state: build-dep
+  when: not groovymame_bin.stat.exists
+
+- name: Get the list of packages installed after build-dep.
+  package_facts:
+    manager: apt
+  when: not groovymame_bin.stat.exists
+
+- name: Save "after" status.
+  set_fact:
+    after: "{{ ansible_facts.packages }}"
   when: not groovymame_bin.stat.exists
 
 - name: Download latest release from github.
@@ -92,19 +84,6 @@
       SYMLEVEL: 1
       REGENIE: 1
       NOWERROR: "{{ nowerror }}"
-  when: not groovymame_bin.stat.exists
-
-- name: Install documentation dependencies.
-  apt:
-    name: "{{ packages }}"
-    install_recommends: no
-  vars:
-    packages:
-    - python3-sphinxcontrib.svg2pdfconverter
-    - latexmk
-    - texlive-latex-recommended
-    - texlive-latex-extra
-    - tex-gyre
   when: not groovymame_bin.stat.exists
 
 #make -f dist.mak PTR64=1
@@ -186,44 +165,7 @@
 
 - name: Uninstall mame build dependencies.
   apt:
-    name: "{{ item }}"
+    name: "{{ after | difference(before) }}"
     state: absent
     purge: true
-  with_items:
-    - git
-    - build-essential
-    - pkg-config
-    - g++
-    - debhelper
-    - dpkg-dev
-    - libasio-dev
-    - libexpat1-dev
-    - libflac-dev
-    - libfontconfig1-dev
-    - libglm-dev
-    - libjpeg-dev
-    - liblua5.3-dev
-    - libportmidi-dev
-    - libpugixml-dev
-    - libsdl2-dev
-    - libsdl2-ttf-dev
-    - libsqlite3-dev
-    - libutf8proc-dev
-    - libxinerama-dev
-    - portaudio19-dev
-    - python3-dev
-    - qtbase5-dev
-    - rapidjson-dev
-    - zlib1g-dev
-    - python3-sphinx
-    - python3-sphinxcontrib.svg2pdfconverter
-    - latexmk
-    - texlive-latex-recommended
-    - texlive-latex-extra
-    - tex-gyre
-  when: "ansible_facts.packages[item] is not defined" #just remove the new installed packages
-
-- name: Remove dependencies that are no longer required.
-  apt:
-    autoremove: yes
-    purge: true
+  when: not groovymame_bin.stat.exists
