@@ -1,2 +1,3 @@
 <?xml version="1.0"?>
+<bool name="ShowQuitMenu" value="true" />
 <string name="Theme" value="minui-menu-es-de" />
