@@ -19,6 +19,10 @@
     before: "{{ ansible_facts.packages }}"
   when: not debpackage.stat.exists
 
+- name: Install git.
+  apt:
+    name: "git"
+
 - name: Install linux build dependencies.
   apt:
     pkg: linux
