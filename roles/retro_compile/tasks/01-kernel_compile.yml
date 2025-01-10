@@ -19,6 +19,29 @@
     before: "{{ ansible_facts.packages }}"
   when: not debpackage.stat.exists
 
+- name: Install i386 kernel for Debian.
+  apt:
+    name: "linux-image-686-pae"
+  when:
+    - ansible_distribution == 'Debian'
+    - ansible_architecture == 'i386'
+    - not debpackage.stat.exists
+
+- name: Install amd64 kernel for Debian.
+  apt:
+    name: "linux-image-amd64"
+  when:
+    - ansible_distribution == 'Debian'
+    - ansible_architecture == 'x86_64'
+    - not debpackage.stat.exists
+
+- name: Install amd64 kernel for Ubuntu.
+  apt:
+    name: "linux-image-generic"
+  when:
+    - ansible_distribution == 'Ubuntu'
+    - not debpackage.stat.exists
+
 - name: Install git.
   apt:
     name: "git"
