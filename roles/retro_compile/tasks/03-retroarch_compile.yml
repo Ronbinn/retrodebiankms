@@ -38,6 +38,11 @@
     before: "{{ ansible_facts.packages }}"
   when: not retroarch_bin.stat.exists
 
+- name: Install git.
+  apt:
+    name: "git"
+  when: not retroarch_bin.stat.exists
+
 - name: Install retroarch build dependencies.
   apt:
     pkg: retroarch

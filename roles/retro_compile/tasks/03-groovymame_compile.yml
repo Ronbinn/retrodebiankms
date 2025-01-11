@@ -39,6 +39,11 @@
     before: "{{ ansible_facts.packages }}"
   when: not groovymame_bin.stat.exists
 
+- name: Install git.
+  apt:
+    name: "git"
+  when: not groovymame_bin.stat.exists
+
 - name: Install mame build dependencies.
   apt:
     pkg: mame
