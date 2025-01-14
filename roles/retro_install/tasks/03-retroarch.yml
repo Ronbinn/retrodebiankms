@@ -11,7 +11,7 @@
 
 - name: Download retroarch. 64 bit.
   get_url:
-    url: "https://github.com/Ronbinn/retrodebiankms/releases/download/23_12_2024/retroarch_v1.19.1_amd64.deb"
+    url: "https://github.com/Ronbinn/retrodebiankms/releases/download/12_01_2025/retroarch_v1.20.0_amd64.deb"
     dest: "/home/retroarch.deb"
     timeout: 60
   when:
@@ -20,7 +20,7 @@
 
 - name: Download retroarch. 32 bit.
   get_url:
-    url: "https://github.com/Ronbinn/retrodebiankms/releases/download/23_12_2024/retroarch_v1.19.1_i386.deb"
+    url: "https://github.com/Ronbinn/retrodebiankms/releases/download/12_01_2025/retroarch_v1.20.0_i386.deb"
     dest: "/home/retroarch.deb"
     timeout: 60
   when:
@@ -126,7 +126,7 @@
 
 - name: Create mGBA dir.
   file:
-    path: "/home/arcade/.config/mGBA"
+    path: "/home/arcade/.config/retroarch/config/mGBA"
     state: directory
     owner: arcade
     group: arcade
@@ -134,7 +134,7 @@
 - name: Disable interlace in mGBA core.
   copy:
     src: "{{ role_path }}/files/retroarch/config/mGBA/mGBA.switchres.ini"
-    dest: "/home/arcade/.config/mGBA/mGBA.switchres.ini"
+    dest: "/home/arcade/.config/retroarch/config/mGBA/mGBA.switchres.ini"
     mode: 0644
 
 - name: Change file ownership.

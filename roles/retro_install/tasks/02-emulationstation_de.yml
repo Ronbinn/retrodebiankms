@@ -27,7 +27,7 @@
 
 - name: Download emulationstation_de. 64 bit.
   get_url:
-    url: "https://github.com/Ronbinn/retrodebiankms/releases/download/23_12_2024/emulationstation_de_v3.1.1_amd64.deb"
+    url: "https://github.com/Ronbinn/retrodebiankms/releases/download/12_01_2025/emulationstation_de_v3.1.1_amd64.deb"
     dest: "/home/emulationstation_de.deb"
     timeout: 60
   when:
@@ -36,7 +36,7 @@
 
 - name: Download emulationstation_de. 32 bit.
   get_url:
-    url: "https://github.com/Ronbinn/retrodebiankms/releases/download/23_12_2024/emulationstation_de_v3.1.1_i386.deb"
+    url: "https://github.com/Ronbinn/retrodebiankms/releases/download/12_01_2025/emulationstation_de_v3.1.1_i386.deb"
     dest: "/home/emulationstation_de.deb"
     timeout: 60
   when:

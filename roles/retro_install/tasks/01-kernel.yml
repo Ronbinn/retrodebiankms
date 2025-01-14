@@ -14,9 +14,9 @@
     dest: "{{ item.dest }}"
     timeout: 60
   with_items:
-     - { src: "https://github.com/Ronbinn/retrodebiankms/releases/download/23_12_2024/linux-image-6.6.65-15khz_6.6.65-1_amd64.deb", dest: "/root/linux_image.deb" }
-     - { src: "https://github.com/Ronbinn/retrodebiankms/releases/download/23_12_2024/linux-headers-6.6.65-15khz_6.6.65-1_amd64.deb", dest: "/root/linux_headers.deb" }
-     - { src: "https://github.com/Ronbinn/retrodebiankms/releases/download/23_12_2024/linux-libc-dev_6.6.65-1_amd64.deb", dest: "/root/linux_libc.deb" }
+     - { src: "https://github.com/Ronbinn/retrodebiankms/releases/download/12_01_2025/linux-image-6.6.71-15khz_6.6.71-1_amd64.deb", dest: "/root/linux_image.deb" }
+     - { src: "https://github.com/Ronbinn/retrodebiankms/releases/download/12_01_2025/linux-headers-6.6.71-15khz_6.6.71-1_amd64.deb", dest: "/root/linux_headers.deb" }
+     - { src: "https://github.com/Ronbinn/retrodebiankms/releases/download/12_01_2025/linux-libc-dev_6.6.71-1_amd64.deb", dest: "/root/linux_libc.deb" }
   when:
     - ansible_architecture == 'x86_64'
     - result.matched == 0
@@ -27,9 +27,9 @@
     dest: "{{ item.dest }}"
     timeout: 60
   with_items:
-     - { src: "https://github.com/Ronbinn/retrodebiankms/releases/download/23_12_2024/linux-image-6.6.65-15khz_6.6.65-1_i386.deb", dest: "/root/linux_image.deb" }
-     - { src: "https://github.com/Ronbinn/retrodebiankms/releases/download/23_12_2024/linux-headers-6.6.65-15khz_6.6.65-1_i386.deb", dest: "/root/linux_headers.deb" }
-     - { src: "https://github.com/Ronbinn/retrodebiankms/releases/download/23_12_2024/linux-libc-dev_6.6.65-1_i386.deb", dest: "/root/linux_libc.deb" }
+     - { src: "https://github.com/Ronbinn/retrodebiankms/releases/download/12_01_2025/linux-image-6.6.71-15khz_6.6.71-1_i386.deb", dest: "/root/linux_image.deb" }
+     - { src: "https://github.com/Ronbinn/retrodebiankms/releases/download/12_01_2025/linux-headers-6.6.71-15khz_6.6.71-1_i386.deb", dest: "/root/linux_headers.deb" }
+     - { src: "https://github.com/Ronbinn/retrodebiankms/releases/download/12_01_2025/linux-libc-dev_6.6.71-1_i386.deb", dest: "/root/linux_libc.deb" }
   when:
     - ansible_architecture == 'i386'
     - result.matched == 0
