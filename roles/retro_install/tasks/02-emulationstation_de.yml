@@ -12,11 +12,11 @@
     - git #we will use it to download themes
     - libcurl4
     - libfreeimage3
-    - libgit2-1.5
+    - libgit2-1.9
     - libpugixml1v5
     - libsdl2-2.0-0
-    - libavcodec59
-    - libavfilter8
+    - libavcodec61
+    - libavfilter10
     - libopengl0
     - libegl1
 
