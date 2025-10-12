@@ -121,7 +121,7 @@
     state: directory
   with_items:
      - "usr/local/bin"
-     - "usr/local/share/attract"
+     - "usr/local/share/attractplus"
      - "DEBIAN"
   when: not debpackage.stat.exists
 
@@ -133,7 +133,7 @@
     remote_src: true
   with_items:
      - "usr/local/bin/attractplus"
-     - "usr/local/share/attract"
+     - "usr/local/share/attractplus"
   when: not debpackage.stat.exists
 
 - name: Copy package's control file.
