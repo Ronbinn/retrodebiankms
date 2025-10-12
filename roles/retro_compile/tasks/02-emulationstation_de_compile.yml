@@ -60,6 +60,7 @@
     - libpugixml-dev
     - libpoppler-dev
     - libpoppler-cpp-dev
+    - libbluetooth-dev
   when: not emulationstationde_bin.stat.exists
 
 - name: Get the list of packages installed after build-dep.
