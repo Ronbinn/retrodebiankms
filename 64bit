@@ -1,2 +1,2 @@
 [hosts]
-/home/debianlive64		distro=debian suite=bookworm	arch=amd64
+/home/debianlive64		distro=debian suite=trixie	arch=amd64
