@@ -1,8 +1,8 @@
 ---
 - name: Set new kernel version.
   set_fact:
-    kernel_version: "6.6.71"
-    kernel_big_version: "6.6"
+    kernel_version: "6.17.1"
+    kernel_big_version: "6.17"
 
 - name: Check if there is a compiled package.
   stat:
@@ -97,11 +97,11 @@
   with_items:
      - "01_linux_15khz.patch"
      - "02_linux_15khz_interlaced_mode_fix.patch"
-     - "03_linux_15khz_dcn1_dcn2_interlaced_mode_fix.patch"
+     - "03_linux_15khz_dcn1_dcn2_dcn3_interlaced_mode_fix.patch"
      - "04_linux_15khz_dce_interlaced_mode_fix.patch"
      - "05_linux_15khz_amdgpu_pll_fix.patch"
      - "06_linux_switchres_kms_drm_modesetting.patch"
-#     - "07_linux_15khz_fix_ddc.patch"
+     - "07_linux_15khz_fix_ddc.patch"
   when: not debpackage.stat.exists
 
 - name: Find current kernel's config file.
