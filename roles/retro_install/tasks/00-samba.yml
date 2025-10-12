@@ -6,7 +6,7 @@
   with_items:
     - samba
     - cifs-utils
-    - wsdd
+    - wsdd2
 
 - name: Configure samba share.
   blockinfile:
