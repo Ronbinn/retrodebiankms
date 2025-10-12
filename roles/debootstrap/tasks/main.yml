@@ -48,7 +48,7 @@
   - name: Create new installation using debootstrap.
     command: /usr/sbin/debootstrap
              --arch={{ arch }}
-             --include=python-is-python3
+             --include=python-is-python3,python3-debian
              --components={{ compo }}
              --merged-usr
              {{ suite }} {{ inventory_hostname }}/live/squashfs-root {{ repo }}
