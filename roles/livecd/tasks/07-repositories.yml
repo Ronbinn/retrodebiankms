@@ -1,44 +1,62 @@
 #this task configures ubuntu or debian repositories
 ---
-- name: add updates repo.
-  apt_repository:
-    repo: "{{ item  }} {{ repo }} {{ ansible_distribution_release }}-updates {{ compo }}"
-    state: present
-  with_items:
-    - "deb"
-    - "deb-src"
-
-- name: add Debian security repo.
-  apt_repository:
-    repo: "{{ item }} http://security.debian.org/debian-security {{ ansible_distribution_release }}-security {{ compo }}"
-    state: present
-  with_items:
-    - "deb"
-    - "deb-src"
-  when: ansible_distribution == 'Debian'
-
-- name: add Ubuntu security repo.
-  apt_repository:
-    repo: "{{ item }} http://security.ubuntu.com/ubuntu {{ ansible_distribution_release }}-security {{ compo }}"
-    state: present
-  with_items:
-    - "deb"
-    - "deb-src"
-  when: ansible_distribution == 'Ubuntu'
-
 - name: Remove original sources.list.
   file:
-    path="/etc/apt/sources.list"
-    state=absent
+    path: "/etc/apt/sources.list"
+    state: absent
 
 - name: Add standard repo.
-  apt_repository:
-    repo: "{{ item  }} {{ repo }} {{ ansible_distribution_release }} {{ compo }}"
-    state: present
-  with_items:
-    - "deb"
-    - "deb-src"
+  deb822_repository:
+    name: "{{ ansible_distribution }}"
+    uris: "{{ repo }}"
+    suites: "{{ ansible_distribution_release }}"
+    components: "{{ compo }}"
+    signed_by: /usr/share/keyrings/debian-archive-keyring.gpg
+    types:
+      - deb
+      - deb-src
+
+- name: add updates repo.
+  deb822_repository:
+    name: "{{ ansible_distribution }}-updates"
+    uris: "{{ repo }}"
+    suites: "{{ ansible_distribution_release }}-updates"
+    components: "{{ compo }}"
+    signed_by: /usr/share/keyrings/debian-archive-keyring.gpg
+    types:
+      - deb
+      - deb-src
+
+- name: add Debian security repo.
+  deb822_repository:
+    name: "debian-security"
+    uris: "http://security.debian.org/debian-security"
+    suites: "{{ ansible_distribution_release }}-security"
+    components: "{{ compo }}"
+    signed_by: /usr/share/keyrings/debian-archive-keyring.gpg
+    types:
+      - deb
+      - deb-src
+  when:
+    - ansible_distribution == 'Debian'
+
+- name: add Ubuntu security repo.
+  deb822_repository:
+    name: "ubuntu-security"
+    uris: "http://security.ubuntu.com/ubuntu"
+    suites: "{{ ansible_distribution_release }}-security"
+    components: "{{ compo }}"
+    signed_by: /usr/share/keyrings/debian-archive-keyring.gpg
+    types:
+      - deb
+      - deb-src
+  when:
+    - ansible_distribution == 'Ubuntu'
 
 - name: "apt-get update"
   apt:
     update_cache: yes
+
+- name: Upgrade system.
+  apt:
+    upgrade: dist
