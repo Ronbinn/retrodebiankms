@@ -7,8 +7,8 @@
     packages:
     - libgl1
     - libgbm1
-    - libavformat59
-    - libswscale6
+    - libavformat61
+    - libswscale8
     - libopenal1
 
 - name: Check if exists a attractplus installation.

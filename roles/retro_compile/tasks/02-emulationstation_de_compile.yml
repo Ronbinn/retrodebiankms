@@ -104,7 +104,7 @@
     target: install
   when: not emulationstationde_bin.stat.exists
 
-- name: Uninstall retroarch build dependencies.
+- name: Uninstall emulationstation build dependencies.
   apt:
     name: "{{ after | difference(before) }}"
     state: absent

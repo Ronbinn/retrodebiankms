@@ -28,6 +28,16 @@
     path: "/home/packages/{{ package_name }}.deb"
   register: debpackage
 
+- name: Get the list of packages installed before build-dep.
+  package_facts:
+    manager: apt
+  when: not attractplus_bin.stat.exists
+
+- name: Save "before" status.
+  set_fact:
+    before: "{{ ansible_facts.packages }}"
+  when: not attractplus_bin.stat.exists
+
 - name: Install attractplus build dependencies.
   apt:
     name: "{{ packages }}"
@@ -57,6 +67,16 @@
     - libboost-system-dev
   when: not attractplus_bin.stat.exists
 
+- name: Get the list of packages installed after build-dep.
+  package_facts:
+    manager: apt
+  when: not attractplus_bin.stat.exists
+
+- name: Save "after" status.
+  set_fact:
+    after: "{{ ansible_facts.packages }}"
+  when: not attractplus_bin.stat.exists
+
 - name: Download attractplus git
   git:
     repo: "https://github.com/oomek/attractplus"
@@ -83,32 +103,10 @@
 
 - name: Uninstall attractplus build dependencies.
   apt:
-    name: "{{ item }}"
+    name: "{{ after | difference(before) }}"
     state: absent
     purge: true
-  with_items:
-    - git
-    - build-essential
-    - pkg-config
-    - cmake
-    - libdrm-dev
-    - libgbm-dev
-    - libavformat-dev
-    - libavcodec-dev
-    - libavutil-dev
-    - libswscale-dev
-    - libswresample-dev
-    - libopenal-dev
-    - libgl1-mesa-dev
-    - libudev-dev
-    - libvorbis-dev
-    - libflac-dev
-    - libfreetype-dev
-    - libexpat1-dev
-    - libglu1-mesa-dev
-    - libboost-filesystem-dev
-    - libboost-system-dev
-  when: "ansible_facts.packages[item] is not defined" #just remove the new installed packages
+  when: not attractplus_bin.stat.exists
 
 - name: Remove source code.
   file:
@@ -163,8 +161,3 @@
   file:
     path: "/home/packages/{{ package_name }}"
     state: absent
-
-- name: Remove dependencies that are no longer required.
-  apt:
-    autoremove: yes
-    purge: true
