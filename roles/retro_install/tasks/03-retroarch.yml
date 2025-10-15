@@ -1,41 +1,42 @@
 #install and configure retroarch
 ---
-- name: Install original retroarch to get the dependencies.
+#- name: Install original retroarch to get the dependencies.
+- name: Install retroarch.
   apt:
     name: retroarch
 
-- name: Check if exists a retroarch installation.
-  stat:
-    path: "/usr/local/bin/retroarch"
-  register: bin
+#- name: Check if exists a retroarch installation.
+#  stat:
+#    path: "/usr/local/bin/retroarch"
+#  register: bin
 
-- name: Download retroarch. 64 bit.
-  get_url:
-    url: "https://github.com/Ronbinn/retrodebiankms/releases/download/12_01_2025/retroarch_v1.20.0_amd64.deb"
-    dest: "/home/retroarch.deb"
-    timeout: 60
-  when:
-    - bin.stat.exists == false
-    - ansible_architecture == 'x86_64'
+#- name: Download retroarch. 64 bit.
+#  get_url:
+#    url: "https://github.com/Ronbinn/retrodebiankms/releases/download/12_01_2025/retroarch_v1.20.0_amd64.deb"
+#    dest: "/home/retroarch.deb"
+#    timeout: 60
+#  when:
+#    - bin.stat.exists == false
+#    - ansible_architecture == 'x86_64'
 
-- name: Download retroarch. 32 bit.
-  get_url:
-    url: "https://github.com/Ronbinn/retrodebiankms/releases/download/12_01_2025/retroarch_v1.20.0_i386.deb"
-    dest: "/home/retroarch.deb"
-    timeout: 60
-  when:
-    - bin.stat.exists == false
-    - ansible_architecture == 'i386'
+#- name: Download retroarch. 32 bit.
+#  get_url:
+#    url: "https://github.com/Ronbinn/retrodebiankms/releases/download/12_01_2025/retroarch_v1.20.0_i386.deb"
+#    dest: "/home/retroarch.deb"
+#    timeout: 60
+#  when:
+#    - bin.stat.exists == false
+#    - ansible_architecture == 'i386'
 
-- name: Install retroarch.
-  apt:
-    deb: "/home/retroarch.deb"
-  when: bin.stat.exists == false
+#- name: Install retroarch.
+#  apt:
+#    deb: "/home/retroarch.deb"
+#  when: bin.stat.exists == false
 
-- name: Remove deb file.
-  file:
-    path: "/home/retroarch.deb"
-    state: absent
+#- name: Remove deb file.
+#  file:
+#    path: "/home/retroarch.deb"
+#    state: absent
 
 - name: Remove retroarch original configuration.
   file:

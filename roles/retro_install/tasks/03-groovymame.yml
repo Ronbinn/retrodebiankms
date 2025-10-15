@@ -17,13 +17,22 @@
   register: bin
 
 - name: Download groovymame. 64 bit.
-  get_url:
-    url: "https://github.com/Ronbinn/retrodebiankms/releases/download/12_01_2025/groovymame_0273sr221d_amd64.deb"
-    dest: "/home/groovymame.deb"
-    timeout: 60
+  unarchive:
+    src: "https://github.com/antonioginer/GroovyMAME/releases/download/gm0281sr221f/groovymame_0281.221f_linux.tar.bz2"
+    dest: /usr/local/bin
+    remote_src: yes
   when:
     - bin.stat.exists == false
     - ansible_architecture == 'x86_64'
+
+#- name: Download groovymame. 64 bit.
+#  get_url:
+#    url: "https://github.com/Ronbinn/retrodebiankms/releases/download/12_01_2025/groovymame_0273sr221d_amd64.deb"
+#    dest: "/home/groovymame.deb"
+#    timeout: 60
+#  when:
+#    - bin.stat.exists == false
+#    - ansible_architecture == 'x86_64'
 
 - name: Download groovymame. 32 bit.
   get_url:
@@ -37,7 +46,9 @@
 - name: Install groovymame.
   apt:
     deb: "/home/groovymame.deb"
-  when: bin.stat.exists == false
+  when:
+    - bin.stat.exists == false
+    - ansible_architecture == 'i386'
 
 - name: Remove deb file.
   file:
