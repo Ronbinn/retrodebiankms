@@ -81,6 +81,7 @@
   git:
     repo: "https://github.com/oomek/attractplus"
     dest: "/home/attractplus"
+    accept_hostkey: "true"
 #    version: "{{ release  }}"
 #    recursive: true
   when: not attractplus_bin.stat.exists

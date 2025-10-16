@@ -78,6 +78,7 @@
     repo: "https://gitlab.com/es-de/emulationstation-de"
     dest: /home/emulationstationdegit
     version: "{{ release  }}"
+    accept_hostkey: "true"
   when: not emulationstationde_bin.stat.exists
 
 - name: Execute cmake.
