@@ -1,16 +1,30 @@
 #!/bin/bash
 
-#check arguments
-if [ $# -eq 0 ]
+disks=`lsblk | grep disk | wc -l`
+if [ $disks -eq 0 ]
   then
-    echo "You have to choose a disk"
-    lsblk | grep disk
+    echo "There are no disks"
     exit
+fi
+
+command=""
+for i in $(seq $disks)
+do
+   name=$(lsblk | grep disk | awk -v line="$i" 'FNR == line {print $1}')
+   size=$(lsblk | grep disk | awk -v line="$i" 'FNR == line {print $4}')
+   command="${command} ${i} ${name}:${size}"
+done
+chose=$(whiptail --menu "Installer" 0 0 $disks $command 3>&2 2>&1 1>&3)
+exitstatus=$?
+if [ $exitstatus = 0 ]; then
+   chosen=$(lsblk | grep disk | awk -v line="$chose" 'FNR == line {print $1}')
+else
+   exit
 fi
 
 #/dev/sda1 vs /dev/nvme0n1p1
 p=""
-if [[ $1 = nvme* || $1 = mmc* ]]
+if [[ $chosen = nvme* || $chosen = mmc* ]]
   then
     p="p"
 fi
@@ -87,11 +101,11 @@ fi
 mkdir system
 mount /dev/${1}${p}2 system
 #echo "copying the image..."
-#pv /lib/live/mount/medium/live/filesystem.squashfs > system/filesystem.squashfs
+#pv /run/live/medium/live/filesystem.squashfs > system/filesystem.squashfs
 echo "copying the md5 file..."
-pv /lib/live/mount/medium/live/filesystem.md5 > system/filesystem.md5
+pv /run/live/medium/live/filesystem.md5 > system/filesystem.md5
 echo "extracting the image..."
-unsquashfs -f -d system /lib/live/mount/medium/live/filesystem.squashfs
+unsquashfs -f -d system /run/live/medium/live/filesystem.squashfs
 
 #copy configuration files
 cp /etc/retroarch.cfg system/etc/retroarch.cfg
