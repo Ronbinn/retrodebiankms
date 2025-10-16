@@ -9,7 +9,7 @@
     name: "{{ item }}"
   with_items:
     - libdrm-dev
-    - xorg-dev #this is not mandatory
+#    - xorg-dev #this is not mandatory
 
 - name: Check if exists a groovymame installation.
   stat:
@@ -68,6 +68,11 @@
     dest: "/home/arcade/.mame/mame.ini"
     owner: arcade
     group: arcade
+
+- name: Remove mame executable.
+  file:
+    path: "/usr/games/mame"
+    state: absent
 
 - name: Create link.
   file:
