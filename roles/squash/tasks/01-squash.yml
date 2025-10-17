@@ -56,11 +56,10 @@
       chdir: "{{ inventory_hostname }}/live"
       argv:
         - "/usr/bin/mksquashfs"
-#        - "-comp xz"
-        - "-comp zstd"
         - "squashfs-root"
         - "filesystem.squashfs"
-
+#        - "-comp xz"
+        - "-comp zstd -Xcompression-level 22"
   - name: Remove squashfs-root folder
     file:
       path="{{ inventory_hostname }}/live/squashfs-root"
