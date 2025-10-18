@@ -1,11 +1,9 @@
 #!/bin/sh
 
-# Capturar la primera cadena desde el argumento del usuario
 input="$@"
 reboot="--reboot now"
 poweroff="--poweroff now"
 
-# Comparación de las cadenas
 if [ "$input" = "$reboot" ]; then
     systemctl reboot
 fi

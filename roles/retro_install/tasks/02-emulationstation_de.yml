@@ -113,6 +113,12 @@
     dest: "/home/arcade/ROMs/arcade/wrally.zip"
     mode: 0644
 
+- name: Copy shutdown script.
+  copy:
+    src: "{{ role_path }}/files/usr/local/bin/shutdown"
+    dest: "/usr/local/bin/shutdown"
+    mode: 0755
+
 - name: Uninstall git.
   apt:
     name: "git"
