@@ -58,8 +58,10 @@
         - "/usr/bin/mksquashfs"
         - "squashfs-root"
         - "filesystem.squashfs"
-#        - "-comp xz"
-        - "-comp zstd -Xcompression-level 22"
+        - "-comp"
+        - "zstd"
+        - "-Xcompression-level"
+        - "22"
   - name: Remove squashfs-root folder
     file:
       path="{{ inventory_hostname }}/live/squashfs-root"

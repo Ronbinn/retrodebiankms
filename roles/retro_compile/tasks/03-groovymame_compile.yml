@@ -65,6 +65,8 @@
     repo: 'https://github.com/antonioginer/groovymame'
     dest: /home/groovymamegit
     version: "{{ release }}"
+  environment:
+    - GIT_SSL_NO_VERIFY: "true"
   when: not groovymame_bin.stat.exists
 
 - name: Apply restoregames patch.

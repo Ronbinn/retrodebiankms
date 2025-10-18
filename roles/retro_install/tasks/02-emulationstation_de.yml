@@ -60,6 +60,8 @@
   with_items:
     - { url: "https://github.com/anthonycaccese/mister-menu-es-de", dest: "/usr/local/share/es-de/themes/mister-menu-es-de" }
     - { url: "https://github.com/anthonycaccese/minui-menu-es-de", dest: "/usr/local/share/es-de/themes/minui-menu-es-de" }
+  environment:
+    - GIT_SSL_NO_VERIFY: "true"
 
 - name: Create ROMs dir.
   command:
