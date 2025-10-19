@@ -84,8 +84,6 @@
 #    accept_hostkey: "true"
 #    version: "{{ release  }}"
 #    recursive: true
-  environment:
-    - GIT_SSL_NO_VERIFY: "true"
   when: not attractplus_bin.stat.exists
 
 - name: Build attractplus.

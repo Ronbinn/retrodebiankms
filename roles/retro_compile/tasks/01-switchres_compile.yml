@@ -66,9 +66,6 @@
     repo: 'https://github.com/antonioginer/switchres.git'
     dest: "/home/switchres"
     version: "{{ release  }}"
-#    accept_hostkey: "true"
-  environment:
-    - GIT_SSL_NO_VERIFY: "true"
   when: not switchres_bin.stat.exists
 
 - name: Build switchres.

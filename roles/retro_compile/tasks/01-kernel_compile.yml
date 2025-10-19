@@ -79,9 +79,6 @@
   git:
     repo: "https://github.com/D0023R/linux_kernel_15khz"
     dest: "/home/patches"
-#    accept_hostkey: "true"
-  environment:
-    - GIT_SSL_NO_VERIFY: "true"
   when: not debpackage.stat.exists
 
 - name: Unarchive kernel source.

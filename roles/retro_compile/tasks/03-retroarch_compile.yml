@@ -64,8 +64,6 @@
     repo: "https://github.com/libretro/retroarch"
     dest: "/home/retroarchgit"
     version: "{{ release  }}"
-  environment:
-    - GIT_SSL_NO_VERIFY: "true"
   when: not retroarch_bin.stat.exists
 
 - name: Configure retroarch
