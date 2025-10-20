@@ -130,7 +130,6 @@ mount /dev/${chosen}${p}1 system$grubmount
 mount -B /dev system/dev
 mount -B /proc system/proc
 mount -B /sys system/sys
-sed -i 's,$uuid,'$uuid2',g' system/etc/grub.d/50_ipxe #ugly hack for update-grub
 if test -d "/sys/firmware/efi"; then
     mount -B /sys/firmware/efi/efivars system/sys/firmware/efi/efivars
     chroot system /usr/sbin/grub-install /dev/${chosen}${p}
@@ -140,7 +139,6 @@ else
     chroot system /usr/sbin/grub-install /dev/${chosen}${p}
     chroot system /usr/sbin/update-grub
 fi
-sed -i 's,'$uuid2',$uuid,g' system/etc/grub.d/50_ipxe #restore file after update-grub
 umount system/sys
 umount system/proc
 umount system/dev

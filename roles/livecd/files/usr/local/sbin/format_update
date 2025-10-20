@@ -1,4 +1,4 @@
-{#!/bin/bash
+#!/bin/bash
 
 disks=`lsblk | grep disk | wc -l`
 if [ $disks -eq 0 ]
@@ -46,11 +46,6 @@ fi
 for n in /dev/$chosen* ; do umount $n ; done
 swapoff --all
 
-#get disk size
-disksize=$(lsblk /dev/$chosen | grep disk | awk '{ print $4 }' | tr -d G)
-nodot=${disksize%.*}
-nodecimal=${nodot%,*}
-
 #format partitions
 mkfs.vfat /dev/${chosen}${p}1 -F 32 -n BOOT > /dev/null 2>&1
 mkfs.ext4 /dev/${chosen}${p}2 -FL system > /dev/null 2>&1
@@ -72,8 +67,6 @@ fi
 #install system in second partition
 mkdir system
 mount /dev/${chosen}${p}2 system
-#echo "copying the image..."
-#pv /run/live/medium/live/filesystem.squashfs > system/filesystem.squashfs
 echo "copying the md5 file..."
 pv /run/live/medium/live/filesystem.md5 > system/filesystem.md5
 echo "extracting the image..."
@@ -114,9 +107,8 @@ echo "updating fstab..."
 echo "UUID=$uuid1        $grubmount           vfat    defaults                0 0" > system/etc/fstab
 echo "UUID=$uuid2    /                   ext4    defaults                0 0" >> system/etc/fstab
 echo "UUID=$uuid3    swap        swap    defaults                0 0" >> system/etc/fstab
-if [ "$uuid4" != "none" ]; then
-    echo "UUID=$uuid4    /home       ext4    defaults                0 0" >> system/etc/fstab
-fi
+echo "#UUID=$uuid4    /home       ext4    defaults                0 0" >> system/etc/fstab
+echo "none    /home       tmpfs    defaults                0 0" >> system/etc/fstab
 
 #remove livecd tweaks
 echo "restoring systemd journal"
