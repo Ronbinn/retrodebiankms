@@ -48,8 +48,7 @@ swapoff --all
 
 #get disk size
 disksize=$(lsblk /dev/$chosen | grep disk | awk '{ print $4 }' | tr -d G)
-nodot=${disksize%.*}
-nodecimal=${nodot%,*}
+nodecimal=${disksize%,*}
 
 if [ "$nodecimal" -gt 20 ]; then
    #create partition table
@@ -100,8 +99,6 @@ fi
 #install system in second partition
 mkdir system
 mount /dev/${chosen}${p}2 system
-#echo "copying the image..."
-#pv /run/live/medium/live/filesystem.squashfs > system/filesystem.squashfs
 echo "copying the md5 file..."
 pv /run/live/medium/live/filesystem.md5 > system/filesystem.md5
 echo "extracting the image..."
@@ -133,6 +130,7 @@ mount /dev/${chosen}${p}1 system$grubmount
 mount -B /dev system/dev
 mount -B /proc system/proc
 mount -B /sys system/sys
+sed -i 's,$uuid,'$uuid2',g' system/etc/grub.d/50_ipxe #ugly hack for update-grub
 if test -d "/sys/firmware/efi"; then
     mount -B /sys/firmware/efi/efivars system/sys/firmware/efi/efivars
     chroot system /usr/sbin/grub-install /dev/${chosen}${p}
@@ -142,6 +140,7 @@ else
     chroot system /usr/sbin/grub-install /dev/${chosen}${p}
     chroot system /usr/sbin/update-grub
 fi
+sed -i 's,'$uuid2',$uuid,g' system/etc/grub.d/50_ipxe #restore file after update-grub
 umount system/sys
 umount system/proc
 umount system/dev
@@ -152,9 +151,8 @@ echo "updating fstab..."
 echo "UUID=$uuid1        $grubmount           vfat    defaults                0 0" > system/etc/fstab
 echo "UUID=$uuid2    /                   ext4    defaults                0 0" >> system/etc/fstab
 echo "UUID=$uuid3    swap        swap    defaults                0 0" >> system/etc/fstab
-if [ "$uuid4" != "none" ]; then
-    echo "UUID=$uuid4    /home       ext4    defaults                0 0" >> system/etc/fstab
-fi
+echo "#UUID=$uuid4    /home       ext4    defaults                0 0" >> system/etc/fstab
+echo "none    /home       tmpfs    defaults                0 0" >> system/etc/fstab
 
 #remove livecd tweaks
 echo "restoring systemd journal"
