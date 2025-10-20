@@ -1,4 +1,4 @@
-#!/bin/bash
+{#!/bin/bash
 
 disks=`lsblk | grep disk | wc -l`
 if [ $disks -eq 0 ]
@@ -43,27 +43,27 @@ else
 fi
 
 #umount disk
-for n in /dev/$1* ; do umount $n ; done
+for n in /dev/$chosen* ; do umount $n ; done
 swapoff --all
 
 #get disk size
-disksize=$(lsblk /dev/$1 | grep disk | awk '{ print $4 }' | tr -d G)
+disksize=$(lsblk /dev/$chosen | grep disk | awk '{ print $4 }' | tr -d G)
 nodot=${disksize%.*}
 nodecimal=${nodot%,*}
 
 #format partitions
-mkfs.vfat /dev/${1}${p}1 -F 32 -n BOOT > /dev/null 2>&1
-mkfs.ext4 /dev/${1}${p}2 -FL system > /dev/null 2>&1
-mkswap /dev/${1}${p}3 > /dev/null 2>&1
+mkfs.vfat /dev/${chosen}${p}1 -F 32 -n BOOT > /dev/null 2>&1
+mkfs.ext4 /dev/${chosen}${p}2 -FL system > /dev/null 2>&1
+mkswap /dev/${chosen}${p}3 > /dev/null 2>&1
 
 #get UUIDs
-uuid1=`blkid -s UUID -o value /dev/${1}${p}1`
-uuid2=`blkid -s UUID -o value /dev/${1}${p}2`
-uuid3=`blkid -s UUID -o value /dev/${1}${p}3`
+uuid1=`blkid -s UUID -o value /dev/${chosen}${p}1`
+uuid2=`blkid -s UUID -o value /dev/${chosen}${p}2`
+uuid3=`blkid -s UUID -o value /dev/${chosen}${p}3`
 
 if [ "$nodecimal" -gt 20 ]; then
    echo "It's bigger than 20GB, there is a home partition"
-   uuid4=`blkid -s UUID -o value /dev/${1}${p}4`
+   uuid4=`blkid -s UUID -o value /dev/${chosen}${p}4`
 else
    echo "It's smaller than 20GB, no home partition"
    uuid4="none"
@@ -71,7 +71,7 @@ fi
 
 #install system in second partition
 mkdir system
-mount /dev/${1}${p}2 system
+mount /dev/${chosen}${p}2 system
 #echo "copying the image..."
 #pv /run/live/medium/live/filesystem.squashfs > system/filesystem.squashfs
 echo "copying the md5 file..."
@@ -91,23 +91,23 @@ echo "installing grub..."
 mkdir system/proc
 mkdir system/sys
 mkdir -p system$grubmount
-mount /dev/${1}${p}1 system$grubmount
+mount /dev/${chosen}${p}1 system$grubmount
 mount -B /dev system/dev
 mount -B /proc system/proc
 mount -B /sys system/sys
 if test -d "/sys/firmware/efi"; then
     mount -B /sys/firmware/efi/efivars system/sys/firmware/efi/efivars
-    chroot system /usr/sbin/grub-install /dev/${1}${p}
+    chroot system /usr/sbin/grub-install /dev/${chosen}${p}
     chroot system /usr/sbin/update-grub
     umount system/sys/firmware/efi/efivars
 else
-    chroot system /usr/sbin/grub-install /dev/${1}${p}
+    chroot system /usr/sbin/grub-install /dev/${chosen}${p}
     chroot system /usr/sbin/update-grub
 fi
 umount system/sys
 umount system/proc
 umount system/dev
-umount /dev/${1}${p}1
+umount /dev/${chosen}${p}1
 
 #generate fstab
 echo "updating fstab..."
@@ -126,5 +126,5 @@ rm -R system/etc/systemd/system/ifup@.service.d
 rm -R system/etc/systemd/system/networking.service.d
 
 #umount second partition
-umount /dev/${1}${p}2
+umount /dev/${chosen}${p}2
 rmdir system
