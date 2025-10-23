@@ -53,7 +53,9 @@ nodecimal=${disksize%,*}
 if [ "$nodecimal" -gt 20 ]; then
    #create partition table
    echo "It's greater than 20GB, create home partition too"
-   dd if=/dev/zero of=/dev/$chosen bs=10240 count=1 > /dev/null 2>&1
+#   dd if=/dev/zero of=/dev/$chosen bs=10240 count=1 > /dev/null 2>&1
+   wipefs -a /dev/$chosen
+   partprobe /dev/$chosen
    parted -s -- /dev/$chosen mklabel $partitiontable  \
     mkpart $firstpartition fat32 0% 200MB  \
     mkpart primary ext4 200MB 20GB  \
@@ -61,6 +63,7 @@ if [ "$nodecimal" -gt 20 ]; then
     mkpart primary ext4 24GB 100%  \
     set 1 boot on
    sync
+   partprobe /dev/$chosen
 
    #format partitions
    mkfs.vfat /dev/${chosen}${p}1 -F 32 -n BOOT > /dev/null 2>&1
@@ -76,13 +79,16 @@ if [ "$nodecimal" -gt 20 ]; then
 else
    #create partition table
    echo "It's smaller than 20GB, don't create home partition"
-   dd if=/dev/zero of=/dev/$chosen bs=10240 count=1 > /dev/null 2>&1
+#   dd if=/dev/zero of=/dev/$chosen bs=10240 count=1 > /dev/null 2>&1
+   wipefs -a /dev/$chosen
+   partprobe /dev/$chosen
    parted -s -- /dev/$chosen mklabel $partitiontable  \
     mkpart $firstpartition fat32 0% 200MB  \
     mkpart primary ext4 200MB -1GB  \
     mkpart primary linux-swap -1GB 100%  \
     set 1 boot on
    sync
+   partprobe /dev/$chosen
 
    #format partitions
    mkfs.vfat /dev/${chosen}${p}1 -F 32 -n BOOT > /dev/null 2>&1
@@ -149,8 +155,7 @@ echo "updating fstab..."
 echo "UUID=$uuid1        $grubmount           vfat    defaults                0 0" > system/etc/fstab
 echo "UUID=$uuid2    /                   ext4    defaults                0 0" >> system/etc/fstab
 echo "UUID=$uuid3    swap        swap    defaults                0 0" >> system/etc/fstab
-echo "#UUID=$uuid4    /home       ext4    defaults                0 0" >> system/etc/fstab
-echo "none    /home       tmpfs    defaults                0 0" >> system/etc/fstab
+echo "UUID=$uuid4    /home       ext4    defaults                0 0" >> system/etc/fstab
 
 #remove livecd tweaks
 echo "restoring systemd journal"
