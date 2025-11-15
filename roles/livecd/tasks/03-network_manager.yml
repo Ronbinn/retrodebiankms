@@ -20,10 +20,16 @@
     mode: 0600
   when: ansible_distribution == 'Ubuntu'
 
-- name: Manage all connections with network-manager. Debian.
-  replace:
-    dest: /etc/NetworkManager/NetworkManager.conf
-    after: "[ifupdown]"
-    regexp: "managed=false"
-    replace: "managed=true"
-  when: ansible_distribution == 'Debian'
+#- name: Manage all connections with network-manager. Debian.
+#  replace:
+#    dest: /etc/NetworkManager/NetworkManager.conf
+#    after: "[ifupdown]"
+#    regexp: "managed=false"
+#    replace: "managed=true"
+#  when: ansible_distribution == 'Debian'
+
+- name: Copy wifi configuration template.
+  copy:
+    src: "{{ role_path }}/files/etc/network/interfaces.d/wifi"
+    dest: "/etc/network/interfaces.d"
+    mode: 0644
