@@ -29,3 +29,9 @@
     create: true
     block: |
       retro
+
+- name: Add hostname to hosts file.
+  lineinfile:
+    path: /etc/hosts
+    insertafter: '^(.*)127.0.0.1(.*)$'
+    line: '127.0.0.1  retro'
