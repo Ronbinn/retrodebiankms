@@ -132,7 +132,7 @@
   with_items:
      - "etc/switchres.ini"
      - "usr/local/bin/switchres"
-     - "usr/lib/libswitchres.so.2.2.1"
+     - "usr/lib/libswitchres.so.2.2.2"
      - "usr/lib/libswitchres.so.2" # it's a link
      - "usr/lib/libswitchres.so" # it's a link
      - "usr/include/switchres/switchres_defines.h"
