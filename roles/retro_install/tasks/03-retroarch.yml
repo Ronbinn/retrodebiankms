@@ -1,42 +1,8 @@
 #install and configure retroarch
 ---
-#- name: Install original retroarch to get the dependencies.
 - name: Install retroarch.
   apt:
     name: retroarch
-
-#- name: Check if exists a retroarch installation.
-#  stat:
-#    path: "/usr/local/bin/retroarch"
-#  register: bin
-
-#- name: Download retroarch. 64 bit.
-#  get_url:
-#    url: "https://github.com/Ronbinn/retrodebiankms/releases/download/12_01_2025/retroarch_v1.20.0_amd64.deb"
-#    dest: "/home/retroarch.deb"
-#    timeout: 60
-#  when:
-#    - bin.stat.exists == false
-#    - ansible_architecture == 'x86_64'
-
-#- name: Download retroarch. 32 bit.
-#  get_url:
-#    url: "https://github.com/Ronbinn/retrodebiankms/releases/download/12_01_2025/retroarch_v1.20.0_i386.deb"
-#    dest: "/home/retroarch.deb"
-#    timeout: 60
-#  when:
-#    - bin.stat.exists == false
-#    - ansible_architecture == 'i386'
-
-#- name: Install retroarch.
-#  apt:
-#    deb: "/home/retroarch.deb"
-#  when: bin.stat.exists == false
-
-#- name: Remove deb file.
-#  file:
-#    path: "/home/retroarch.deb"
-#    state: absent
 
 - name: Remove retroarch original configuration.
   file:
@@ -93,24 +59,13 @@
       - "*.so"
   register: result
 
-- name: Download retroarch cores. 32 bit.
-  get_url:
-#    url: "https://buildbot.libretro.com/stable/1.19.1/linux/x86/RetroArch_cores.7z"
-    url: "https://buildbot.libretro.com/stable/1.20.0/linux/x86/RetroArch_cores.7z"
-    dest: "/home/arcade/RetroArch_cores.7z"
-    timeout: 60
-  when:
-    - ansible_architecture == 'i386'
-    - result.matched == 0
-
-- name: Download retroarch cores. 64 bit.
+- name: Download retroarch cores.
   get_url:
 #    url: "https://buildbot.libretro.com/stable/1.19.1/linux/x86_64/RetroArch_cores.7z"
     url: "https://buildbot.libretro.com/stable/1.20.0/linux/x86_64/RetroArch_cores.7z"
     dest: "/home/arcade/RetroArch_cores.7z"
     timeout: 60
   when:
-    - ansible_architecture == 'x86_64'
     - result.matched == 0
 
 - name: Extract cores.
@@ -121,7 +76,6 @@
       - "/home/arcade/RetroArch_cores.7z"
       - "-o/home/arcade/.config/retroarch/cores"
       - "*.so"
-#      - "fbneo_libretro.so"
       - "-r"
   when: result.matched == 0
 

@@ -8,30 +8,16 @@
       - "*15khz*"
   register: result
 
-- name: Download kernel debs. 64 bit.
+- name: Download kernel debs
   get_url:
     url: "{{ item.src }}"
     dest: "{{ item.dest }}"
     timeout: 60
   with_items:
-     - { src: "https://github.com/Ronbinn/retrodebiankms/releases/download/12_01_2025/linux-image-6.6.71-15khz_6.6.71-1_amd64.deb", dest: "/root/linux_image.deb" }
-     - { src: "https://github.com/Ronbinn/retrodebiankms/releases/download/12_01_2025/linux-headers-6.6.71-15khz_6.6.71-1_amd64.deb", dest: "/root/linux_headers.deb" }
-     - { src: "https://github.com/Ronbinn/retrodebiankms/releases/download/12_01_2025/linux-libc-dev_6.6.71-1_amd64.deb", dest: "/root/linux_libc.deb" }
+     - { src: "https://github.com/Ronbinn/retrodebiankms/releases/download/30_06_2026/linux-image-6.18.7-15khz_6.18.7-1_amd64.deb", dest: "/root/linux_image.deb" }
+     - { src: "https://github.com/Ronbinn/retrodebiankms/releases/download/30_06_2026/linux-headers-6.18.7-15khz_6.18.7-1_amd64.deb", dest: "/root/linux_headers.deb" }
+     - { src: "https://github.com/Ronbinn/retrodebiankms/releases/download/30_06_2026/linux-libc-dev_6.18.7-1_amd64.deb", dest: "/root/linux_libc.deb" }
   when:
-    - ansible_architecture == 'x86_64'
-    - result.matched == 0
-
-- name: Download kernel debs. 32 bit.
-  get_url:
-    url: "{{ item.src }}"
-    dest: "{{ item.dest }}"
-    timeout: 60
-  with_items:
-     - { src: "https://github.com/Ronbinn/retrodebiankms/releases/download/12_01_2025/linux-image-6.6.71-15khz_6.6.71-1_i386.deb", dest: "/root/linux_image.deb" }
-     - { src: "https://github.com/Ronbinn/retrodebiankms/releases/download/12_01_2025/linux-headers-6.6.71-15khz_6.6.71-1_i386.deb", dest: "/root/linux_headers.deb" }
-     - { src: "https://github.com/Ronbinn/retrodebiankms/releases/download/12_01_2025/linux-libc-dev_6.6.71-1_i386.deb", dest: "/root/linux_libc.deb" }
-  when:
-    - ansible_architecture == 'i386'
     - result.matched == 0
 
 - name: Install 15khz kernel debs.
@@ -69,7 +55,7 @@
       - "vmlinuz*15khz*"
   register: vmlinuz15
 
-- name: Create new links. Debian.
+- name: Create new links.
   file:
     src: "{{ item.src }}"
     dest: "{{ item.dest }}"
@@ -78,16 +64,6 @@
      - { src: "{{ initrd15.files[-1].path | replace('/boot','boot') }}", dest: "/initrd.img" } #0 is first -1 is last
      - { src: "{{ vmlinuz15.files[-1].path | replace('/boot','boot') }}", dest: "/vmlinuz" } #remove first slash
   when: ansible_distribution == 'Debian'
-
-- name: Create new links. Ubuntu.
-  file:
-    src: "{{ item.src }}"
-    dest: "{{ item.dest }}"
-    state: link
-  with_items:
-     - { src: "{{ initrd15.files[-1].path }}", dest: "/boot/initrd.img" }
-     - { src: "{{ vmlinuz15.files[-1].path }}", dest: "/boot/vmlinuz" }
-  when: ansible_distribution == 'Ubuntu'
 
 - name: Modify grub default line.
   lineinfile:

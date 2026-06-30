@@ -4,30 +4,6 @@
   apt:
     name: "network-manager"
 
-- name: Remove configuration files. Ubuntu.
-  file:
-    path: "{{ item }}"
-    state: absent
-  with_items:
-    - "/lib/NetworkManager/conf.d/10-dns-resolved.conf"
-    - "/lib/NetworkManager/conf.d/10-globally-managed-devices.conf"
-  when: ansible_distribution == 'Ubuntu'
-
-- name: Manage all connections with network-manager. Ubuntu.
-  copy:
-    src: "{{ role_path }}/files/etc/netplan/01-network-manager-all.yaml"
-    dest: "/etc/netplan/01-network-manager-all.yaml"
-    mode: 0600
-  when: ansible_distribution == 'Ubuntu'
-
-#- name: Manage all connections with network-manager. Debian.
-#  replace:
-#    dest: /etc/NetworkManager/NetworkManager.conf
-#    after: "[ifupdown]"
-#    regexp: "managed=false"
-#    replace: "managed=true"
-#  when: ansible_distribution == 'Debian'
-
 - name: Copy wifi configuration template.
   copy:
     src: "{{ role_path }}/files/etc/network/interfaces.d/wifi"

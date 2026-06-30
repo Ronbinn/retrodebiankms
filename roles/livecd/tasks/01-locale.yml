@@ -6,15 +6,6 @@
   register: debianlocale
   when: ansible_distribution == 'Debian'
 
-- name: Install locales in ubuntu.
-  apt:
-    name: "{{ item }}"
-  with_items:
-#    - "language-pack-es"
-    - "language-pack-en"
-  register: ubuntulocale
-  when: ansible_distribution == 'Ubuntu'
-
 - name: Add locales.
   locale_gen:
     name: "{{ item }}"
@@ -26,8 +17,8 @@
 
 - name: Dpkg-reconfigure locales.
   command: /usr/sbin/dpkg-reconfigure --frontend=noninteractive locales
-  when: (ubuntulocale is changed) or (debianlocale is changed) or (spanish is changed)
+  when: (debianlocale is changed) or (spanish is changed)
 
 - name: Update locales.
   command: /usr/sbin/update-locale LANG=en_US.UTF-8 LANGUAGE=en_US.UTF-8 LC_ALL=en_US.UTF-8
-  when: (ubuntulocale is changed) or (debianlocale is changed) or (spanish is changed)
+  when: (debianlocale is changed) or (spanish is changed)

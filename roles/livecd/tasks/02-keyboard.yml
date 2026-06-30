@@ -1,6 +1,6 @@
 #this task configures spanish keyboard and UTF-8 charmap for the console
 ---
-- name: Install keyboard-configuration and console-setup. Debian.
+- name: Install keyboard-configuration and console-setup.
   apt:
     name: "{{ packages }}"
   vars:

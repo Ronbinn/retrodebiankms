@@ -25,23 +25,13 @@
     path: "/usr/local/bin/es-de"
   register: bin
 
-- name: Download emulationstation_de. 64 bit.
+- name: Download emulationstation_de.
   get_url:
-    url: "https://github.com/Ronbinn/retrodebiankms/releases/download/12_01_2025/emulationstation_de_v3.1.1_amd64.deb"
+    url: "https://github.com/Ronbinn/retrodebiankms/releases/download/30_06_2026/emulationstation_de_v3.4.1_amd64.deb"
     dest: "/home/emulationstation_de.deb"
     timeout: 60
   when:
     - bin.stat.exists == false
-    - ansible_architecture == 'x86_64'
-
-- name: Download emulationstation_de. 32 bit.
-  get_url:
-    url: "https://github.com/Ronbinn/retrodebiankms/releases/download/12_01_2025/emulationstation_de_v3.1.1_i386.deb"
-    dest: "/home/emulationstation_de.deb"
-    timeout: 60
-  when:
-    - bin.stat.exists == false
-    - ansible_architecture == 'i386'
 
 - name: Install emulationstation_de.
   apt:

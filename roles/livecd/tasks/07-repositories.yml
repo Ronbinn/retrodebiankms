@@ -37,21 +37,6 @@
     types:
       - deb
       - deb-src
-  when:
-    - ansible_distribution == 'Debian'
-
-- name: add Ubuntu security repo.
-  deb822_repository:
-    name: "ubuntu-security"
-    uris: "http://security.ubuntu.com/ubuntu"
-    suites: "{{ ansible_distribution_release }}-security"
-    components: "{{ compo }}"
-    signed_by: /usr/share/keyrings/debian-archive-keyring.gpg
-    types:
-      - deb
-      - deb-src
-  when:
-    - ansible_distribution == 'Ubuntu'
 
 - name: "apt-get update"
   apt:
