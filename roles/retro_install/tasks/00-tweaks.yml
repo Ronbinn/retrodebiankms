@@ -45,3 +45,9 @@
     dest: "/etc/inputrc"
     regexp: "# set bell-style none"
     replace: "set bell-style none"
+
+- name: Poweroff with PowerKey.
+  replace:
+    dest: /etc/systemd/logind.conf
+    regexp: '#HandlePowerKey=poweroff'
+    replace: 'HandlePowerKey=poweroff'
