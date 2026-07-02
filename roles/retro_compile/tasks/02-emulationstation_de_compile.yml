@@ -157,7 +157,7 @@
     package_internal_name: "emulationstationde"
     package_version: "{{ release | replace('v','') }}"
     package_architecture: "{{ ansible_architecture | replace('x86_64','amd64') }}" #ansible uses x86_64 debian uses amd64
-    package_depends: "libcurl4, libfreeimage3, libgit2-1.5, libpugixml1v5, libsdl2-2.0-0, libavcodec59, libavfilter8, libopengl0, libegl1"
+    package_depends: "libcurl4, libfreeimage3, libgit2-1.9, libpugixml1v5, libsdl2-2.0-0, libavcodec61, libavfilter10, libopengl0, libegl1"
     package_description: "Emulator frontend"
   when: not debpackage.stat.exists
 
