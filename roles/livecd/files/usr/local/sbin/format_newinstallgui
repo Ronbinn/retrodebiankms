@@ -47,6 +47,8 @@ main() {
  partition_disk $disk $nodecimal $efi
  format_disks $disk $nodecimal $efi
  install_system $disk
+ configure $disk
+ copy_home $disk $nodecimal
  install_grub $disk $efi
  config_system $disk $nodecimal $efi
 }
@@ -141,6 +143,42 @@ install_system () {
  rmdir system/squashfs-root
  umount system
  rmdir system
+}
+
+configure () {
+
+ diskname=$1
+
+ #mount partition
+ mkdir system
+ mount /dev/${diskname}${p}2 system
+
+ #copy configuration files
+ echo "Copying configuration..."
+ cp /etc/retroarch.cfg system/etc/retroarch.cfg
+ cp /etc/switchres.ini system/etc/switchres.ini
+ cp /etc/default/grub system/etc/default/grub
+ cp /etc/profile.d/99-launcher.sh system/etc/profile.d/99-launcher.sh
+ rm system/etc/systemd/system/multi-user.target.wants/configurator.service
+
+ echo "Cleaning..."
+ umount system
+ rmdir system
+}
+
+copy_home () {
+
+ diskname=$1
+ disksize=$2
+
+ if [ $disksize -gt 20 ]; then
+  echo "moving home dir..."
+  mkdir home
+  mount /dev/${diskname}${p}4 home
+  mv system/home/arcade home/arcade
+  umount /dev/${diskname}${p}4
+  rmdir home
+ fi
 }
 
 install_grub () {
