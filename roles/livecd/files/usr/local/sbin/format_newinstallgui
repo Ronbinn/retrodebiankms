@@ -1,0 +1,224 @@
+#!/bin/bash
+
+#get disk list"
+disks=`lsblk | grep disk | wc -l`
+if [ $disks -eq 0 ]; then
+ echo "There is no disk"
+ exit
+fi
+
+#create whiptail menu
+command=""
+for i in $(seq $disks)
+do
+ name=$(lsblk | grep disk | awk -v line="$i" 'FNR == line {print $1}')
+ size=$(lsblk | grep disk | awk -v line="$i" 'FNR == line {print $4}')
+ command="${command} ${i} ${name}:${size}"
+done
+
+#exec whiptail and get answer
+chose=$(whiptail --menu "Installer" 0 0 $disks $command 3>&2 2>&1 1>&3)
+if [ $? -eq 0 ]; then
+ diska=$(lsblk | grep disk | awk -v line="$chose" 'FNR == line {print $1}')
+else
+ echo "No disk chosen"
+ exit
+fi
+
+#vars
+p=""
+if [[ $disk = nvme* || $disk = mmc* ]]
+ then
+  p="p"
+fi
+if [ -d "/sys/firmware/efi" ]; then
+ echo "This is an EFI system"
+ efi=1
+else
+ echo "This is a BIOS system"
+ efi=0
+fi
+
+main() {
+ disksize=$(lsblk /dev/$disk | grep disk | awk '{ print $4 }' | tr -d G)
+ nodecimal=${disksize%,*}
+ echo "$disk disk chosen $nodecimal GB size"
+ swapoff --all
+ partition_disk $disk $nodecimal $efi
+ format_disks $disk $nodecimal $efi
+ install_system $diska
+ install_grub $disk $efi
+ config_system $disk $nodecimal $efi
+}
+
+irten () {
+ echo "Error $1"
+ exit
+}
+
+partition_disk () {
+
+ #aldagaiak esleitu
+ diskname=$1
+ disksize=$2
+ efi=$3
+ if [ $efi -eq 1 ]; then
+  firstpartition="ESP fat32"
+  tag="boot"
+ else
+  firstpartition="primary"
+  tag="bios_grub"
+ fi
+
+ if [ $disksize -gt 20 ]; then
+  echo "Creating new partitions with Home partition..."
+  parted -s -- /dev/$diskname \
+   mklabel gpt  \
+   mkpart $firstpartition 0% 200MB \
+   mkpart primary ext4 200MB 20GB  \
+   mkpart primary linux-swap 20GB 24GB  \
+   mkpart primary ext4 24GB 100% \
+   set 1 $tag on
+ else
+  echo "Creating new partitions without Home partition..."
+  parted -s -- /dev/$diskname \
+   mklabel gpt  \
+   mkpart $firstpartition 0% 200MB \
+   mkpart primary ext4 200MB -1GB  \
+   mkpart primary linux-swap -1GB 100%  \
+   set 1 $tag on
+ fi
+
+ #Exit on error
+ if [ $? -eq 1 ]; then irten partitioning; fi
+}
+
+format_disks () {
+
+ diskname=$1
+ disksize=$2
+ efi=$3
+
+ #if BIOS system, don't format first partition
+ if [ $efi -eq 1 ]; then
+  echo "Formating ESP partition..."
+  mkfs.vfat /dev/${diskname}${p}1 -F 32 -n BOOT > /dev/null 2>&1
+ fi
+ echo "Formating system partition..."
+ mkfs.ext4 /dev/${diskname}${p}2 -FL system > /dev/null 2>&1
+ echo "Formating swap partition..."
+ mkswap /dev/${diskname}${p}3 > /dev/null 2>&1
+ if [ $disksize -gt 20 ]; then
+  echo "Formating home partition..."
+  mkfs.ext4 /dev/${diskname}${p}4 -FL home > /dev/null 2>&1
+ fi
+
+ #Exit on error
+ if [ $? -eq 1 ]; then irten formating; fi
+}
+
+install_system () {
+
+ diskname=$1
+
+ #install system in second partition
+ mkdir system
+ mount /dev/${diskname}${p}2 system
+
+ echo "Copying image..."
+ pv /run/live/medium/live/filesystem.squashfs > system/filesystem.squashfs
+ echo "Copying md5 file..."
+ pv /run/live/medium/live/filesystem.md5 > system/filesystem.md5
+
+ cd system
+ echo "Extracting image..."
+ unsquashfs filesystem.squashfs
+ cd ..
+
+ echo "Cleaning..."
+ rm system/filesystem.squashfs
+ mv system/squashfs-root/* system/
+ rmdir system/squashfs-root
+ umount system
+ rmdir system
+}
+
+install_grub () {
+ diskname=$1
+ efi=$2
+
+ #install grub in first partition
+ echo "Mounting partitions..."
+ mkdir system
+ mount /dev/${diskname}${p}2 system
+ mkdir -p system/{dev,proc,sys}
+ mount -B /dev system/dev
+ mount -B /proc system/proc
+ mount -B /sys system/sys
+ if [ $efi -eq 1 ]; then
+  mkdir -p system/boot/efi
+  mount /dev/${diskname}${p}1 system/boot/efi
+  mount -B /sys/firmware/efi/efivars system/sys/firmware/efi/efivars
+ fi
+
+ echo "Install and configure GRUB..."
+# https://askubuntu.com/questions/1072986/how-can-i-prevent-grub-updates-from-resetting-my-efi-bootorder
+ chroot system /usr/bin/echo "set grub2/update_nvram false" | /usr/bin/debconf-communicate
+ chroot system /usr/sbin/grub-install /dev/${diskname}
+ chroot system /usr/sbin/update-grub
+
+ echo "Umount partitions..."
+ if [ $efi -eq 1 ]; then
+  umount system/sys/firmware/efi/efivars
+  umount system/boot/efi
+ fi
+ umount system/sys
+ umount system/proc
+ umount system/dev
+ umount /dev/${diskname}${p}2
+ rmdir system
+}
+
+config_system () {
+
+ diskname=$1
+ disksize=$2
+ efi=$3
+
+ #get UUIDs
+ uuid1=`blkid -s UUID -o value /dev/${diskname}${p}1`
+ uuid2=`blkid -s UUID -o value /dev/${diskname}${p}2`
+ uuid3=`blkid -s UUID -o value /dev/${diskname}${p}3`
+ uuid4="none"
+ if [ $disksize -gt 20 ]; then
+  uuid4=`blkid -s UUID -o value /dev/${diskname}${p}4`
+ fi
+
+ #mount system
+ mkdir system
+ mount /dev/${diskname}${p}2 system
+
+ #generate fstab
+ echo "Updating fstab..."
+ if [ $efi -eq 1 ]; then
+  echo "UUID=$uuid1 /boot/efi vfat defaults 0 0" > system/etc/fstab
+ fi
+ echo "UUID=$uuid2 / ext4 defaults 0 0" >> system/etc/fstab
+ echo "UUID=$uuid3 swap swap defaults 0 0" >> system/etc/fstab
+ echo "#UUID=$uuid4 /home ext4 defaults 0 0" >> system/etc/fstab
+ echo "none /home tmpfs defaults 0 0" >> system/etc/fstab
+
+ #remove livecd tweaks
+ echo "Restoring systemd journal..."
+ sed -i.bak 's,Storage=none,#Storage=auto,g' system/etc/systemd/journald.conf
+ echo "Removing livecd services..."
+ rm system/etc/systemd/system/multi-user.target.wants/getnamebymac.service
+ rm -R system/etc/systemd/system/ifup@.service.d
+ rm -R system/etc/systemd/system/networking.service.d
+
+ #umount second partition
+ umount /dev/${diskname}${p}2
+ rmdir system
+}
+
+main "$@"; exit
