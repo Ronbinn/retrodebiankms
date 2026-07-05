@@ -34,6 +34,12 @@
     dest: "/usr/local/bin/listconnectors"
     mode: 0755
 
+- name: Copy menu script.
+  copy:
+    src: "{{ role_path }}/files/usr/local/bin/menu"
+    dest: "/usr/local/bin/menu"
+    mode: 0755
+
 - name: Disable pcspeaker.
   lineinfile:
     create: yes
