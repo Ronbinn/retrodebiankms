@@ -5,8 +5,7 @@ CHOICE=$(whiptail --title "RetroDebian Menu" \
                  --menu "Select an option to launch:" 15 60 6 \
                  "1" "Retroarch" \
                  "2" "EmulationStation" \
-                 "3" "Installer" \
-                 "4" "Poweroff" \
+                 "3" "Poweroff" \
                  "S" "Shell" 3>&1 1>&2 2>&3)
 
 # Handle the user's exit status
@@ -27,10 +26,6 @@ case "$CHOICE" in
         myesde && menu
         ;;
     "3")
-        echo "Launching Installer..."
-        sudo format_newinstallgui && menu
-        ;;
-    "4")
         echo "Power off..."
         systemctl poweroff
         ;;
