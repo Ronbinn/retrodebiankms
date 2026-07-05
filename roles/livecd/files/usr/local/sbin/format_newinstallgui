@@ -19,7 +19,7 @@ done
 #exec whiptail and get answer
 chose=$(whiptail --menu "Installer" 0 0 $disks $command 3>&2 2>&1 1>&3)
 if [ $? -eq 0 ]; then
- diska=$(lsblk | grep disk | awk -v line="$chose" 'FNR == line {print $1}')
+ disk=$(lsblk | grep disk | awk -v line="$chose" 'FNR == line {print $1}')
 else
  echo "No disk chosen"
  exit
@@ -46,7 +46,7 @@ main() {
  swapoff --all
  partition_disk $disk $nodecimal $efi
  format_disks $disk $nodecimal $efi
- install_system $diska
+ install_system $disk
  install_grub $disk $efi
  config_system $disk $nodecimal $efi
 }
