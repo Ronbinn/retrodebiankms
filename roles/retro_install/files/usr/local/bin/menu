@@ -1,13 +1,24 @@
 #!/bin/bash
 
 # Launch the Whiptail menu
+
 CHOICE=$(whiptail --title "RetroDebian Menu" \
                  --menu "Select an option to launch:" 15 60 6 \
                  "1" "Retroarch" \
                  "2" "EmulationStation" \
-                 "3" "Installer" \
-                 "4" "Poweroff" \
+                 "3" "Poweroff" \
+                 "4" "Installer" \
                  "S" "Shell" 3>&1 1>&2 2>&3)
+
+if ! [ -f "/run/live/medium/live/filesystem.squashfs" ]; then
+ #not a live system, remove installer
+ CHOICE=$(whiptail --title "RetroDebian Menu" \
+                 --menu "Select an option to launch:" 15 60 6 \
+                 "1" "Retroarch" \
+                 "2" "EmulationStation" \
+                 "3" "Poweroff" \
+                 "S" "Shell" 3>&1 1>&2 2>&3)
+fi
 
 # Handle the user's exit status
 EXIT_STATUS=$?
@@ -27,12 +38,12 @@ case "$CHOICE" in
         myesde && menu
         ;;
     "3")
-        echo "Launching Installer..."
-        sudo format_newinstallgui && menu
-        ;;
-    "4")
         echo "Power off..."
         systemctl poweroff
+        ;;
+    "4")
+        echo "Launching Installer..."
+        sudo format_newinstallgui && menu
         ;;
     "S"|"s")
         echo "Exit"

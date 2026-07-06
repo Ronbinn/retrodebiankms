@@ -247,8 +247,8 @@ config_system () {
  rm -R system/etc/systemd/system/ifup@.service.d
  rm -R system/etc/systemd/system/networking.service.d
 
- #change menu
- mv system/usr/local/bin/menu2 system/usr/local/bin/menu
+ #remove installer
+ rm system/usr/local/sbin/format_newinstallgui
 
  #umount second partition
  umount /dev/${diskname}${p}2
