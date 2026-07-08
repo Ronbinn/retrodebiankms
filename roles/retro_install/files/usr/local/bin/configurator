@@ -1,48 +1,27 @@
 #!/bin/sh
 
-#crt_switch_resolution = "0" #off
-#crt_switch_resolution = "4" #ini
-#crt_switch_resolution_super = "0" #native
-#crt_switch_resolution_super = "1" #dynamic
+CHOICE0=$(whiptail --title "RetroDebian Configurator" \
+                 --menu "Select your frontend:" 15 60 6 \
+                 "1" "Retroarch" \
+                 "2" "ES-DE" 3>&1 1>&2 2>&3)
 
-#lspci | grep -i vga | grep -i amd
-#lspci | grep -i vga | grep -i intel
-#lspci | grep -i vga | grep -i nvidia
-
-if grep -q 640 /proc/cmdline #ati card
-then
-    sed -i 's,crt_switch_resolution =.*,crt_switch_resolution = "4",g' /etc/retroarch.cfg
-    sed -i 's,crt_switch_resolution_super.*,crt_switch_resolution_super = "1",g' /etc/retroarch.cfg
-    sed -i '24s,monitor.*,monitor generic_15,g' /etc/switchres.ini
-    sed -i '41s,lcd_range.*,lcd_range auto,g' /etc/switchres.ini
-    sed -i 's,dotclock_min.*,dotclock_min 0,g' /etc/switchres.ini
-    sed -i 's,GRUB_CMDLINE_LINUX_DEFAULT=.*,GRUB_CMDLINE_LINUX_DEFAULT="video=640x480iS",g' /etc/default/grub
-
+if [ $CHOICE0 -eq 1 ]; then #retroarch frontend
+    echo "Now retroarch is the default launcher"
+    sed -i 's,myesde,retroarch,g' /etc/profile.d/99-launcher.sh
 fi
 
-if grep -q 320 /proc/cmdline #ati card 240p
-then
-    sed -i 's,crt_switch_resolution =.*,crt_switch_resolution = "4",g' /etc/retroarch.cfg
-    sed -i 's,crt_switch_resolution_super.*,crt_switch_resolution_super = "1",g' /etc/retroarch.cfg
-    sed -i '24s,monitor.*,monitor generic_15,g' /etc/switchres.ini
-    sed -i '41s,lcd_range.*,lcd_range auto,g' /etc/switchres.ini
-    sed -i 's,dotclock_min.*,dotclock_min 0,g' /etc/switchres.ini
-    sed -i 's,GRUB_CMDLINE_LINUX_DEFAULT=.*,GRUB_CMDLINE_LINUX_DEFAULT="video=320x240S",g' /etc/default/grub
-
+if [ $CHOICE0 -eq 2 ]; then #ES-DE frontend
+    echo "Now ES-DE is the default launcher"
+    sed -i 's,retroarch,myesde,g' /etc/profile.d/99-launcher.sh
 fi
 
-if grep -q 1280 /proc/cmdline #non ati card
-then
-    sed -i 's,crt_switch_resolution =.*,crt_switch_resolution = "4",g' /etc/retroarch.cfg
-    sed -i 's,crt_switch_resolution_super.*,crt_switch_resolution_super = "2560",g' /etc/retroarch.cfg
-    sed -i '24s,monitor.*,monitor generic_15,g' /etc/switchres.ini
-    sed -i '41s,lcd_range.*,lcd_range auto,g' /etc/switchres.ini
-    sed -i 's,dotclock_min.*,dotclock_min 25.0,g' /etc/switchres.ini
-    sed -i 's,GRUB_CMDLINE_LINUX_DEFAULT=.*,GRUB_CMDLINE_LINUX_DEFAULT="video=1280x480iS",g' /etc/default/grub
-fi
+CHOICE1=$(whiptail --title "RetroDebian Configurator" \
+                 --menu "Select your monitor:" 15 60 6 \
+                 "1" "CRT" \
+                 "2" "LCD" 3>&1 1>&2 2>&3)
 
-if grep -q -v video /proc/cmdline #lcd
-then
+if [ $CHOICE1 -eq 2 ]; then #LCD monitor
+    echo "LCD monitor, nothing else to do"
     sed -i 's,crt_switch_resolution =.*,crt_switch_resolution = "0",g' /etc/retroarch.cfg
     sed -i 's,crt_switch_resolution_super.*,crt_switch_resolution_super = "2560",g' /etc/retroarch.cfg
     sed -i '24s,monitor.*,monitor lcd,g' /etc/switchres.ini
@@ -50,9 +29,43 @@ then
     sed -i 's,dotclock_min.*,dotclock_min 25.0,g' /etc/switchres.ini
     sed -i 's,GRUB_CMDLINE_LINUX_DEFAULT=.*,GRUB_CMDLINE_LINUX_DEFAULT="",g' /etc/default/grub
     echo 'video_scale_integer = "true"' >> /etc/retroarch.cfg
+    exit
 fi
 
-if grep -q esde /proc/cmdline #emulationstation
-then
-    sed -i 's,retroarch,myesde,g' /etc/profile.d/99-launcher.sh
+CHOICE2=$(whiptail --title "RetroDebian Configurator" \
+                 --menu "Select your graphics card:" 15 60 6 \
+                 "1" "ATI" \
+                 "2" "Generic" 3>&1 1>&2 2>&3)
+
+if [ $CHOICE0 -eq 2 ] && [ $CHOICE2 -eq 1 ]; then #ES-DE and ATI
+ echo "CRT monitor, ATI and ES-DE"
+ CHOICE3=$(whiptail --title "RetroDebian Configurator" \
+                 --menu "Select ES-DE resolution:" 15 60 6 \
+                 "1" "240p" \
+                 "2" "480i" 3>&1 1>&2 2>&3)
+fi
+
+if [ $CHOICE2 -eq 1 ]; then #ati card
+    echo "480i native"
+    sed -i 's,crt_switch_resolution =.*,crt_switch_resolution = "4",g' /etc/retroarch.cfg
+    sed -i 's,crt_switch_resolution_super.*,crt_switch_resolution_super = "1",g' /etc/retroarch.cfg
+    sed -i '24s,monitor.*,monitor generic_15,g' /etc/switchres.ini
+    sed -i '41s,lcd_range.*,lcd_range auto,g' /etc/switchres.ini
+    sed -i 's,dotclock_min.*,dotclock_min 0,g' /etc/switchres.ini
+    sed -i 's,GRUB_CMDLINE_LINUX_DEFAULT=.*,GRUB_CMDLINE_LINUX_DEFAULT="video=640x480iS",g' /etc/default/grub
+fi
+
+if [ $CHOICE3 -eq 1 ]; then #ati card 240p
+    echo "240p native"
+    sed -i 's,GRUB_CMDLINE_LINUX_DEFAULT=.*,GRUB_CMDLINE_LINUX_DEFAULT="video=320x240S",g' /etc/default/grub
+fi
+
+if [ $CHOICE2 -eq 2 ]; then #non ati card
+    echo "480i super resolution"
+    sed -i 's,crt_switch_resolution =.*,crt_switch_resolution = "4",g' /etc/retroarch.cfg
+    sed -i 's,crt_switch_resolution_super.*,crt_switch_resolution_super = "2560",g' /etc/retroarch.cfg
+    sed -i '24s,monitor.*,monitor generic_15,g' /etc/switchres.ini
+    sed -i '41s,lcd_range.*,lcd_range auto,g' /etc/switchres.ini
+    sed -i 's,dotclock_min.*,dotclock_min 25.0,g' /etc/switchres.ini
+    sed -i 's,GRUB_CMDLINE_LINUX_DEFAULT=.*,GRUB_CMDLINE_LINUX_DEFAULT="video=1280x480iS",g' /etc/default/grub
 fi
