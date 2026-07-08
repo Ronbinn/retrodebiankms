@@ -26,3 +26,8 @@
     dest: "/etc/profile.d/99-launcher.sh"
     mode: 0644
 
+- name: Copy menu script.
+  copy:
+    src: "{{ role_path }}/files/usr/local/bin/menu"
+    dest: "/usr/local/bin/menu"
+    mode: 0755
