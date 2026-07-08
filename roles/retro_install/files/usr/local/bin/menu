@@ -2,7 +2,8 @@
 
 # Launch the Whiptail menu
 
-CHOICE=$(whiptail --title "RetroDebian Menu" \
+if [ -f "/run/live/medium/live/filesystem.squashfs" ]; then
+ CHOICE=$(whiptail --title "RetroDebian Menu" \
                  --menu "Select an option to launch:" 15 60 6 \
                  "1" "Retroarch" \
                  "2" "EmulationStation" \
@@ -10,7 +11,7 @@ CHOICE=$(whiptail --title "RetroDebian Menu" \
                  "4" "Installer" \
                  "S" "Shell" 3>&1 1>&2 2>&3)
 
-if ! [ -f "/run/live/medium/live/filesystem.squashfs" ]; then
+else
  #not a live system, remove installer
  CHOICE=$(whiptail --title "RetroDebian Menu" \
                  --menu "Select an option to launch:" 15 60 6 \

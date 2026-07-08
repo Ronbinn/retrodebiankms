@@ -62,6 +62,6 @@
     dest: "/usr/local/sbin/{{ item }}"
     mode: 0755
   with_items:
-     - format_newinstall
+#     - format_newinstall
      - format_newinstallgui
-     - format_update
+#     - format_update
