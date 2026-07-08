@@ -1,21 +1,21 @@
 #configure live system based on grub info and set hostname
 ---
-- name: Copy configurator executable.
+- name: Copy autoconfigurator executable.
   copy:
-    src: "{{ role_path }}/files/usr/local/bin/configurator"
+    src: "{{ role_path }}/files/usr/local/bin/autoconfigurator"
     dest: "/usr/local/bin/configurator"
     mode: 0755
 
 - name: Copy configurator service.
   copy:
-    src: "{{ role_path }}/files/etc/systemd/system/configurator.service"
+    src: "{{ role_path }}/files/etc/systemd/system/autoconfigurator.service"
     dest: "/etc/systemd/system/configurator.service"
     mode: 0644
 
 - name: Enable configurator service.
   file:
     src: "/etc/systemd/system/configurator.service"
-    dest: "/etc/systemd/system/multi-user.target.wants/configurator.service"
+    dest: "/etc/systemd/system/multi-user.target.wants/autoconfigurator.service"
     state: link
 
 - name: Remove hostname file

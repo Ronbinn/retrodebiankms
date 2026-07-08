@@ -51,3 +51,9 @@
     dest: /etc/systemd/logind.conf
     regexp: '#HandlePowerKey=poweroff'
     replace: 'HandlePowerKey=poweroff'
+
+- name: Copy configurator executable.
+  copy:
+    src: "{{ role_path }}/files/usr/local/bin/configurator"
+    dest: "/usr/local/bin/configurator"
+    mode: 0755
