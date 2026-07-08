@@ -246,6 +246,7 @@ config_system () {
  echo "Removing livecd services..."
  rm -R system/etc/systemd/system/ifup@.service.d
  rm -R system/etc/systemd/system/networking.service.d
+ rm system/etc/systemd/system/multi-user.target.wants/autoconfigurator.service
 
  #remove installer
  rm system/usr/local/sbin/format_newinstallgui
