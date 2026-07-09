@@ -135,8 +135,6 @@ install_system () {
  unsquashfs -f -d system /run/live/medium/live/filesystem.squashfs
 
  echo "Cleaning..."
- mv system/squashfs-root/* system/
- rmdir system/squashfs-root
  umount system
  rmdir system
 }
@@ -155,7 +153,6 @@ configure () {
  cp /etc/switchres.ini system/etc/switchres.ini
  cp /etc/default/grub system/etc/default/grub
  cp /etc/profile.d/99-launcher.sh system/etc/profile.d/99-launcher.sh
- rm system/etc/systemd/system/multi-user.target.wants/configurator.service
 
  echo "Cleaning..."
  umount system
