@@ -10,6 +10,13 @@ CHOICE0=$(whiptail --title "RetroDebian Configurator" \
 if [ $CHOICE0 -eq 1 ]; then #retroarch frontend
  echo "Now retroarch is the default launcher"
  sed -i 's,myesde,retroarch,g' /etc/profile.d/99-launcher.sh
+ CHOICE1=$(whiptail --title "RetroDebian Configurator" \
+                    --menu "Poweroff on exit?" 15 60 6 \
+                    "1" "YES" \
+                    "2" "NO" 3>&1 1>&2 2>&3)
+ if [ $CHOICE1 -eq 1 ]; then #LCD monitor
+  sed -i 's,menu,systemctl poweroff,g' /etc/profile.d/99-launcher.sh
+ fi
 fi
 
 if [ $CHOICE0 -eq 2 ]; then #ES-DE frontend
