@@ -1,5 +1,7 @@
 #!/bin/sh
 
+rm /home/arcade/.config/retroarch/retroarch.cfg
+
 CHOICE0=$(whiptail --title "RetroDebian Configurator" \
                    --menu "Select your frontend:" 15 60 6 \
                    "1" "Retroarch" \
@@ -27,6 +29,7 @@ if [ $CHOICE1 -eq 2 ]; then #LCD monitor
  sed -i '41s,lcd_range.*,lcd_range 50-61,g' /etc/switchres.ini
  sed -i 's,video_scale_integer =.*,video_scale_integer = "true",g' /etc/retroarch.cfg
  sed -i 's,GRUB_CMDLINE_LINUX_DEFAULT=.*,GRUB_CMDLINE_LINUX_DEFAULT="",g' /etc/default/grub
+ update-grub
  exit
 fi
 
@@ -51,9 +54,11 @@ if [ $CHOICE2 -eq 1 ]; then #ati card
  if [ $CHOICE3 -eq 1 ]; then #ES-DE 240p
   echo "ATI 240p native"
   sed -i 's,GRUB_CMDLINE_LINUX_DEFAULT=.*,GRUB_CMDLINE_LINUX_DEFAULT="video=320x240S",g' /etc/default/grub
+  update-grub
  else
   echo "ATI 480i native"
   sed -i 's,GRUB_CMDLINE_LINUX_DEFAULT=.*,GRUB_CMDLINE_LINUX_DEFAULT="video=640x480iS",g' /etc/default/grub
+  update-grub
  fi
 fi
 
@@ -62,4 +67,5 @@ if [ $CHOICE2 -eq 2 ]; then #non ati card
  sed -i 's,crt_switch_resolution_super.*,crt_switch_resolution_super = "2560",g' /etc/retroarch.cfg
  sed -i 's,dotclock_min.*,dotclock_min 25.0,g' /etc/switchres.ini
  sed -i 's,GRUB_CMDLINE_LINUX_DEFAULT=.*,GRUB_CMDLINE_LINUX_DEFAULT="video=1280x480iS",g' /etc/default/grub
+ update-grub
 fi
