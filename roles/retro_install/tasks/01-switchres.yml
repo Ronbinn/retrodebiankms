@@ -11,7 +11,7 @@
 
 - name: Download switchres.
   get_url:
-    url: "https://github.com/Ronbinn/retrodebiankms/releases/download/30_06_2026/switchres_v2.2.2_amd64.deb"
+    url: "https://github.com/Ronbinn/retrodebiankms/releases/download/10_07_2026/switchres_v2.2.2_amd64.deb"
     dest: "/home/switchres.deb"
     timeout: 60
   when:
