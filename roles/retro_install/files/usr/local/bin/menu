@@ -7,8 +7,10 @@ if [ -f "/run/live/medium/live/filesystem.squashfs" ]; then
                  --menu "Select an option to launch:" 15 60 6 \
                  "1" "Retroarch" \
                  "2" "EmulationStation" \
-                 "3" "Poweroff" \
-                 "4" "Installer" \
+                 "3" "Configurator" \
+                 "4" "Network" \
+                 "5" "Poweroff" \
+                 "6" "Installer" \
                  "S" "Shell" 3>&1 1>&2 2>&3)
 
 else
@@ -17,7 +19,9 @@ else
                  --menu "Select an option to launch:" 15 60 6 \
                  "1" "Retroarch" \
                  "2" "EmulationStation" \
-                 "3" "Poweroff" \
+                 "3" "Configurator" \
+                 "4" "Network" \
+                 "5" "Poweroff" \
                  "S" "Shell" 3>&1 1>&2 2>&3)
 fi
 
@@ -39,10 +43,18 @@ case "$CHOICE" in
         myesde && menu
         ;;
     "3")
+        echo "Configurator..."
+        sudo configurator && menu
+        ;;
+    "4")
+        echo "Network..."
+        nmtui && menu
+        ;;
+    "5")
         echo "Power off..."
         systemctl poweroff
         ;;
-    "4")
+    "6")
         echo "Launching Installer..."
         sudo format_newinstallgui && menu
         ;;
