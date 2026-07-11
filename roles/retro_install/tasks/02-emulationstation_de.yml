@@ -19,6 +19,7 @@
     - libavfilter10
     - libopengl0
     - libegl1
+    - libbluetooth3
 
 - name: Check if exists a emulationstation_de installation.
   stat:
