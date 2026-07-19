@@ -1,0 +1,151 @@
+---
+- name: Get the list of packages installed in this system.
+  package_facts:
+    manager: apt
+
+- name: Check if it's already installed
+  stat:
+    path: "/usr/local/bin/sdl2-config"
+  register: sdl2_bin
+
+- name: Set release version.
+  set_fact:
+    release: "2.32.10"
+
+- name: Set package name.
+  set_fact:
+    package_name: "switchres_{{ release }}_{{ ansible_architecture | replace('x86_64','amd64') }}"
+
+- name: Check if there is a package.
+  stat:
+    path: "/home/packages/{{ package_name }}.deb"
+  register: debpackage
+
+- name: Get the list of packages installed before build-dep.
+  package_facts:
+    manager: apt
+  when: not sdl2_bin.stat.exists
+
+- name: Save "before" status.
+  set_fact:
+    before: "{{ ansible_facts.packages }}"
+  when: not sdl2_bin.stat.exists
+
+- name: Install sdl2 build dependencies
+  apt:
+    name: "{{ packages }}"
+    install_recommends: no
+  vars:
+    packages:
+    - git
+    - build-essential
+    - pkg-config
+  when: not sdl2_bin.stat.exists
+
+- name: Get the list of packages installed after build-dep.
+  package_facts:
+    manager: apt
+  when: not sdl2_bin.stat.exists
+
+- name: Save "after" status.
+  set_fact:
+    after: "{{ ansible_facts.packages }}"
+  when: not sdl2_bin.stat.exists
+
+- name: Download sdl2 git
+  git:
+    repo: 'https://github.com/libsdl-org/SDL'
+    dest: "/home/sdl2"
+    version: "{{ release  }}"
+  when: not sdl2_bin.stat.exists
+
+- name: Build sdl2.
+  make:
+    chdir: "/home/sdl2"
+    params:
+      NUM_THREADS: "{{ ansible_processor_nproc }}"
+  when: not sdl2_bin.stat.exists
+
+- name: Install sdl2.
+  make:
+    chdir: "/home/sdl2"
+    target: install
+  when: not sdl2_bin.stat.exists
+
+- name: Uninstall sdl2 build dependencies.
+  apt:
+    name: "{{ after | difference(before) }}"
+    state: absent
+    purge: true
+  when: not sdl2_bin.stat.exists
+
+- name: Remove source code.
+  file:
+    path: "/home/sdl2"
+    state: absent
+  when: not sdl2_bin.stat.exists
+
+- name: Create package dirs.
+  file:
+    path: "/home/packages/{{ package_name }}/{{ item }}"
+    state: directory
+  with_items:
+     - "usr/local/bin"
+     - "usr/local/include/SDL2"
+     - "usr/local/share/aclocal"
+     - "usr/local/lib/pkgconfig"
+     - "usr/local/lib/cmake/SDL2"
+     - "DEBIAN"
+  when: not debpackage.stat.exists
+
+- name: Copy package files.
+  copy:
+    src: "/{{ item }}"
+    dest: "/home/packages/{{ package_name }}/{{ item }}"
+    mode: "preserve"
+    remote_src: true
+  with_items:
+     - "usr/local/bin/sdl2-config"
+     - "usr/local/include/SDL2/"
+#     - "usr/local/lib/libSDL2.a"
+     - "usr/local/lib/libSDL2.la"
+#     - "usr/local/lib/libSDL2main.a"
+     - "usr/local/lib/libSDL2main.la"
+#     - "usr/local/lib/libSDL2_test.a"
+     - "usr/local/lib/libSDL2_test.la"
+#     - "usr/local/lib/libSDL2-2.0.so.0.3200.11"
+#     - "usr/local/lib/libSDL2.so" #it's a link
+#     - "usr/local/lib/libSDL2-2.0.so.0" #it's a link
+     - "usr/local/share/aclocal/sdl2.m4"
+     - "usr/local/lib/pkgconfig/sdl2.pc"
+     - "usr/local/lib/cmake/SDL2/sdl2-config.cmake"
+     - "usr/local/lib/cmake/SDL2/sdl2-config-version.cmake"
+  when: not debpackage.stat.exists
+
+- name: Copy package's control file.
+  template:
+    src: "{{ role_path }}/templates/control.j2"
+    dest: "/home/packages/{{ package_name }}/DEBIAN/control"
+    mode: 0644
+  vars:
+    package_internal_name: "libsdl2-2.0-0"
+    package_version: "{{ release | replace('v','') }}" #remove the "v" character from the number
+    package_architecture: "{{ ansible_architecture | replace('x86_64','amd64') }}" #ansible uses x86_64 debian uses amd64
+    package_depends: "libsdl2-2.0-0"
+    package_description: "SDL2 Patched for KMS"
+  when: not debpackage.stat.exists
+
+- name: Build package.
+  command:
+    chdir: "/home/packages"
+    argv:
+      - /usr/bin/dpkg-deb
+      - "--build"
+      - "--root-owner-group"
+      - "{{ package_name }}"
+  when: not debpackage.stat.exists
+
+- name: Remove package source.
+  file:
+    path: "/home/packages/{{ package_name }}"
+    state: absent
