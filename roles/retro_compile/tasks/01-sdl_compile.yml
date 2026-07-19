@@ -37,9 +37,43 @@
     install_recommends: no
   vars:
     packages:
-    - git
-    - build-essential
-    - pkg-config
+#    - git
+#    - build-essential
+#    - pkg-config
+    - graphviz
+    - libdrm-dev
+    - libgles-dev
+    - libsamplerate0-dev
+    - libwayland-dev
+    - libxfixes-dev
+    - libxrandr-dev
+    - libxxf86vm-dev
+    - debhelper
+    - libasound2-dev
+    - libegl-dev
+    - libibus-1.0-dev
+    - libsndio-dev
+    - libx11-dev
+    - libxi-dev
+    - libxss-dev
+    - pkgconf
+    - doxygen
+    - libdbus-1-dev
+    - libgbm-dev
+    - libpipewire-0.3-dev
+    - libudev-dev
+    - libxcursor-dev
+    - libxinerama-dev
+    - libxt-dev
+    - wayland-protocols
+    - fcitx-libs-dev
+    - libdecor-0-dev
+    - libgl-dev
+    - libpulse-dev
+    - libvulkan-dev
+    - libxext-dev
+    - libxkbcommon-dev
+    - libxv-dev
   when: not sdl2_bin.stat.exists
 
 - name: Get the list of packages installed after build-dep.
@@ -107,15 +141,15 @@
   with_items:
      - "usr/local/bin/sdl2-config"
      - "usr/local/include/SDL2/"
-#     - "usr/local/lib/libSDL2.a"
+     - "usr/local/lib/libSDL2.a"
      - "usr/local/lib/libSDL2.la"
-#     - "usr/local/lib/libSDL2main.a"
+     - "usr/local/lib/libSDL2main.a"
      - "usr/local/lib/libSDL2main.la"
-#     - "usr/local/lib/libSDL2_test.a"
+     - "usr/local/lib/libSDL2_test.a"
      - "usr/local/lib/libSDL2_test.la"
-#     - "usr/local/lib/libSDL2-2.0.so.0.3200.11"
-#     - "usr/local/lib/libSDL2.so" #it's a link
-#     - "usr/local/lib/libSDL2-2.0.so.0" #it's a link
+     - "usr/local/lib/libSDL2-2.0.so.0.3200.10"
+     - "usr/local/lib/libSDL2.so" #it's a link
+     - "usr/local/lib/libSDL2-2.0.so.0" #it's a link
      - "usr/local/share/aclocal/sdl2.m4"
      - "usr/local/lib/pkgconfig/sdl2.pc"
      - "usr/local/lib/cmake/SDL2/sdl2-config.cmake"
