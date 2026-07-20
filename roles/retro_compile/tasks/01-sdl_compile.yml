@@ -215,3 +215,11 @@
   file:
     path: "/home/packages/{{ package_name }}"
     state: absent
+
+- name: Remove patches.
+  file:
+    path: "/home/{{ item }}"
+    state: absent
+  with_items:
+     - "force_modes_refresh.patch"
+     - "sdl_restore_crtc_at_DestroyWindow.patch"
