@@ -14,7 +14,7 @@
 
 - name: Set package name.
   set_fact:
-    package_name: "switchres_{{ release }}_{{ ansible_architecture | replace('x86_64','amd64') }}"
+    package_name: "sdl2_{{ release }}_{{ ansible_architecture | replace('x86_64','amd64') }}"
 
 - name: Check if there is a package.
   stat:
@@ -90,19 +90,51 @@
   git:
     repo: 'https://github.com/libsdl-org/SDL'
     dest: "/home/sdl2"
-    version: "{{ release  }}"
+    version: "release-{{ release }}"
+  when: not sdl2_bin.stat.exists
+
+- name: Download KMS patches.
+  get_url:
+    url: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+    timeout: 60
+  with_items:
+     - { src: "https://gitlab.com/groovyarcade/packages/-/raw/master/package/sdl2/force_modes_refresh.patch?ref_type=heads", dest: "/home/force_modes_refresh.patch" }
+     - { src: "https://gitlab.com/groovyarcade/packages/-/raw/master/package/sdl2/sdl_restore_crtc_at_DestroyWindow.patch?ref_type=heads", dest: "/home/sdl_restore_crtc_at_DestroyWindow.patch" }
+  when: not sdl2_bin.stat.exists
+
+- name: Apply KMS patches.
+  patch:
+    src: "/home/{{ item }}"
+    basedir: "/home/sdl2"
+    strip: 1
+    remote_src: true
+  with_items:
+     - "force_modes_refresh.patch"
+     - "sdl_restore_crtc_at_DestroyWindow.patch"
+  when: not sdl2_bin.stat.exists
+
+- name: Create build dir.
+  file:
+    path: "/home/sdl2/build"
+    state: directory
+
+- name: Configure sdl2.
+  command: ../configure
+  args:
+    chdir: "/home/sdl2/build"
   when: not sdl2_bin.stat.exists
 
 - name: Build sdl2.
   make:
-    chdir: "/home/sdl2"
+    chdir: "/home/sdl2/build"
     params:
       NUM_THREADS: "{{ ansible_processor_nproc }}"
   when: not sdl2_bin.stat.exists
 
 - name: Install sdl2.
   make:
-    chdir: "/home/sdl2"
+    chdir: "/home/sdl2/build"
     target: install
   when: not sdl2_bin.stat.exists
 
