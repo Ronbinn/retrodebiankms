@@ -51,7 +51,7 @@
 
 - name: Download kernel.
   get_url:
-    url: "https://mirrors.edge.kernel.org/pub/linux/kernel/v6.x/linux-{{ kernel_version }}.tar.gz"
+    url: "https://mirrors.edge.kernel.org/pub/linux/kernel/v7.x/linux-{{ kernel_version }}.tar.gz"
     dest: "/home/kernelcompile"
     timeout: 60
   when: not debpackage.stat.exists
