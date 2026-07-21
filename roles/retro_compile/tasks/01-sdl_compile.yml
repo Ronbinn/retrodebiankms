@@ -37,9 +37,9 @@
     install_recommends: no
   vars:
     packages:
-#    - git
-#    - build-essential
-#    - pkg-config
+    - git
+    - build-essential
+    - pkg-config
     - graphviz
     - libdrm-dev
     - libgles-dev
@@ -194,7 +194,7 @@
     dest: "/home/packages/{{ package_name }}/DEBIAN/control"
     mode: 0644
   vars:
-    package_internal_name: "libsdl2-2.0-0"
+    package_internal_name: "SDL2 KMS"
     package_version: "{{ release | replace('v','') }}" #remove the "v" character from the number
     package_architecture: "{{ ansible_architecture | replace('x86_64','amd64') }}" #ansible uses x86_64 debian uses amd64
     package_depends: "libsdl2-2.0-0"
