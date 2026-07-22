@@ -22,10 +22,12 @@
 - name: Install amd64 kernel.
   apt:
     name: "linux-image-amd64"
+  when: not debpackage.stat.exists
 
 - name: Install git.
   apt:
     name: "git"
+  when: not debpackage.stat.exists
 
 - name: Install linux build dependencies.
   apt:
