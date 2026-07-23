@@ -1,0 +1,28 @@
+#install and configure sdl2
+---
+- name: Install dependencies.
+  apt:
+    name: "libsdl2-2.0-0"
+
+- name: Check if exists a sdl2 installation.
+  stat:
+    path: "/usr/local/bin/sdl2-config"
+  register: bin
+
+- name: Download sdl2.
+  get_url:
+    url: "https://github.com/Ronbinn/retrodebiankms/releases/download/10_07_2026/switchres_v2.2.2_amd64.deb"
+    dest: "/home/sdl2.deb"
+    timeout: 60
+  when:
+    - bin.stat.exists == false
+
+- name: Install sdl2.
+  apt:
+    deb: "/home/sdl2.deb"
+  when: bin.stat.exists == false
+
+- name: Remove deb file.
+  file:
+    path: "/home/sdl2.deb"
+    state: absent
