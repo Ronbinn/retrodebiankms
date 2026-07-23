@@ -137,7 +137,7 @@
     package_version: "{{ version }}"
     package_architecture: "{{ architecture }}"
 #    package_depends: "libsdl2-2.0-0, libgl1, libqt5widgets5, libsdl2-ttf-2.0-0, libdrm-dev"
-    package_depends: "mame, libdrm-dev"
+    package_depends: "libsdl2-2.0-0"
     package_description: "MAME fork for CRTs"
   when: not debpackage.stat.exists
 
