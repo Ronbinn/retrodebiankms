@@ -1,43 +1,36 @@
 diff --git a/src/mame/cave/cv1k.cpp b/src/mame/cave/cv1k.cpp
-index 8cce1a252f2..f77f4beac95 100644
+index 8cce1a252f2..3ba9b4c553b 100644
 --- a/src/mame/cave/cv1k.cpp
 +++ b/src/mame/cave/cv1k.cpp
-@@ -902,7 +902,7 @@ ROM_START( dfkbl )
+@@ -902,7 +902,6 @@ ROM_START( dfkbl )
  	ROM_LOAD16_WORD_SWAP( "u24", 0x400000, 0x400000, CRC(31f9eb0a) SHA1(322158779e969bb321241065dd49c1167b91ff6c) )
  ROM_END
  
 -#if 0 // not included in MAME, see driver notes
-+//#if 0 // not included in MAME, see driver notes
  ROM_START( akatana )
  	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF)
  	ROM_LOAD16_WORD_SWAP( "u4", 0x000000, 0x400000, CRC(613fd380) SHA1(6e28480eef3b483d00b42d811a9d2c7fa1097924) ) // (2010/ 8/13 MASTER VER.)
-@@ -929,7 +929,7 @@ ROM_START( ddpsdoj )
+@@ -929,7 +928,6 @@ ROM_START( ddpsdoj )
  	ROM_LOAD16_WORD_SWAP("u24", 0x400000, 0x400000, CRC(f593045b) SHA1(91b92870d0dd2a7817cb0059cc750e2393686f4c) )
  	ROM_IGNORE( 0x000100 ) // Flash extra bytes
  ROM_END
 -#endif
-+//#endif
  
  u64 cv1k_state::speedup_r()
  {
-@@ -1055,10 +1055,10 @@ GAME( 2008, ddpdfk10,   ddpdfk,   cv1k_d, cv1k, cv1k_state, init_ddpdfk,   ROT27
+@@ -1055,10 +1053,10 @@ GAME( 2008, ddpdfk10,   ddpdfk,   cv1k_d, cv1k, cv1k_state, init_ddpdfk,   ROT27
  GAME( 2010, dfkbl,      0,        cv1k_d, cv1k, cv1k_state, init_ddpdfk,   ROT270, "Cave",                 "DoDonPachi Dai-Fukkatsu Black Label (Japan, 2010/1/18 BLACK LABEL)",                   MACHINE_IMPERFECT_TIMING )
  
  // CA021  Akai Katana
--//GAME( 2010, akatana,    0,        cv1k_d, cv1k, cv1k_state, init_ddpdfk,   ROT0,   "Cave",                 "Akai Katana (Japan, 2010/ 8/13 MASTER VER.)",                 
-                         MACHINE_IMPERFECT_TIMING )
-+GAME( 2010, akatana,    0,        cv1k_d, cv1k, cv1k_state, init_ddpdfk,   ROT0,   "Cave",                 "Akai Katana (Japan, 2010/ 8/13 MASTER VER.)",
-                       MACHINE_IMPERFECT_TIMING )
+-//GAME( 2010, akatana,    0,        cv1k_d, cv1k, cv1k_state, init_ddpdfk,   ROT0,   "Cave",                 "Akai Katana (Japan, 2010/ 8/13 MASTER VER.)",                                          MACHINE_IMPERFECT_TIMING )
++GAME( 2010, akatana,    0,        cv1k_d, cv1k, cv1k_state, init_ddpdfk,   ROT0,   "Cave",                 "Akai Katana (Japan, 2010/ 8/13 MASTER VER.)",                                          MACHINE_IMPERFECT_TIMING )
  
  // CA??? DoDonPachi SaiDaiOuJou
--//GAME( 2012, ddpsdoj,    0,        cv1k_d, cv1k, cv1k_state, init_ddpdfk,   ROT270, "Cave",                 "DoDonPachi SaiDaiOuJou (Japan, 2012/ 4/20)",                  
-                         MACHINE_IMPERFECT_TIMING )
-+GAME( 2012, ddpsdoj,    0,        cv1k_d, cv1k, cv1k_state, init_ddpdfk,   ROT270, "Cave",                 "DoDonPachi SaiDaiOuJou (Japan, 2012/ 4/20)",
-                       MACHINE_IMPERFECT_TIMING )
+-//GAME( 2012, ddpsdoj,    0,        cv1k_d, cv1k, cv1k_state, init_ddpdfk,   ROT270, "Cave",                 "DoDonPachi SaiDaiOuJou (Japan, 2012/ 4/20)",                                           MACHINE_IMPERFECT_TIMING )
++GAME( 2012, ddpsdoj,    0,        cv1k_d, cv1k, cv1k_state, init_ddpdfk,   ROT270, "Cave",                 "DoDonPachi SaiDaiOuJou (Japan, 2012/ 4/20)",                                           MACHINE_IMPERFECT_TIMING )
  
  // CMDL01 Medal Mahjong Moukari Bancho
- GAME( 2007, mmmbanc,    0,        cv1k,   cv1k, cv1k_state, init_pinkswts, ROT0,   "Cave (AMI license)",   "Medal Mahjong Moukari Bancho (Japan, 2007/06/05 MASTER VER.)",  
-                       MACHINE_NOT_WORKING )
+ GAME( 2007, mmmbanc,    0,        cv1k,   cv1k, cv1k_state, init_pinkswts, ROT0,   "Cave (AMI license)",   "Medal Mahjong Moukari Bancho (Japan, 2007/06/05 MASTER VER.)",                         MACHINE_NOT_WORKING )
 diff --git a/src/mame/mame.lst b/src/mame/mame.lst
 index 3dffc57b784..14c5d2eae9d 100644
 --- a/src/mame/mame.lst
