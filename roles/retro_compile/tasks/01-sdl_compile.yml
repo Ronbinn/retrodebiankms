@@ -59,19 +59,19 @@
     version: "release-{{ release }}"
   when: not sdl2_bin.stat.exists
 
-- name: Download KMS patches.
-  get_url:
-    url: "{{ item.src }}"
-    dest: "{{ item.dest }}"
-    timeout: 60
-  with_items:
-     - { src: "https://gitlab.com/groovyarcade/packages/-/raw/master/package/sdl2/force_modes_refresh.patch?ref_type=heads", dest: "/home/force_modes_refresh.patch" }
-     - { src: "https://gitlab.com/groovyarcade/packages/-/raw/master/package/sdl2/sdl_restore_crtc_at_DestroyWindow.patch?ref_type=heads", dest: "/home/sdl_restore_crtc_at_DestroyWindow.patch" }
-  when: not sdl2_bin.stat.exists
+#- name: Download KMS patches.
+#  get_url:
+#    url: "{{ item.src }}"
+#    dest: "{{ item.dest }}"
+#    timeout: 60
+#  with_items:
+#     - { src: "https://gitlab.com/groovyarcade/packages/-/raw/master/package/sdl2/force_modes_refresh.patch?ref_type=heads", dest: "/home/force_modes_refresh.patch" }
+#     - { src: "https://gitlab.com/groovyarcade/packages/-/raw/master/package/sdl2/sdl_restore_crtc_at_DestroyWindow.patch?ref_type=heads", dest: "/home/sdl_restore_crtc_at_DestroyWindow.patch" }
+#  when: not sdl2_bin.stat.exists
 
 - name: Apply KMS patches.
   patch:
-    src: "/home/{{ item }}"
+    src: "{{ role_path }}/files/sdlpatches/{{ item }}"
     basedir: "/home/sdl2"
     strip: 1
     remote_src: true
