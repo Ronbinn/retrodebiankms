@@ -89,6 +89,7 @@
       SYMLEVEL: 1
       REGENIE: 1
       NOWERROR: "{{ nowerror }}"
+      USE_QTDEBUG: 0
   when: not groovymame_bin.stat.exists
 
 #make -f dist.mak PTR64=1
