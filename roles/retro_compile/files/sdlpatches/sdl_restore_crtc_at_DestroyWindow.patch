@@ -1,0 +1,85 @@
+diff --git a/src/video/kmsdrm/SDL_kmsdrmvideo.c b/src/video/kmsdrm/SDL_kmsdrmvideo.c
+index ebe15fe9c..f7c21ef68 100644
+--- a/src/video/kmsdrm/SDL_kmsdrmvideo.c
++++ b/src/video/kmsdrm/SDL_kmsdrmvideo.c
+@@ -1025,36 +1025,13 @@ static void KMSDRM_GBMDeinit(_THIS, SDL_DisplayData *dispdata)
+ 
+ static void KMSDRM_DestroySurfaces(_THIS, SDL_Window *window)
+ {
+-    SDL_VideoData *viddata = ((SDL_VideoData *)_this->driverdata);
+     SDL_WindowData *windata = (SDL_WindowData *)window->driverdata;
+-    SDL_DisplayData *dispdata = (SDL_DisplayData *)SDL_GetDisplayForWindow(window)->driverdata;
+-    int ret;
+ 
+     /**********************************************/
+     /* Wait for last issued pageflip to complete. */
+     /**********************************************/
+     /*KMSDRM_WaitPageflip(_this, windata);*/
+ 
+-    /***********************************************************************/
+-    /* Restore the original CRTC configuration: configue the crtc with the */
+-    /* original video mode and make it point to the original TTY buffer.   */
+-    /***********************************************************************/
+-
+-    ret = KMSDRM_drmModeSetCrtc(viddata->drm_fd, dispdata->crtc->crtc_id,
+-                                dispdata->crtc->buffer_id, 0, 0, &dispdata->connector->connector_id, 1,
+-                                &dispdata->original_mode);
+-
+-    /* If we failed to set the original mode, try to set the connector prefered mode. */
+-    if (ret && (dispdata->crtc->mode_valid == 0)) {
+-        ret = KMSDRM_drmModeSetCrtc(viddata->drm_fd, dispdata->crtc->crtc_id,
+-                                    dispdata->crtc->buffer_id, 0, 0, &dispdata->connector->connector_id, 1,
+-                                    &dispdata->original_mode);
+-    }
+-
+-    if (ret) {
+-        SDL_LogError(SDL_LOG_CATEGORY_VIDEO, "Could not restore CRTC");
+-    }
+-
+     /***************************/
+     /* Destroy the EGL surface */
+     /***************************/
+@@ -1090,6 +1067,33 @@ static void KMSDRM_DestroySurfaces(_THIS, SDL_Window *window)
+     }
+ }
+ 
++static void KMSDRM_RestoreCrtc(_THIS, SDL_Window *window)
++{
++    SDL_VideoData *viddata = ((SDL_VideoData *)_this->driverdata);
++    SDL_DisplayData *dispdata = (SDL_DisplayData *) SDL_GetDisplayForWindow(window)->driverdata;
++    int ret;
++
++    /***********************************************************************/
++    /* Restore the original CRTC configuration: configue the crtc with the */
++    /* original video mode and make it point to the original TTY buffer.   */
++    /***********************************************************************/
++
++    ret = KMSDRM_drmModeSetCrtc(viddata->drm_fd, dispdata->crtc->crtc_id,
++            dispdata->crtc->buffer_id, 0, 0, &dispdata->connector->connector_id, 1,
++            &dispdata->original_mode);
++
++    /* If we failed to set the original mode, try to set the connector prefered mode. */
++    if (ret && (dispdata->crtc->mode_valid == 0)) {
++        ret = KMSDRM_drmModeSetCrtc(viddata->drm_fd, dispdata->crtc->crtc_id,
++                dispdata->crtc->buffer_id, 0, 0, &dispdata->connector->connector_id, 1,
++                &dispdata->original_mode);
++    }
++
++    if(ret) {
++        SDL_LogError(SDL_LOG_CATEGORY_VIDEO, "Could not restore CRTC");
++    }
++}
++
+ static void KMSDRM_GetModeToSet(SDL_Window *window, drmModeModeInfo *out_mode)
+ {
+     SDL_VideoDisplay *display = SDL_GetDisplayForWindow(window);
+@@ -1337,6 +1341,9 @@ void KMSDRM_DestroyWindow(_THIS, SDL_Window *window)
+         /* Destroy cursor GBM BO of the display of this window. */
+         KMSDRM_DestroyCursorBO(_this, SDL_GetDisplayForWindow(window));
+ 
++        /* Restore the original CRTC */
++        KMSDRM_RestoreCrtc(_this, window);
++
+         /* Destroy GBM surface and buffers. */
+         KMSDRM_DestroySurfaces(_this, window);
+ 
