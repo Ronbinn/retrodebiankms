@@ -74,7 +74,7 @@
     src: "{{ role_path }}/files/sdlpatches/{{ item }}"
     basedir: "/home/sdl2"
     strip: 1
-    remote_src: true
+#    remote_src: true
   with_items:
      - "force_modes_refresh.patch"
      - "sdl_restore_crtc_at_DestroyWindow.patch"
