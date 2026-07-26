@@ -4,6 +4,29 @@
   apt:
     name: retroarch
 
+#- name: Check if exists a custom retroarch installation.
+#  stat:
+#    path: "/usr/local/bin/retroarch"
+#  register: bin
+
+#- name: Download custom retroarch.
+#  get_url:
+#    url: "https://github.com/Ronbinn/retrodebiankms/releases/download/10_07_2026/retroarch_v1.22.2_amd64.deb"
+#    dest: "/home/retroarch.deb"
+#    timeout: 60
+#  when:
+#    - bin.stat.exists == false
+
+#- name: Install custom retroarch.
+#  apt:
+#    deb: "/home/retroarch.deb"
+#  when: bin.stat.exists == false
+
+#- name: Remove deb file.
+#  file:
+#    path: "/home/retroarch.deb"
+#    state: absent
+
 - name: Remove retroarch original configuration.
   file:
     path: "/etc/retroarch.cfg"

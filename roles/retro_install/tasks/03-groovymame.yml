@@ -16,13 +16,31 @@
     path: "/usr/local/bin/groovymame"
   register: bin
 
-- name: Download groovymame.
+- name: Download groovymame from official github.
   unarchive:
     src: "https://github.com/antonioginer/GroovyMAME/releases/download/gm0288sr222d/groovymame_0288.222d_linux.tar.bz2"
     dest: /usr/local/bin
     remote_src: yes
   when:
     - bin.stat.exists == false
+
+#- name: Download custom groovymame.
+#  get_url:
+#    url: "https://github.com/Ronbinn/retrodebiankms/releases/download/10_07_2026/groovymame_0288sr222d_amd64.deb"
+#    dest: "/home/groovymame.deb"
+#    timeout: 60
+#  when:
+#    - bin.stat.exists == false
+
+#- name: Install custom groovymame.
+#  apt:
+#    deb: "/home/groovymame.deb"
+#  when: bin.stat.exists == false
+
+#- name: Remove deb file.
+#  file:
+#    path: "/home/groovymame.deb"
+#    state: absent
 
 - name: Create mame dirs.
   file:
