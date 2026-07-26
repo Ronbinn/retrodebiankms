@@ -11,7 +11,7 @@
 
 #- name: Download custom retroarch.
 #  get_url:
-#    url: "https://github.com/Ronbinn/retrodebiankms/releases/download/10_07_2026/retroarch_v1.22.2_amd64.deb"
+#    url: "{{ source_url }}/retroarch_v1.22.2_amd64.deb"
 #    dest: "/home/retroarch.deb"
 #    timeout: 60
 #  when:

@@ -11,7 +11,7 @@
 
 - name: Download sdl2.
   get_url:
-    url: "https://github.com/Ronbinn/retrodebiankms/releases/download/10_07_2026/sdl2_2.32.10_amd64.deb"
+    url: "{{ source_url }}/sdl2_2.32.10_amd64.deb"
     dest: "/home/sdl2.deb"
     timeout: 60
   when:

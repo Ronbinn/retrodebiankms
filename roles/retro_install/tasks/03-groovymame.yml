@@ -26,7 +26,7 @@
 
 #- name: Download custom groovymame.
 #  get_url:
-#    url: "https://github.com/Ronbinn/retrodebiankms/releases/download/10_07_2026/groovymame_0288sr222d_amd64.deb"
+#    url: "{{ source_url }}/groovymame_0288sr222d_amd64.deb"
 #    dest: "/home/groovymame.deb"
 #    timeout: 60
 #  when:

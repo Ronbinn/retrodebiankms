@@ -28,7 +28,7 @@
 
 - name: Download emulationstation_de.
   get_url:
-    url: "https://github.com/Ronbinn/retrodebiankms/releases/download/10_07_2026/emulationstation_de_v3.4.1_amd64.deb"
+    url: "{{ source_url }}/emulationstation_de_v3.4.1_amd64.deb"
     dest: "/home/emulationstation_de.deb"
     timeout: 60
   when:
