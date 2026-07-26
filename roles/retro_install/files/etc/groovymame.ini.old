@@ -1,4 +1,4 @@
-#
+﻿#
 # CORE CONFIGURATION OPTIONS
 #
 readconfig                1
@@ -9,16 +9,16 @@ writeconfig               0
 #
 homepath                  .
 rompath                   roms
-hashpath                  hash
-samplepath                samples
-artpath                   artwork
-ctrlrpath                 ctrlr
+hashpath                  /usr/share/games/mame/hash
+samplepath                /usr/share/games/mame/samples
+artpath                   /usr/share/games/mame/artwork
+ctrlrpath                 /usr/share/games/mame/ctrlr
 inipath                   $HOME/.mame;.;ini
-fontpath                  .
-cheatpath                 cheat
-crosshairpath             crosshair
-pluginspath               plugins
-languagepath              language
+fontpath                  /usr/share/games/mame/fonts
+cheatpath                 /usr/share/games/mame/cheat
+crosshairpath             /usr/share/games/mame/crosshair
+pluginspath               /usr/share/games/mame/plugins
+languagepath              /usr/share/games/mame/language
 swpath                    software
 
 #
@@ -66,12 +66,9 @@ refreshspeed              0
 syncrefresh               0
 syncaudio                 1
 lowlatency                1
-autoframedelay            1
 framedelay                0
-fd_margin                 1.0
 vsync_offset              0
 black_frame_insertion     0
-tearbar                   1
 
 #
 # CORE RENDER OPTIONS
@@ -102,7 +99,6 @@ flipy                     0
 artwork_crop              0
 fallback_artwork          
 override_artwork          
-artwork_font              default
 
 #
 # CORE SCREEN OPTIONS
@@ -111,7 +107,6 @@ brightness                1.0
 contrast                  1.0
 gamma                     1.0
 pause_brightness          0.65
-bfi_brightness            0.0
 effect                    none
 
 #
@@ -129,6 +124,8 @@ flicker                   0
 samplerate                48000
 samples                   1
 volume                    0
+compressor                1
+speaker_report            0
 
 #
 # CORE INPUT OPTIONS
@@ -142,6 +139,7 @@ multikeyboard             0
 multimouse                0
 steadykey                 0
 ui_active                 0
+offscreen_reload          0
 joystick_map              auto
 joystick_deadzone         0.15
 joystick_saturation       0.85
@@ -172,8 +170,6 @@ debug                     0
 update_in_pause           0
 debugscript               
 debuglog                  0
-emusynclog                0
-emusyncserial             
 
 #
 # CORE COMM OPTIONS
@@ -188,7 +184,6 @@ comm_framesync            0
 # CORE MISC OPTIONS
 #
 drc                       1
-drc_rwx                   1
 drc_use_c                 0
 drc_log_uml               0
 drc_log_native            0
@@ -301,7 +296,7 @@ view3                     auto
 # OSD FULL SCREEN OPTIONS
 #
 switchres                 1
-switchres_ini             0
+switchres_ini             1
 switchres_backend         auto
 modesetting               0
 modeline_generation       1
@@ -322,7 +317,6 @@ pixel_precision           1
 sync_refresh_tolerance    2.0
 interlace_force_even      0
 autosync                  1
-vblank_thread             0
 autofilter                1
 autostretch               1
 scale_proportional        1
@@ -389,13 +383,14 @@ glsl_shader_screen9       none
 # OSD SOUND OPTIONS
 #
 sound                     auto
-audio_latency             0.0
+audio_latency             2
 
 #
 # PORTAUDIO OPTIONS
 #
-part_api                  none
-part_device               none
+pa_api                    none
+pa_device                 none
+pa_latency                0
 
 #
 # OSD MIDI OPTIONS
