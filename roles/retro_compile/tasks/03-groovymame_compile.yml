@@ -50,6 +50,15 @@
     state: build-dep
   when: not groovymame_bin.stat.exists
 
+- name: Install qt6.
+  apt:
+    name: "{{ packages }}"
+  vars:
+    packages:
+    - qt6-base-dev
+    - qt6-tools-dev-tools
+  when: not groovymame_bin.stat.exists
+
 - name: Get the list of packages installed after build-dep.
   package_facts:
     manager: apt
@@ -89,7 +98,6 @@
       SYMLEVEL: 1
       REGENIE: 1
       NOWERROR: "{{ nowerror }}"
-      USE_QTDEBUG: 0
   when: not groovymame_bin.stat.exists
 
 #make -f dist.mak PTR64=1
