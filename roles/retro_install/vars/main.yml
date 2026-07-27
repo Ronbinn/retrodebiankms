@@ -2,3 +2,11 @@
 ---
 #source_url: https://github.com/Ronbinn/retrodebiankms/releases/download/10_07_2026
 source_url: http://localhost
+linuximagedeb: linux-image-7.1.4-15khz_7.1.4-1_amd64.deb
+linuxheadersdeb: linux-headers-7.1.4-15khz_7.1.4-1_amd64.deb
+linuxlibcdeb: linux-libc-dev_7.1.4-1_amd64.deb
+switchresdeb: switchres_v2.2.2_amd64.deb
+sdl2deb: sdl2_2.32.10_amd64.deb
+emulationstationdeb: emulationstation_de_v3.4.1_amd64.deb
+groovymamedeb: groovymame_0288sr222d_amd64.deb
+retroarchdeb: retroarch_v1.22.2_amd64.deb

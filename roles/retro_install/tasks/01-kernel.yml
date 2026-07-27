@@ -14,9 +14,9 @@
     dest: "{{ item.dest }}"
     timeout: 60
   with_items:
-     - { src: "{{ source_url }}/linux-image-7.1.4-15khz_7.1.4-1_amd64.deb", dest: "/root/linux_image.deb" }
-     - { src: "{{ source_url }}/linux-headers-7.1.4-15khz_7.1.4-1_amd64.deb", dest: "/root/linux_headers.deb" }
-     - { src: "{{ source_url }}/linux-libc-dev_7.1.4-1_amd64.deb", dest: "/root/linux_libc.deb" }
+     - { src: "{{ source_url }}/{{ linuximagedeb }}", dest: "/root/linux_image.deb" }
+     - { src: "{{ source_url }}/{{ linuxheadersdeb }}", dest: "/root/linux_headers.deb" }
+     - { src: "{{ source_url }}/{{ linuxlibcdeb }}", dest: "/root/linux_libc.deb" }
   when:
     - result.matched == 0
 
