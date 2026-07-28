@@ -4,43 +4,46 @@
   apt:
     name: mame
 
-- name: Install libdrm-dev and xorg-dev.
+- name: Install other dependencies
   apt:
     name: "{{ item }}"
   with_items:
     - libdrm-dev
 #    - xorg-dev #this is not mandatory
+    - libqt6core6t64
+    - libqt6gui6
+    - libqt6widgets6
 
 - name: Check if exists a groovymame installation.
   stat:
     path: "/usr/local/bin/groovymame"
   register: bin
 
-- name: Download groovymame from official github.
-  unarchive:
-    src: "https://github.com/antonioginer/GroovyMAME/releases/download/gm0288sr222d/groovymame_0288.222d_linux.tar.bz2"
-    dest: /usr/local/bin
-    remote_src: yes
-  when:
-    - bin.stat.exists == false
-
-#- name: Download custom groovymame.
-#  get_url:
-#    url: "{{ source_url }}/{{ groovymamedeb }}"
-#    dest: "/home/groovymame.deb"
-#    timeout: 60
+#- name: Download groovymame from official github.
+#  unarchive:
+#    src: "https://github.com/antonioginer/GroovyMAME/releases/download/gm0288sr222d/groovymame_0288.222d_linux.tar.bz2"
+#    dest: /usr/local/bin
+#    remote_src: yes
 #  when:
 #    - bin.stat.exists == false
 
-#- name: Install custom groovymame.
-#  apt:
-#    deb: "/home/groovymame.deb"
-#  when: bin.stat.exists == false
+- name: Download custom groovymame.
+  get_url:
+    url: "{{ source_url }}/{{ groovymamedeb }}"
+    dest: "/home/groovymame.deb"
+    timeout: 60
+  when:
+    - bin.stat.exists == false
 
-#- name: Remove deb file.
-#  file:
-#    path: "/home/groovymame.deb"
-#    state: absent
+- name: Install custom groovymame.
+  apt:
+    deb: "/home/groovymame.deb"
+  when: bin.stat.exists == false
+
+- name: Remove deb file.
+  file:
+    path: "/home/groovymame.deb"
+    state: absent
 
 - name: Create mame dirs.
   file:
