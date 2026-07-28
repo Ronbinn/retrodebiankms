@@ -102,17 +102,26 @@
       - "-r"
   when: result.matched == 0
 
-- name: Create mGBA dir.
+- name: Create config dirs.
   file:
-    path: "/home/arcade/.config/retroarch/config/mGBA"
+    path: "{{ item }}"
     state: directory
     owner: arcade
     group: arcade
+  with_items:
+    - "/home/arcade/.config/retroarch/config/mGBA"
+    - "/home/arcade/.config/retroarch/config/Beetle Saturn"
 
 - name: Disable interlace in mGBA core.
   copy:
     src: "{{ role_path }}/files/retroarch/config/mGBA/mGBA.switchres.ini"
     dest: "/home/arcade/.config/retroarch/config/mGBA/mGBA.switchres.ini"
+    mode: 0644
+
+- name: Disable threaded_rendering in beetle saturn core.
+  copy:
+    src: "{{ role_path }}/files/retroarch/config/Beetle Saturn/Beetle Saturn.opt"
+    dest: "/home/arcade/.config/retroarch/config/Beetle Saturn/Beetle Saturn.opt"
     mode: 0644
 
 - name: Change file ownership.
