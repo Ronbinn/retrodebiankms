@@ -4,28 +4,28 @@
   apt:
     name: retroarch
 
-#- name: Check if exists a custom retroarch installation.
-#  stat:
-#    path: "/usr/local/bin/retroarch"
-#  register: bin
+- name: Check if exists a custom retroarch installation.
+  stat:
+    path: "/usr/local/bin/retroarch"
+  register: bin
 
-#- name: Download custom retroarch.
-#  get_url:
-#    url: "{{ source_url }}/{{ retroarchdeb }}"
-#    dest: "/home/retroarch.deb"
-#    timeout: 60
-#  when:
-#    - bin.stat.exists == false
+- name: Download custom retroarch.
+  get_url:
+    url: "{{ source_url }}/{{ retroarchdeb }}"
+    dest: "/home/retroarch.deb"
+    timeout: 60
+  when:
+    - bin.stat.exists == false
 
-#- name: Install custom retroarch.
-#  apt:
-#    deb: "/home/retroarch.deb"
-#  when: bin.stat.exists == false
+- name: Install custom retroarch.
+  apt:
+    deb: "/home/retroarch.deb"
+  when: bin.stat.exists == false
 
-#- name: Remove deb file.
-#  file:
-#    path: "/home/retroarch.deb"
-#    state: absent
+- name: Remove deb file.
+  file:
+    path: "/home/retroarch.deb"
+    state: absent
 
 - name: Remove retroarch original configuration.
   file:
@@ -84,6 +84,7 @@
 
 - name: Download retroarch cores.
   get_url:
+#    url: "https://buildbot.libretro.com/stable/1.20.0/linux/x86_64/RetroArch_cores.7z"
     url: "https://buildbot.libretro.com/stable/1.22.2/linux/x86_64/RetroArch_cores.7z"
     dest: "/home/arcade/RetroArch_cores.7z"
     timeout: 60
