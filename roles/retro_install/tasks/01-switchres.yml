@@ -37,3 +37,10 @@
    - switchres_arcade_31.ini
    - switchres_generic_15_ati.ini
    - switchres_generic_15_intel.ini
+
+- name: Set KMS backend by default
+  lineinfile:
+    dest: /etc/switchres.ini
+    regexp: "^(.*)api(.*)$"
+    line: "\tapi\t\t\tdrmkms"
+    backrefs: yes
