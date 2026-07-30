@@ -27,17 +27,6 @@
     path: "/home/switchres.deb"
     state: absent
 
-- name: Copy switchres configuration examples.
-  copy:
-    src: "{{ role_path }}/files/etc/{{ item }}"
-    dest: "/etc/{{ item }}"
-    mode: 0644
-  with_items:
-   - switchres_lcd.ini
-   - switchres_arcade_31.ini
-   - switchres_generic_15_ati.ini
-   - switchres_generic_15_intel.ini
-
 - name: Set KMS backend by default
   lineinfile:
     dest: /etc/switchres.ini
