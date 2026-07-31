@@ -14,7 +14,7 @@
 
   - include_tasks: 05-repositories.yml
 
-#  - include_tasks: 06-tasksel.yml
+  - include_tasks: 06-tasksel.yml
 
   - include_tasks: 07-grub.yml
 
