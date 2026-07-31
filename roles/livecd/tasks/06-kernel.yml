@@ -1,5 +1,0 @@
-#this task installs the kernel for debian or ubuntu. It also installs grub and some non-free firmwares for Debian.
----
-- name: Install amd64 kernel.
-  apt:
-    name: "linux-image-amd64"

@@ -10,16 +10,14 @@
 
   - include_tasks: 03-network_manager.yml
 
-  - include_tasks: 05-timezone.yml
+  - include_tasks: 04-timezone.yml
 
-#  - include_tasks: 06-kernel.yml
+  - include_tasks: 05-repositories.yml
 
-  - include_tasks: 07-repositories.yml
+#  - include_tasks: 06-tasksel.yml
 
-  - include_tasks: 08-tasksel.yml
+  - include_tasks: 07-grub.yml
 
-  - include_tasks: 09-grub.yml
+  - include_tasks: 08-live.yml
 
-  - include_tasks: 10-live.yml
-
-  - include_tasks: 11-configurator.yml
+  - include_tasks: 09-configurator.yml
