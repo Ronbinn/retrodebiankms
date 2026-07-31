@@ -2,8 +2,8 @@
 
 #crt_switch_resolution = "0" #off
 #crt_switch_resolution = "4" #ini
-#crt_switch_resolution_super = "0" #native
-#crt_switch_resolution_super = "1" #dynamic
+#crt_switch_resolution_super = "0" #This will pass the cores native resolution to SR
+#crt_switch_resolution_super = "1920" #This will pass a hard set super width of 1920 to SR
 
 #lspci | grep -i vga | grep -i amd
 #lspci | grep -i vga | grep -i intel
@@ -33,7 +33,7 @@ fi
 if grep -q 1280 /proc/cmdline #non ati card
 then
  sed -i 's,crt_switch_resolution =.*,crt_switch_resolution = "4",g' /etc/retroarch.cfg
- sed -i 's,crt_switch_resolution_super.*,crt_switch_resolution_super = "2560",g' /etc/retroarch.cfg
+ sed -i 's,crt_switch_resolution_super.*,crt_switch_resolution_super = "1920",g' /etc/retroarch.cfg
  sed -i '24s,monitor.*,monitor generic_15,g' /etc/switchres.ini
  sed -i 's,dotclock_min.*,dotclock_min 25.0,g' /etc/switchres.ini
  sed -i 's,video_scale_integer =.*,video_scale_integer = "false",g' /etc/retroarch.cfg
