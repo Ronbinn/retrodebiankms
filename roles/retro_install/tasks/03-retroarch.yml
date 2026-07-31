@@ -3,6 +3,7 @@
 - name: Install retroarch.
   apt:
     name: retroarch
+    install_recommends: no
 
 - name: Check if exists a custom retroarch installation.
   stat:
@@ -51,6 +52,7 @@
 - name: Install 7z and zip extractor.
   apt:
     name: "{{ item }}"
+    install_recommends: no
   with_items:
     - "p7zip-full"
     - "unzip"
