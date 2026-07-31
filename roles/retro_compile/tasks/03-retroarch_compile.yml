@@ -1,8 +1,4 @@
 ---
-- name: Get the list of packages installed in this system.
-  package_facts:
-    manager: apt
-
 - name: Get latest release's tag.
   uri:
     url: https://api.github.com/repos/libretro/retroarch/releases/latest
@@ -40,12 +36,14 @@
 - name: Install git.
   apt:
     name: "git"
+    install_recommends: no
   when: not retroarch_bin.stat.exists
 
 - name: Install retroarch build dependencies.
   apt:
     pkg: retroarch
     state: build-dep
+    install_recommends: no
   when: not retroarch_bin.stat.exists
 
 - name: Get the list of packages installed after build-dep.

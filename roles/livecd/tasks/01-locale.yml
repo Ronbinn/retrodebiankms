@@ -3,6 +3,7 @@
 - name: Install locales. Debian.
   apt:
     name: "locales"
+    install_recommends: no
   register: debianlocale
   when: ansible_distribution == 'Debian'
 

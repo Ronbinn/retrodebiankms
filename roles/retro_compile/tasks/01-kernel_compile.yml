@@ -22,17 +22,20 @@
 - name: Install amd64 kernel.
   apt:
     name: "linux-image-amd64"
+    install_recommends: no
   when: not debpackage.stat.exists
 
 - name: Install git.
   apt:
     name: "git"
+    install_recommends: no
   when: not debpackage.stat.exists
 
 - name: Install linux build dependencies.
   apt:
     pkg: linux
     state: build-dep
+    install_recommends: no
   when: not debpackage.stat.exists
 
 - name: Get the list of packages installed after build-dep.

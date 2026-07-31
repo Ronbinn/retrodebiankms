@@ -1,8 +1,4 @@
 ---
-- name: Get the list of packages installed in this system.
-  package_facts:
-    manager: apt
-
 - name: Get latest release's tag.
   uri:
     url: https://api.github.com/repos/antonioginer/groovymame/releases/latest
@@ -42,17 +38,20 @@
 - name: Install git.
   apt:
     name: "git"
+    install_recommends: no
   when: not groovymame_bin.stat.exists
 
 - name: Install mame build dependencies.
   apt:
     pkg: mame
     state: build-dep
+    install_recommends: no
   when: not groovymame_bin.stat.exists
 
 - name: Install qt6.
   apt:
     name: "{{ packages }}"
+    install_recommends: no
   vars:
     packages:
     - qt6-base-dev
