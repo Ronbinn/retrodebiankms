@@ -1,0 +1,11 @@
+#This task configures apt to no install recommended packages
+---
+- name: Copy configuration.
+  copy:
+    src: "{{ role_path }}/files/etc/apt/apt.conf.d/99noRecommends"
+    dest: "/etc/apt/apt.conf.d/99noRecommends"
+    mode: 0644
+
+- name: "apt-get update"
+  apt:
+    update_cache: yes
