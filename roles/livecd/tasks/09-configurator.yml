@@ -3,7 +3,7 @@
 - name: Copy autoconfigurator executable.
   copy:
     src: "{{ role_path }}/files/usr/local/bin/autoconfigurator"
-    dest: "/usr/local/bin/configurator"
+    dest: "/usr/local/bin/autoconfigurator"
     mode: 0755
 
 - name: Copy configurator service.
