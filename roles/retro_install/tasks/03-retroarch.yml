@@ -5,6 +5,11 @@
     name: retroarch
     install_recommends: no
 
+- name: Install libavdevice.
+  apt:
+    name: libavdevice61
+    install_recommends: no
+
 - name: Check if exists a custom retroarch installation.
   stat:
     path: "/usr/local/bin/retroarch"
