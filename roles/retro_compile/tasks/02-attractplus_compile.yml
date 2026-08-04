@@ -37,7 +37,6 @@
 - name: Install attractplus build dependencies.
   apt:
     name: "{{ packages }}"
-    install_recommends: no
   vars:
     packages:
     - git

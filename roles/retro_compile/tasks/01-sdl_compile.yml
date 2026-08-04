@@ -30,14 +30,12 @@
 - name: Install git.
   apt:
     name: "git"
-    install_recommends: no
   when: not sdl2_bin.stat.exists
 
 - name: Install sdl build dependencies.
   apt:
     pkg: mame
     state: build-dep
-    install_recommends: no
   when: not sdl2_bin.stat.exists
 
 - name: Get the list of packages installed after build-dep.

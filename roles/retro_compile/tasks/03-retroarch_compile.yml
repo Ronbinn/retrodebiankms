@@ -36,14 +36,12 @@
 - name: Install git.
   apt:
     name: "git"
-    install_recommends: no
   when: not retroarch_bin.stat.exists
 
 - name: Install retroarch build dependencies.
   apt:
     pkg: retroarch
     state: build-dep
-    install_recommends: no
   when: not retroarch_bin.stat.exists
 
 - name: Get the list of packages installed after build-dep.
