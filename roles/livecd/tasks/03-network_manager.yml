@@ -3,7 +3,6 @@
 - name: Install network-manager.
   apt:
     name: "network-manager"
-    install_recommends: no
 
 - name: Copy wifi configuration template.
   copy:

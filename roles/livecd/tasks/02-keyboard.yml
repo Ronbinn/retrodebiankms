@@ -3,7 +3,6 @@
 - name: Install keyboard-configuration and console-setup.
   apt:
     name: "{{ packages }}"
-    install_recommends: no
   vars:
     packages:
     - keyboard-configuration

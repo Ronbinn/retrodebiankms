@@ -3,10 +3,8 @@
 - name: Install grub.
   apt:
     name: grub-pc
-    install_recommends: no
 
 - name: Istall grub EFI
   apt:
     name: grub-efi-amd64-signed
-    install_recommends: no
   when: ansible_architecture == 'x86_64'

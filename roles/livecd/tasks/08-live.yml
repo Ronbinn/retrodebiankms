@@ -3,7 +3,6 @@
 - name: Install live-boot packages and haveged.
   apt:
     name: "{{ packages }}"
-    install_recommends: no
   vars:
     packages:
     - live-boot
@@ -47,7 +46,6 @@
 - name: Install needed programs.
   apt:
     name: "{{ packages }}"
-    install_recommends: no
   vars:
     packages:
     - pv

@@ -14,4 +14,3 @@
 - name: Install ca-certificates.
   apt:
     name: ca-certificates
-    install_recommends: no
