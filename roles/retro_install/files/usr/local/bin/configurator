@@ -52,7 +52,7 @@ CHOICE2=$(whiptail --title "RetroDebian Configurator" \
 
 if [ $CHOICE2 -eq 1 ]; then #ati card
  sed -i 's,crt_switch_resolution_super.*,crt_switch_resolution_super = "0",g' /etc/retroarch.cfg
- sed -i 's,dotclock_min.*,dotclock_min 0,g' /etc/switchres.ini
+ sed -i 's,dotclock_min.*,dotclock_min 6.0,g' /etc/switchres.ini
 
  CHOICE3=$(whiptail --title "RetroDebian Configurator" \
                     --menu "Select system resolution:" 15 60 6 \
