@@ -4,7 +4,6 @@
 - name: Install extra packages.
   apt:
     name: "{{ packages }}"
-    install_recommends: no
   vars:
     packages:
     - sudo

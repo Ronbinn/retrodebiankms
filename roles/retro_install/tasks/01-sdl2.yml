@@ -3,7 +3,6 @@
 - name: Install dependencies.
   apt:
     name: "libsdl2-2.0-0"
-    install_recommends: no
 
 - name: Check if exists a sdl2 installation.
   stat:

@@ -3,7 +3,6 @@
 - name: Install extra firmwares.
   apt:
     name: "{{ packages }}"
-    install_recommends: no
   vars:
     packages:
     - firmware-linux-nonfree
@@ -15,12 +14,10 @@
 - name: Install openssh-server.
   apt:
     name: "openssh-server"
-    install_recommends: no
 
 - name: Install audio utils.
   apt:
     name: "{{ packages }}"
-    install_recommends: no
   vars:
     packages:
     - alsa-utils
@@ -30,7 +27,6 @@
 - name: Install joystick.
   apt:
     name: "joystick"
-    install_recommends: no
 
 - name: Copy listconnectors script.
   copy:

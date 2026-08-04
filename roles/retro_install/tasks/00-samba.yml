@@ -3,7 +3,6 @@
 - name: Install samba, cifs-utils and wsdd.
   apt:
     name: "{{ item }}"
-    install_recommends: no
   with_items:
     - samba
     - cifs-utils

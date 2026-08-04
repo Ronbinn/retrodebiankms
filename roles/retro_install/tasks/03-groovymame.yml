@@ -3,12 +3,10 @@
 - name: Install original MAME to get the dependencies.
   apt:
     name: mame
-    install_recommends: no
 
 - name: Install other dependencies
   apt:
     name: "{{ item }}"
-    install_recommends: no
   with_items:
     - libdrm-dev
 #    - xorg-dev #this is not mandatory
