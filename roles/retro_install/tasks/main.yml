@@ -1,4 +1,5 @@
 ---
+  - include_tasks: 00-no_install_recommends.yml
   - include_tasks: 00-users.yml
   - include_tasks: 00-autologin.yml
   - include_tasks: 00-samba.yml
