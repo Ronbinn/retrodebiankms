@@ -9,12 +9,12 @@
 - name: Copy configurator service.
   copy:
     src: "{{ role_path }}/files/etc/systemd/system/autoconfigurator.service"
-    dest: "/etc/systemd/system/configurator.service"
+    dest: "/etc/systemd/system/autoconfigurator.service"
     mode: 0644
 
 - name: Enable configurator service.
   file:
-    src: "/etc/systemd/system/configurator.service"
+    src: "/etc/systemd/system/autoconfigurator.service"
     dest: "/etc/systemd/system/multi-user.target.wants/autoconfigurator.service"
     state: link
 
