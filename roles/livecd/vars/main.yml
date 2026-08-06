@@ -1,4 +1,0 @@
-#variables for debian based systems
----
-repo: http://deb.debian.org/debian
-compo: main non-free-firmware

@@ -8,9 +8,9 @@
 - name: Add standard repo.
   deb822_repository:
     name: "{{ ansible_distribution }}"
-    uris: "{{ repo }}"
+    uris: "http://deb.debian.org/debian"
     suites: "{{ ansible_distribution_release }}"
-    components: "{{ compo }}"
+    components: "main non-free-firmware"
     signed_by: /usr/share/keyrings/debian-archive-keyring.gpg
     types:
       - deb
@@ -19,9 +19,9 @@
 - name: add updates repo.
   deb822_repository:
     name: "{{ ansible_distribution }}-updates"
-    uris: "{{ repo }}"
+    uris: "http://deb.debian.org/debian"
     suites: "{{ ansible_distribution_release }}-updates"
-    components: "{{ compo }}"
+    components: "main non-free-firmware"
     signed_by: /usr/share/keyrings/debian-archive-keyring.gpg
     types:
       - deb
@@ -32,7 +32,7 @@
     name: "debian-security"
     uris: "http://security.debian.org/debian-security"
     suites: "{{ ansible_distribution_release }}-security"
-    components: "{{ compo }}"
+    components: "main non-free-firmware"
     signed_by: /usr/share/keyrings/debian-archive-keyring.gpg
     types:
       - deb
