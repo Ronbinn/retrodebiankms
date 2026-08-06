@@ -66,7 +66,7 @@
     state: directory
   with_items:
     - "/home/arcade/ES-DE/settings"
-#    - "/home/arcade/ES-DE/gamelists/arcade"
+    - "/home/arcade/ES-DE/gamelists/arcade"
     - "/home/arcade/ES-DE/controllers"
 
 - name: Copy config files.
@@ -76,7 +76,7 @@
     mode: 0644
   with_items:
     - "ES-DE/settings/es_settings.xml"
- #   - "ES-DE/gamelists/arcade/gamelist.xml"
+    - "ES-DE/gamelists/arcade/gamelist.xml"
     - "ES-DE/controllers/es_controller_mappings.cfg"
 
 - name: Change file ownership.
