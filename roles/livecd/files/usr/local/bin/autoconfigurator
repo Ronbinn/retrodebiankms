@@ -14,7 +14,7 @@ then
  sed -i 's,crt_switch_resolution =.*,crt_switch_resolution = "4",g' /etc/retroarch.cfg
  sed -i 's,crt_switch_resolution_super.*,crt_switch_resolution_super = "0",g' /etc/retroarch.cfg
  sed -i '24s,monitor.*,monitor generic_15,g' /etc/switchres.ini
- sed -i 's,dotclock_min.*,dotclock_min 0,g' /etc/switchres.ini
+ sed -i 's,dotclock_min.*,dotclock_min 8.0,g' /etc/switchres.ini
  sed -i 's,video_scale_integer =.*,video_scale_integer = "false",g' /etc/retroarch.cfg
  sed -i 's,GRUB_CMDLINE_LINUX_DEFAULT=.*,GRUB_CMDLINE_LINUX_DEFAULT="video=640x480iS",g' /etc/default/grub
 fi
@@ -24,7 +24,7 @@ then
  sed -i 's,crt_switch_resolution =.*,crt_switch_resolution = "4",g' /etc/retroarch.cfg
  sed -i 's,crt_switch_resolution_super.*,crt_switch_resolution_super = "0",g' /etc/retroarch.cfg
  sed -i '24s,monitor.*,monitor generic_15,g' /etc/switchres.ini
- sed -i 's,dotclock_min.*,dotclock_min 0,g' /etc/switchres.ini
+ sed -i 's,dotclock_min.*,dotclock_min 8.0,g' /etc/switchres.ini
  sed -i 's,video_scale_integer =.*,video_scale_integer = "false",g' /etc/retroarch.cfg
  sed -i 's,GRUB_CMDLINE_LINUX_DEFAULT=.*,GRUB_CMDLINE_LINUX_DEFAULT="video=320x240S",g' /etc/default/grub
 
