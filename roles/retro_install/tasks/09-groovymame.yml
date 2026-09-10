@@ -2,7 +2,10 @@
 ---
 - name: Install original MAME to get the dependencies.
   apt:
-    name: mame
+    name: "{{ item }}"
+  with_items:
+    - mame
+    - mame-tools
 
 - name: Install other dependencies
   apt:
