@@ -32,9 +32,12 @@ CHOICE1=$(whiptail --title "RetroDebian Configurator" \
 if [ $CHOICE1 -eq 2 ]; then #LCD monitor
  echo "LCD monitor, nothing else to do"
  sed -i 's,crt_switch_resolution =.*,crt_switch_resolution = "0",g' /etc/retroarch.cfg
- sed -i '24s,monitor.*,monitor lcd,g' /etc/switchres.ini
- sed -i '41s,lcd_range.*,lcd_range 50-61,g' /etc/switchres.ini
  sed -i 's,video_scale_integer =.*,video_scale_integer = "true",g' /etc/retroarch.cfg
+ sed -i '24s,monitor.*,monitor                   lcd,g' /etc/switchres.ini
+ sed -i '41s,lcd_range.*,lcd_range                 50-61,g' /etc/switchres.ini
+ sed -i 's,dotclock_min.*,dotclock_min              0,g' /etc/switchres.ini
+ sed -i '79s,keepaspect.*,keepaspect                1,g' /home/arcade/.mame/mame.ini
+ sed -i '280s,aspect.*,aspect                    auto,g' /home/arcade/.mame/mame.ini
  sed -i 's,GRUB_CMDLINE_LINUX_DEFAULT=.*,GRUB_CMDLINE_LINUX_DEFAULT="",g' /etc/default/grub
  update-grub
  exit
@@ -42,8 +45,9 @@ fi
 
 #CRT monitor
 sed -i 's,crt_switch_resolution =.*,crt_switch_resolution = "4",g' /etc/retroarch.cfg
-sed -i '24s,monitor.*,monitor generic_15,g' /etc/switchres.ini
 sed -i 's,video_scale_integer =.*,video_scale_integer = "false",g' /etc/retroarch.cfg
+sed -i '24s,monitor.*,monitor                   generic_15,g' /etc/switchres.ini
+sed -i '41s,lcd_range.*,lcd_range                 auto,g' /etc/switchres.ini
 
 CHOICE2=$(whiptail --title "RetroDebian Configurator" \
                    --menu "Select your graphics card:" 15 60 6 \
@@ -52,7 +56,9 @@ CHOICE2=$(whiptail --title "RetroDebian Configurator" \
 
 if [ $CHOICE2 -eq 1 ]; then #ati card
  sed -i 's,crt_switch_resolution_super.*,crt_switch_resolution_super = "0",g' /etc/retroarch.cfg
- sed -i 's,dotclock_min.*,dotclock_min 8.0,g' /etc/switchres.ini
+ sed -i 's,dotclock_min.*,dotclock_min              8.0,g' /etc/switchres.ini
+ sed -i '79s,keepaspect.*,keepaspect                1,g' /home/arcade/.mame/mame.ini
+ sed -i '280s,aspect.*,aspect                    auto,g' /home/arcade/.mame/mame.ini
 
  CHOICE3=$(whiptail --title "RetroDebian Configurator" \
                     --menu "Select system resolution:" 15 60 6 \
@@ -73,7 +79,9 @@ fi
 if [ $CHOICE2 -eq 2 ]; then #non ati card
  echo "super resolution"
  sed -i 's,crt_switch_resolution_super.*,crt_switch_resolution_super = "1920",g' /etc/retroarch.cfg
- sed -i 's,dotclock_min.*,dotclock_min 25.0,g' /etc/switchres.ini
+ sed -i 's,dotclock_min.*,dotclock_min              25.0,g' /etc/switchres.ini
+ sed -i '79s,keepaspect.*,keepaspect                0,g' /home/arcade/.mame/mame.ini
+ sed -i '280s,aspect.*,aspect                    4:3,g' /home/arcade/.mame/mame.ini
  sed -i 's,GRUB_CMDLINE_LINUX_DEFAULT=.*,GRUB_CMDLINE_LINUX_DEFAULT="video=1280x480iS",g' /etc/default/grub
  update-grub
 fi
